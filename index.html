@@ -1,0 +1,270 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Knapp Family</title><style>
+:root{--ryan:#4a7bd0;--jess:#c45a8a;--west:#2f9e6e;--jack:#e08a2c;--june:#8a63c9;--bg:#f6f4ef;--card:#fff;--ink:#2b2b2b;--mute:#888}
+*{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,sans-serif;background:var(--bg);color:var(--ink);font-size:18px}
+header{padding:18px 16px 8px}h1{margin:0;font-size:26px}.sub{color:var(--mute);font-size:15px}
+nav{display:flex;gap:8px;overflow-x:auto;padding:8px 16px;position:sticky;top:0;background:var(--bg);z-index:5}
+nav button{flex:none;border:0;border-radius:22px;padding:10px 16px;font-size:16px;background:#e8e4dc;cursor:pointer}
+nav button.on{background:var(--ink);color:#fff}
+main{padding:8px 16px 40px;display:grid;gap:14px;grid-template-columns:1fr}@media(min-width:900px){section:first-child{grid-column:span 3}}
+@media(min-width:900px){main{grid-template-columns:repeat(3,1fr)}nav{display:none}section{display:block!important}.wide{grid-column:span 3}}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border-radius:18px;padding:14px;margin-bottom:12px;border-left:8px solid var(--c,#ccc);box-shadow:0 1px 3px #0001}
+h2{font-size:20px;margin:6px 0 10px}h3{margin:0 0 8px;font-size:19px;display:flex;justify-content:space-between;align-items:center}
+.tag{font-size:12px;background:#fff3c4;color:#7a5d00;padding:3px 8px;border-radius:10px;font-weight:600}
+.row{display:flex;gap:10px;align-items:center;padding:10px 4px;border-top:1px solid #eee}.row:first-of-type{border-top:0}
+.t{font-weight:700;min-width:54px;color:var(--c)}
+.chk{display:flex;align-items:center;gap:12px;padding:12px 6px;border-radius:12px;cursor:pointer;user-select:none;font-size:18px}
+.chk .box{width:32px;height:32px;border-radius:10px;border:3px solid var(--c);flex:none;display:grid;place-items:center;font-size:20px;color:#fff}
+.chk.done .box{background:var(--c)}.chk.done .lbl{text-decoration:line-through;color:var(--mute)}
+.bar{height:12px;background:#eee;border-radius:8px;overflow:hidden;margin:4px 0 6px}.bar i{display:block;height:100%;background:var(--c);transition:width .4s}
+.grp{font-size:14px;color:var(--mute);margin:10px 0 2px;font-weight:700;text-transform:uppercase}
+.add{display:flex;gap:8px;margin-bottom:8px}.add input{flex:1;font-size:18px;padding:12px;border-radius:12px;border:2px solid #ddd}
+.add button,.x{border:0;background:var(--ink);color:#fff;border-radius:12px;padding:0 16px;font-size:22px;cursor:pointer}
+.x{background:none;color:#bbb;margin-left:auto;font-size:20px}
+.date{font-weight:700;min-width:84px;font-size:15px}
+#party{position:fixed;inset:0;pointer-events:none;display:grid;place-items:center;font-size:90px;opacity:0;transition:opacity .3s}
+#party.go{opacity:1;animation:pop .9s}@keyframes pop{0%{transform:scale(.3)}50%{transform:scale(1.2)}100%{transform:scale(1)}}
+.legend{display:flex;gap:10px;flex-wrap:wrap;font-size:14px;margin-top:6px}.legend span:before{content:"";display:inline-block;width:12px;height:12px;border-radius:6px;background:var(--c);margin-right:4px;vertical-align:-1px}
+#top{display:grid;gap:12px;padding:0 16px 8px;grid-template-columns:1fr}
+@media(min-width:900px){#top{grid-template-columns:330px 1fr}}
+.clock{background:#fff;border-radius:22px;padding:14px;display:flex;gap:16px;align-items:center;box-shadow:0 1px 3px #0001}
+.clock svg{width:110px;height:110px;flex:none}.dig{font-size:58px;font-weight:800;letter-spacing:1px;line-height:1}.dname{font-size:18px;color:var(--mute);margin-top:4px}
+.nexts{display:grid;gap:10px;align-content:start;align-items:start;grid-template-columns:1fr}@media(min-width:600px){.nexts{grid-template-columns:repeat(3,1fr)}}
+.nx{border-radius:20px;padding:14px;color:#fff;background:var(--c);transition:background .5s}.nx.amber{background:#ffd23f;color:#3a2a00;outline:4px solid #e0a800}.nx.red{background:#d64040;animation:pulse 1.6s infinite}
+@keyframes pulse{50%{opacity:.82}}.nx .who{font-size:16px;opacity:.9}.nx .big{font-size:24px;font-weight:800;margin:4px 0}.nx .then{font-size:15px;opacity:.9}
+.tl{position:relative;height:46px;margin:6px 0 4px;background:#f1eee8;border-radius:12px}.tl .ev{position:absolute;top:6px;transform:translateX(-50%);font-size:22px}
+.tl .now{position:absolute;top:-4px;bottom:-4px;width:4px;background:#d64040;border-radius:2px}.tl .past{position:absolute;left:0;top:0;bottom:0;background:#0000000d;border-radius:12px 0 0 12px}
+.hrs{display:flex;justify-content:space-between;font-size:12px;color:var(--mute)}
+.dl{font-size:14px;margin:2px 0 4px;padding:4px 10px;border-radius:10px;display:inline-block;background:#eef6f1;color:#246}.dl.amber{background:#fff0c9;color:#7a5200}.dl.red{background:#fde0e0;color:#a02020}.dl.ok{background:#e4f6ea;color:#1b6b3a}
+.pe{display:flex;gap:8px;align-items:center;padding:6px 0;border-top:1px solid #eee}.pe input[type=time]{font-size:17px;padding:6px;border-radius:10px;border:2px solid #ddd}.pe input[type=text]{flex:1;min-width:0;font-size:17px;padding:6px;border-radius:10px;border:2px solid #ddd}
+.pe .w{font-size:12px;color:var(--mute);width:70px}.seg{display:flex;gap:6px;margin-bottom:8px}.seg button{border:0;border-radius:18px;padding:8px 14px;font-size:15px;background:#e8e4dc;cursor:pointer}.seg button.on{background:var(--ink);color:#fff}
+.tag.real{background:#dff3e6;color:#1b6b3a}.wx{background:#fff;border-radius:22px;padding:12px 16px;margin-top:10px;box-shadow:0 1px 3px #0001;display:flex;gap:12px;align-items:center}
+.wx .ic{font-size:44px}.wx .tp{font-size:28px;font-weight:800}.wx .tip{font-size:17px;font-weight:600}.wtip{font-size:15px;margin:2px 0;font-weight:600}.nx .wt{margin-top:6px;background:#ffffff33;border-radius:10px;padding:4px 8px;font-size:15px;display:inline-block}
+.chk.med{background:#fff4e0;border:3px solid var(--c);font-weight:800;font-size:21px;margin:4px 0}.chk.med .lbl:after{content:' · every day';font-weight:400;font-size:14px;color:var(--mute)}
+.nx .huge{font-size:72px;font-weight:900;line-height:1;margin:6px 0;font-variant-numeric:tabular-nums}.nx.amber .ring{background:#0001}
+.ring{height:16px;background:#ffffff40;border-radius:10px;overflow:hidden;margin:8px 0}.ring i{display:block;height:100%;background:#fff;border-radius:10px;transition:width 1s linear}.nx.amber .ring i{background:#3a2a00}
+.pace{font-size:17px;font-weight:700;margin:4px 0 10px}.punch{width:100%;border:0;border-radius:16px;padding:16px;font-size:22px;font-weight:800;background:#fff;color:#1b6b3a;cursor:pointer;box-shadow:0 3px 0 #0002}
+.punch:disabled{background:#ffffff55;color:inherit;opacity:.85;cursor:default;font-size:18px;box-shadow:none}.undo{background:none;border:0;color:inherit;opacity:.7;text-decoration:underline;font-size:13px;cursor:pointer;padding:4px 0}
+.streak{font-size:20px;letter-spacing:3px;margin:6px 0}.nx.doneP{background:linear-gradient(135deg,var(--c),#2fb36e)}.mclosed{padding:14px;border-radius:14px;background:#e4f6ea;color:#1b6b3a;font-weight:700;margin:6px 0}
+html,body{height:100%;overflow:hidden}#pager{display:flex;height:100%;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;scrollbar-width:none;overscroll-behavior-x:contain}#pager::-webkit-scrollbar{display:none}
+.page{flex:0 0 100%;height:100%;overflow-y:auto;scroll-snap-align:start;scroll-snap-stop:always;padding-bottom:90px}
+.kp{background:color-mix(in srgb,var(--c) 14%,var(--bg));padding:16px 16px 100px;max-width:100%}.kp>*{max-width:640px;margin-left:auto;margin-right:auto}
+.kh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:10px}.kname{font-size:30px;font-weight:900;color:var(--c)}
+.kp .nx .huge{font-size:96px}.kl{margin-top:14px}.kl .chk{padding:16px 8px;font-size:22px}.kl .chk .box{width:44px;height:44px;font-size:26px}.kl h3{flex-wrap:wrap}
+.cc{cursor:pointer;padding:12px}.cc .cbig{font-size:40px;font-weight:900;font-variant-numeric:tabular-nums;line-height:1.1}.cc .csub{font-size:15px;opacity:.9}.cc .ring{height:10px;margin:8px 0 4px}
+.nexts{grid-template-columns:repeat(3,1fr)!important}
+#dots{position:fixed;left:0;right:0;bottom:0;display:flex;justify-content:center;gap:6px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:#f6f4efee;backdrop-filter:blur(6px);border-top:1px solid #0001;z-index:20}
+#dots button{border:0;background:none;cursor:pointer}.dot{display:flex;flex-direction:column;align-items:center;font-size:24px;padding:4px 10px;border-radius:14px;opacity:.55}.dot small{font-size:12px;font-weight:700;color:var(--c)}
+.dot.on{opacity:1;background:#fff;box-shadow:0 0 0 3px var(--c)}.arr{font-size:34px;padding:0 10px;color:#555}.arr:disabled{opacity:.2}
+#top>*,.nexts>*,main>*{min-width:0}.page{min-width:0;overflow-x:hidden}.cc .csub{overflow-wrap:anywhere}
+@media(max-width:600px){.nexts{gap:6px}.cc{padding:10px 8px;border-radius:16px}.cc .cbig{font-size:28px}.cc .who{font-size:14px}.cc .csub{font-size:13px}}
+.punch.pk{background:var(--c);color:#fff;margin-top:12px;box-shadow:0 4px 0 #0003}.punch.pk.wait{background:color-mix(in srgb,var(--c) 70%,#fff);font-size:19px}
+.punch.pdone{background:#1f9d55;color:#fff;margin-top:12px;display:flex;flex-direction:column;align-items:center;box-shadow:0 4px 0 #0003}.punch.pdone small{font-size:15px;font-weight:600;opacity:.95}
+.punch.sm{padding:8px 4px;font-size:14px;border-radius:12px;margin-top:8px;box-shadow:0 2px 0 #0002;border:2px solid #fff8}.punch.sm small{font-size:12px}.cc .punch.pk{background:#fff;color:var(--c)}.cc .punch.pk.wait{background:#ffffff55;color:#fff}
+.mwin{font-size:18px;font-weight:800;padding:10px 14px;border-radius:14px;background:#fff;color:var(--c);margin-bottom:10px;text-align:center}
+.divider{text-align:center;font-weight:800;color:var(--mute);margin:18px 0 8px;font-size:15px}.unlock{background:#1f9d55;color:#fff;font-size:22px;font-weight:900;border-radius:14px;padding:14px;text-align:center;margin:6px 0}
+.parent{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:14px;padding-top:10px;border-top:1px dashed #ddd;font-size:13px;color:var(--mute)}.parent button{border:1px solid #ddd;background:#fff;border-radius:14px;padding:6px 10px;font-size:13px;cursor:pointer}.parent button.on{background:#ffe9a8;border-color:#e0b400}
+.set label{display:block;font-size:14px;font-weight:700;color:var(--mute);margin:10px 0 4px}.set textarea,.set input[type=time],.set input[type=url],.set input[type=number]{width:100%;font-size:16px;padding:8px;border-radius:10px;border:2px solid #ddd;font-family:inherit}.set .tg{display:flex;gap:8px;align-items:center;color:var(--ink)}.sbtn{margin-top:10px;border:0;border-radius:12px;padding:10px 14px;background:#e8e4dc;font-size:15px;cursor:pointer}
+.chk.must .lbl:after{content:' · must-do Friday'}.fri{background:#ffe08a;color:#5a3d00;border-radius:10px;padding:1px 8px;font-weight:700}
+</style></head><body>
+<div id="pager"><div class="page" id="p0"><header><h1>🏡 Knapp Family</h1><div class="sub" id="today"></div>
+<div class="legend"><span style="--c:var(--ryan)">Ryan</span><span style="--c:var(--jess)">Jess</span><span style="--c:var(--west)">West</span><span style="--c:var(--jack)">Jack</span><span style="--c:var(--june)">June</span></div></header>
+<div id="top"><div><div class="clock" id="clock"></div><div class="wx" id="wx"></div></div><div class="nexts" id="nexts"></div></div>
+<nav id="nav"></nav><main id="main"></main></div><div class="page kp" id="kp-West" style="--c:var(--west)"></div><div class="page kp" id="kp-Jack" style="--c:var(--jack)"></div><div class="page kp" id="kp-June" style="--c:var(--june)"></div></div><div id="dots"></div><div id="party">🎉</div>
+<script>
+const P={Ryan:{c:'--ryan',e:'🧔'},Jess:{c:'--jess',e:'👩'},West:{c:'--west',e:'🧒',d:'10 · Realschule'},Jack:{c:'--jack',e:'👦',d:'8 · 3b Südschule'},June:{c:'--june',e:'👧',d:'5 · Montessori'}};
+const S=JSON.parse(localStorage.getItem('knapp')||'{}');const save=()=>localStorage.setItem('knapp',JSON.stringify(S));
+const col=n=>`--c:var(${P[n].c})`;
+const today={Ryan:[['07:00','🍳','Breakfast + school run'],['09:00','💻','Work'],['16:00','🚗','Pick up Jack (OGT)']],
+Jess:[['07:10','🎒','June to Kinderhaus'],['12:30','🛒','Groceries'],['18:30','🍝','Dinner']],
+West:[['06:30','⏰','Wake up ✔'],['07:10','🚶','Walk to Realschule ✔'],['13:30','🍽️','Lunch at home'],['15:00','📚','Homework']],
+Jack:[['06:30','⏰','Wake up ✔'],['07:10','🚶','Walk to Südschule ✔'],['11:30','🍽️','OGT lunch'],['16:00','🚗','OGT pickup']],
+June:[['06:30','⏰','Wake up ✔'],['07:10','🚪','Out the door to Kinderhaus ✔'],['09:30','🥨','Own Brotzeit'],['12:30','🏠','Pickup']]};
+const R={West:{'🌅 Morning':['👕 Get dressed','🪥 Brush teeth','🍱 Grab Brotbox','🌦️ Check the weather & dress for it'],'🏠 After school':['🍎 Snack','📚 Homework','🍽️ Empty dishwasher'],'🌙 Evening':['🎒 Bag ready for tomorrow','🗑️ Take out trash','🦷 Brush teeth','📖 Read 20 min']},
+Jack:{'🌅 Morning':['💊 Take medication','👕 Get dressed','🪥 Brush teeth','🍱 Grab Brotbox','🌦️ Check the weather & dress for it'],'🏠 After school':['👟 Shoes away','📚 Homework','🧺 Laundry to basket'],'🌙 Evening':['🍴 Set the table','🧸 Tidy room 5 min','🦷 Brush teeth']},
+June:{'🌅 Morning':['👕 Get dressed','🪥 Brush teeth','🍱 Grab Brotbox','🌦️ Check the weather & dress for it'],'🏠 After Kinderhaus':['🥾 Slippers + boots away','🧸 Toys in box'],'🌙 Evening':['🥄 Napkins on table','🛁 Bath','🦷 Brush teeth']}};
+const HW={West:['➗ Math p. 34 #1–5','🇬🇧 English vocab unit 2','🇩🇪 Deutsch: read chapter 3'],Jack:['✏️ Spelling words','➕ Math worksheet'],June:['🍂 Bring a leaf for nature table']};
+const APPT=[['Thu Oct 22','08:30','June','👓','Eye test'],['Tue Oct 27','','Jess','🦷','Dental cleaning'],['Mon Nov 9','13:15','West','🩺','Dr. Ferrari'],['Wed Nov 11','15:30','Jack','🩺','U10 check-up, Dr. Ferrari'],['Wed Nov 18','09:00','June','🧩','Frühförderung, Frau Stelzer'],['Wed Nov 18','19:00','West','🦷','Kids\' dentist (all 3)']];
+if(!S.gro)S.gro=[{t:'🥛 Milk'},{t:'🍞 Bread'},{t:'🍎 Apples'},{t:'🥨 Brezen for Brotzeit'}];
+const sections=[['plan','🧭 Day plan'],['today','📅 Today'],['routines','✅ Routines'],['hw','📚 Homework'],['gro','🛒 Groceries'],['week','🗓️ Coming up'],['act','⚽ Activities'],['activity','🔔 Activity'],['settings','⚙️ Settings']];
+let cur=localStorage.getItem('tab')||'plan';
+document.getElementById('today').textContent=new Date().toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})+' · Bad Tölz';
+function check(key,label,n){const d=S[key];return `<div class="chk ${d?'done':''} ${/💊/.test(label)?'med':/📝/.test(label)?'med must':''}" style="${col(n)}" onclick="tog('${key}')"><div class="box">${d?'✓':''}</div><div class="lbl">${label}</div></div>`}
+function bar(n,keys){const done=keys.filter(k=>S[k]).length;return `<div class="bar" style="${col(n)}"><i style="width:${keys.length?done/keys.length*100:0}%"></i></div><div class="sub">${done} / ${keys.length} done ${done===keys.length&&keys.length?'⭐':''}</div>`}
+function tog(k){S[k]=!S[k];save();if(S[k])party();render()}
+function party(){const p=document.getElementById('party');p.textContent=['🎉','⭐','🙌','🚀','🌟'][Math.random()*5|0];p.classList.remove('go');void p.offsetWidth;p.classList.add('go');setTimeout(()=>p.classList.remove('go'),900)}
+function render(){
+document.getElementById('nav').innerHTML=sections.map(([id,l])=>`<button class="${id===cur?'on':''}" onclick="cur='${id}';localStorage.setItem('tab',cur);render()">${l}</button>`).join('');
+const h={};h.plan=planHTML();h.activity=activityHTML();h.settings=settingsHTML();aftCheck();
+h.today=`<h2>📅 Today <span class="tag">SAMPLE DATA</span> <span class="tag real">✔ = REAL</span></h2>`+Object.keys(today).map(n=>`<div class="card" style="${col(n)}"><h3>${P[n].e} ${n}</h3>${today[n].map(([t,e,l])=>`<div class="row"><span class="t">${t}</span>${e} ${l}</div>`).join('')}</div>`).join('');
+h.routines=`<h2>✅ Kids' routines</h2>`+Object.keys(R).map(n=>{const keys=[];const body=Object.entries(R[n]).map(([g,items])=>`<div class="grp">${g} ${/Morning/.test(g)?'<span class="tag real">✔ REAL ROUTINE</span>':''}</div>${/Morning/.test(g)?'<div class="wtip"></div>':''}<div class="dl" data-k="${n}|${g}"></div>`+((/Morning/.test(g)&&punched(n))?(items.forEach((it,i)=>keys.push(`r_${n}_${g}_${i}`)),`<div class="mclosed">${pmsg(punched(n))}</div>`):items.map((it,i)=>{const k=`r_${n}_${g}_${i}`;keys.push(k);return check(k,it,n)}).join(''))).join('');return `<div class="card" style="${col(n)}"><h3>${P[n].e} ${n} <span class="sub">${P[n].d}</span></h3>${bar(n,keys)}${body}</div>`}).join('');
+h.hw=`<h2>📚 Homework <span class="tag">SAMPLE DATA</span></h2>`+Object.keys(HW).map(n=>{const keys=HW[n].map((_,i)=>`h_${n}_${i}`);return `<div class="card" style="${col(n)}"><h3>${P[n].e} ${n}</h3>${bar(n,keys)}${HW[n].map((x,i)=>check(keys[i],x,n)).join('')}</div>`}).join('');
+h.gro=`<h2>🛒 Groceries</h2><div class="card" style="--c:#999"><div class="add"><input id="gi" placeholder="Add item…" onkeydown="if(event.key==='Enter')addG()"><button onclick="addG()">＋</button></div>${S.gro.map((g,i)=>`<div class="chk ${g.d?'done':''}" style="--c:#2f9e6e" onclick="S.gro[${i}].d=!S.gro[${i}].d;save();render()"><div class="box">${g.d?'✓':''}</div><div class="lbl">${g.t}</div><button class="x" onclick="event.stopPropagation();S.gro.splice(${i},1);save();render()">✕</button></div>`).join('')}</div>`;
+h.week=`<h2>🗓️ Coming up</h2><div class="card" style="--c:#999">${APPT.map(([d,t,n,e,l])=>`<div class="row" style="${col(n)}"><span class="date">${d}<br><span class="t">${t||'—'}</span></span><span>${e} <b style="color:var(${P[n].c})">${n==='West'&&l.includes('Kids')?'Kids':n}</b><br>${l}</span></div>`).join('')}</div>`;
+h.act=`<h2>⚽ Activities <span class="tag">COMING SOON</span></h2>`+['West','Jack','June'].map(n=>`<div class="card" style="${col(n)}"><h3>${P[n].e} ${n}</h3><div class="sub">What does ${n} want to try? ⚽ 🏊 🥋 🎵 🎨 ⛷️</div></div>`).join('');
+document.getElementById('main').innerHTML=sections.map(([id])=>`<section class="${id===cur?'on':''}">${h[id]}</section>`).join('');kidPages();aftPages();tick();}
+function addG(){const v=document.getElementById('gi').value.trim();if(v){S.gro.push({t:v});save();render();document.getElementById('gi').focus()}}
+
+const Q=new URLSearchParams(location.search);const T0=Date.now();
+function nowD(){const d=new Date();if(Q.get('at')){const[h,m]=Q.get('at').split(':');d.setHours(+h,+m,0);d.setTime(d.getTime()+(Date.now()-T0))}return d}
+const mins=d=>d.getHours()*60+d.getMinutes()+d.getSeconds()/60;const tm=t=>{const[h,m]=t.split(':');return h*60+ +m};
+const dayType=()=>Q.get('day')||([0,6].includes(nowD().getDay())?'weekend':nowD().getDay()===5?'friday':'weekday');const isFri=()=>dayType()==='friday';
+const KIDS='West,Jack,June',ALL='Ryan,Jess,West,Jack,June';
+const DEF={weekday:[['06:30','⏰','Wake up','West,Jack,June'],['06:45','⏰','Wake up','Ryan,Jess'],['07:00','🥣','Breakfast','Ryan,Jess'],['07:10','🚪','Out the door to Kinderhaus','June','out'],['07:10','🚶','Walk to school','West','out'],['07:10','🚶','Walk to school','Jack','out'],['12:30','🍽️','Lunch',ALL],['15:30','🍎','Snack',KIDS],['16:00','📚','Homework','West,Jack','hw'],['17:00','📺','Screen time',KIDS],['18:30','🍝','Dinner',ALL],['19:00','🛁','Bath','June'],['19:30','😴','Bedtime','June','bed'],['20:00','😴','Bedtime','Jack','bed'],['20:30','😴','Bedtime','West','bed']],
+weekend:[['07:30','⏰','Wake up',ALL],['08:00','🥞','Breakfast',ALL,'out'],['12:30','🍽️','Lunch',ALL],['15:30','🍎','Snack',KIDS,'hw'],['16:00','📺','Screen time',KIDS],['18:30','🍝','Dinner',ALL],['19:00','🛁','Bath','June'],['19:30','😴','Bedtime','June','bed'],['20:00','😴','Bedtime','Jack','bed'],['20:30','😴','Bedtime','West','bed']]};
+if(!S.plan)S.plan=JSON.parse(JSON.stringify(DEF));if(!S.plan.friday){S.plan.friday=JSON.parse(JSON.stringify(S.plan.weekday||DEF.weekday));S.plan.friday.push(['13:00','🏠','Home from school (set real time)','West']);save()}if(S.planV!==3){S.plan.weekday=JSON.parse(JSON.stringify(DEF.weekday));S.planV=3;save()}
+const evs=(n,dt=dayType())=>S.plan[dt].filter(e=>e[3].split(',').includes(n)).sort((a,b)=>tm(a[0])-tm(b[0]));
+const fmt=m=>{m=Math.round(m);return m>=60?`${Math.floor(m/60)} h ${m%60} min`:`${m} min`};
+function anchor(n,kind){const e=evs(n).find(e=>e[4]===kind)||(kind==='hw'?evs(n).find(e=>/Dinner/.test(e[2])):null);return e}
+const GK=g=>/Morning/.test(g)?'out':/After/.test(g)?'hw':'bed';
+function clock(){const d=nowD(),h=d.getHours(),m=d.getMinutes(),sec=d.getSeconds();const hand=(a,l,w,c)=>`<line x1="50" y1="50" x2="${50+l*Math.sin(a)}" y2="${50-l*Math.cos(a)}" stroke="${c}" stroke-width="${w}" stroke-linecap="round"/>`;
+let ticks='';for(let i=0;i<12;i++){const a=i*Math.PI/6;ticks+=`<line x1="${50+40*Math.sin(a)}" y1="${50-40*Math.cos(a)}" x2="${50+45*Math.sin(a)}" y2="${50-45*Math.cos(a)}" stroke="#bbb" stroke-width="${i%3?2:4}"/>`}
+document.getElementById('clock').innerHTML=`<svg viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#fbfaf7" stroke="#2b2b2b" stroke-width="3"/>${ticks}${hand((h%12+m/60)*Math.PI/6,26,6,'#2b2b2b')}${hand((m+sec/60)*Math.PI/30,38,4,'#2b2b2b')}${hand(sec*Math.PI/30,40,1.5,'#d64040')}<circle cx="50" cy="50" r="3.5" fill="#2b2b2b"/></svg><div><div class="dig">${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}</div><div class="dname">${d.toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'short'})}<br>${isFri()?'<span class="fri">🎉 Friday plan</span>':dayType()==='weekend'?'🌤️ Weekend plan':'🏫 School day plan'}</div></div>`}
+
+const dkey=d=>d.toLocaleDateString('sv');if(!S.punch)S.punch={};
+const mkName=n=>Object.keys(R[n]).find(g=>/Morning/.test(g));const mKeys=n=>R[n][mkName(n)].map((_,i)=>`r_${n}_${mkName(n)}_${i}`);
+const hm=m=>`${String(Math.floor(m/60)).padStart(2,'0')}:${String(Math.floor(m%60)).padStart(2,'0')}`;
+function punched(n){return (S.punch[n]||{})[dkey(nowD())]}
+function doPunch(n){notify('morning_punch_out',n);const out=anchor(n,'out');const m=mins(nowD());(S.punch[n]=S.punch[n]||{})[dkey(nowD())]={t:hm(m),d:Math.round(m-tm(out[0]))};
+const ks=Object.keys(S.punch[n]).sort().slice(-7);S.punch[n]=Object.fromEntries(ks.map(k=>[k,S.punch[n][k]]));save();party();setTimeout(party,500);setTimeout(party,1000);render()}
+function undoPunch(n){if(confirm('Parent undo: reopen '+n+"'s morning?")){delete S.punch[n][dkey(nowD())];save();render()}}
+function streak(n){const d=nowD();let o='';for(let i=6;i>=0;i--){const x=new Date(d);x.setDate(d.getDate()-i);const p=(S.punch[n]||{})[dkey(x)];o+=p?(p.d<=0?'⭐':'🟠'):([0,6].includes(x.getDay())?'·':'▫️')}return o}
+const pmsg=p=>`✅ Punched out at ${p.t} – ${p.d<0?-p.d+' min early 🎉':p.d===0?'right on time 🎉':p.d+' min late'}`;
+function morningCard(n,n0){if(dayType()==='weekend')return null;const out=anchor(n,'out');if(!out)return null;const o=tm(out[0]),w=evs(n).find(e=>/Wake/.test(e[2]));const ws=w?tm(w[0]):o-40;
+const p=punched(n);if(p){return {cls:'doneP',html:`<div class="big">${pmsg(p)}</div><div class="streak" title="last 7 days">${streak(n)}</div><button class="undo" onclick="undoPunch('${n}')">parent: undo</button>`}}
+if(n0<360||n0>o+120)return null;const ks=mKeys(n),L=ks.filter(k=>!S[k]).length,T=o-n0;
+const cls=T<0?'red':T<10?'amber':'';const sec=Math.abs(T*60),mmss=`${T<0?'+':''}${Math.floor(sec/60)}:${String(Math.floor(sec%60)).padStart(2,'0')}`;
+const pace=L===0?'🙌 All done – punch out! 👇':T<=0?`🚨 Late! ${L} task${L>1?'s':''} left – go go go`:(T/L>=3?`${L} task${L>1?'s':''} left – about ${Math.floor(T/L)} min each, you're on track 👍`:`⚡ Hurry: ${L} task${L>1?'s':''}, ${Math.ceil(T)} min`);
+const pct=Math.max(0,Math.min(100,(o-n0)/(o-ws)*100));
+return {cls,html:`<div class="huge">${mmss}</div><div class="big">${T<0?`${Math.max(1,Math.floor(-T))} min late for ${out[2].toLowerCase()}!`:`${Math.ceil(T)} min until ${out[2].toLowerCase()}!`}</div><div class="ring"><i style="width:${pct}%"></i></div><div class="pace">${pace}</div>`}}
+function bigCard(n){const n0=mins(nowD());const L=evs(n);const out=L.find(e=>e[4]==='out');
+const mk=Object.keys(R[n]).find(g=>/Morning/.test(g));const mDone=R[n][mk].every((_,i)=>S[`r_${n}_${mk}_${i}`]);
+const MC=morningCard(n,n0);if(MC)return `<div class="nx ${MC.cls}" style="${col(n)}"><div class="who">${P[n].e} ${n} · 🌅 Morning</div>${MC.html}${MC.cls==='doneP'?'':(n0<tm(anchor(n,'out')[0])?`<div class="wt">${wTip(walk())}</div>`:'')}</div>`;
+let cls='',big,then;if(out&&dayType()!=='weekend'&&n0>tm(out[0])&&n0<tm(out[0])+20&&!mDone){cls='red';big=`🚨 Late! ${out[2]} was ${out[0]}`;then=`Finish the morning list fast`}
+else{const i=L.findIndex(e=>tm(e[0])>n0);if(i<0){big='🌙 Sleep tight';then='See you tomorrow'}else{const e=L[i],left=tm(e[0])-n0;if(left<10)cls='amber';big=`${e[1]} ${e[2]} in ${fmt(left)}`;then=L[i+1]?`Then: ${L[i+1][1]} ${L[i+1][2]} at ${L[i+1][0]}`:`at ${e[0]}`;then=`⏰ ${e[0]} · `+then}}
+const wt=dayType()!=='weekend'&&out&&n0<tm(out[0])+20?`<div class="wt">${wTip(walk())}</div>`:'';return `<div class="nx ${cls}" style="${col(n)}"><div class="who">${P[n].e} ${n} · Next up</div><div class="big">${big}</div><div class="then">${then}</div>${wt}</div>`}
+const KIDL=['West','Jack','June'];
+/* ===== Afternoon module ===== */
+const CFG_DEF={landMin:20,hook:'',hookOn:false,kids:{
+West:{home:'16:00',L:['🍎 Snack','🎒 Unpack backpack','🍱 Give lunchbox to Dad','🪝 Put backpack away','📚 Homework done? (finished at OGT)'],SC:['🗣️📖 Reading 15 min – out loud','🧺 Laundry to basket','🍽️ Empty dishwasher']},
+Jack:{home:'16:00',L:['🍎 Snack','🎒 Unpack backpack','🍱 Give lunchbox to Dad','🪝 Put backpack away','📚 Homework done? (finished at OGT)'],SC:['🗣️📖 Reading 15 min – out loud','👟 Line up shoes','🍴 Set the table']},
+June:{home:'16:00',L:['🍎 Snack','🍱 Unpack Brotbox','🥾 Shoes away'],SC:[]}}};
+if(!S.cfg)S.cfg=JSON.parse(JSON.stringify(CFG_DEF));if(S.Rm)for(const n in S.Rm)R[n][mkName(n)]=S.Rm[n];
+for(const n of KIDL)for(const g of Object.keys(R[n]))if(/After/.test(g))delete R[n][g];
+if(!S.day)S.day={};if(!S.log)S.log=[];
+const today_=()=>dkey(nowD());const DS=n=>{const d=today_();S.day[d]=S.day[d]||{};return S.day[d][n]=S.day[d][n]||{}};
+function dailyReset(){if(S.td!==today_()){for(const k in S)if(/^r_/.test(k))delete S[k];const ks=Object.keys(S.day).sort().slice(-8);S.day=Object.fromEntries(ks.map(k=>[k,S.day[k]]));S.td=today_();save();return true}}
+dailyReset();
+const KC=n=>S.cfg.kids[n];if(!S.cfg.kids.West.homeFri){S.cfg.kids.West.homeFri='13:00';S.cfg.kids.Jack.homeFri='16:00';save()}if(S.cfg.v!==2){S.cfg.kids.June.home='16:00';S.cfg.v=2;save()}const actOn=n=>dayType()==='weekend'||mins(nowD())>=homeT(n);const homeS=n=>isFri()&&KC(n).homeFri?KC(n).homeFri:KC(n).home;const homeT=n=>tm(homeS(n));
+const aKey=(n,t,i)=>`a_${today_()}_${n}_${t}_${i}`;
+const lKeys=n=>KC(n).L.map((_,i)=>aKey(n,'L',i));
+function sList(n){const e=DS(n).easy||0,L=KC(n).SC.map((x,i)=>[x,aKey(n,'S',i)]);const W=isFri()&&n!=='June'&&KC(n).SC.length?[[S.cfg.whw||'📝 Weekend homework',aKey(n,'S','WH')]]:[];if(e===2)return[];if(e===1){const r=L.find(x=>/📖/.test(x[0]));return W.concat(r?[r]:L.slice(0,1))}return W.concat(L)}
+const isReadKey=(n,k)=>sList(n).some(x=>x[1]===k&&/📖/.test(x[0]));
+function notify(ev,n,extra){const t=hm(mins(nowD())),E={morning_punch_out:'✅ punched out (morning)',left_house:'🚪 left the house',punch_in:'🏠 punched in – home',landing_done:'🛬 landing done',screens_unlocked:'🎮 screens unlocked',easy_day:'💛 easy day set'};
+const item={ev,kid:n,time:t,date:today_(),text:`${n?P[n].e+' '+n+' ':''}${E[ev]||ev}${extra?' · '+extra:''}`};S.log.push(item);S.log=S.log.slice(-60);save();
+if(S.cfg.hookOn&&S.cfg.hook){try{fetch(S.cfg.hook,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(item)})}catch(e){}}}
+function leftHouse(){const n0=mins(nowD());KIDL.forEach(n=>{const o=anchor(n,'out'),d=DS(n);if(o&&punched(n)&&!d.left&&n0>=tm(o[0])&&dayType()!=='weekend'){d.left=hm(n0);notify('left_house',n);save()}})}
+function aftPunchIn(n){const d=DS(n),m=mins(nowD());d.in=hm(m);d.inD=Math.round(m-homeT(n));notify('punch_in',n);save();party();render()}
+function aftLand(n){const d=DS(n);d.land=hm(mins(nowD()));notify('landing_done',n);save();party();setTimeout(party,500);render()}
+function aftEasy(n,v){const d=DS(n);d.easy=d.easy===v?0:v;if(d.easy)notify('easy_day',n,d.easy===1?'reading only':'skip today');save();render()}
+function aftCheck(){KIDL.forEach(n=>{const d=DS(n);if(d.land&&!d.screens&&KC(n).SC.length&&sList(n).every(x=>S[x[1]])){d.screens=hm(mins(nowD()));notify('screens_unlocked',n,d.easy===2?'skip day':d.easy===1?'easy day':'');save();setTimeout(party,300)}})}
+function readDone(n){return KC(n).SC.some((x,i)=>/📖/.test(x)&&S[aKey(n,'S',i)])||S[aKey(n,'EV',0)]}
+function aPhase(n){const d=DS(n);if(!d.in)return'wait';if(!d.land)return'land';if(KC(n).SC.length&&!d.screens)return'screens';return'free'}
+const mmss=T=>{const sec=Math.abs(T*60);return `${T<0?'+':''}${Math.floor(sec/60)}:${String(Math.floor(sec%60)).padStart(2,'0')}`};
+const paceTxt=(L,T)=>L===0?'🙌 All done – punch out! 👇':T<=0?`⏰ ${L} task${L>1?'s':''} left – let's finish`:(T/L>=3?`${L} task${L>1?'s':''} left – about ${Math.floor(T/L)} min each, you're on track 👍`:`⚡ Hurry: ${L} task${L>1?'s':''}, ${Math.ceil(T)} min`);
+function aftCard(n){const n0=mins(nowD()),d=DS(n),ph=aPhase(n),wk=dayType()!=='weekend';let cls='',body;
+if(ph==='wait'){const T=homeT(n)-n0;const who=n==='West'?(isFri()?'School out':'Leaving school'):n==='June'?'Leaving Kinderhaus':'Leaving OGT';body=T>0&&wk?`<div class="huge" style="font-size:64px">${T>=60?fmt(T):mmss(T)}</div><div class="big">🏫 ${who} at ${homeS(n)}</div>`:`<div class="big">🚶 On the way home</div><div class="then">Tap Punch In when you get home 👇${wk?` · left ${homeS(n)} (${fmt(-T)} ago)`:''}</div>`}
+else if(ph==='land'){const tgt=tm(d.in)+S.cfg.landMin,T=tgt-n0,L=lKeys(n).filter(k=>!S[k]).length,ws=tm(d.in);cls=T<0?'red':T<5?'amber':'';
+body=`<div class="huge">${mmss(T)}</div><div class="big">🛬 Landing – finish by ${hm(tgt)}</div><div class="ring"><i style="width:${Math.max(0,Math.min(100,T/S.cfg.landMin*100))}%"></i></div><div class="pace">${paceTxt(L,T)}</div>`}
+else if(ph==='screens'){const L=sList(n).filter(x=>!S[x[1]]).length;body=`<div class="big" style="font-size:30px">🎮 Before screens</div><div class="pace">${L} task${L!==1?'s':''} left ${d.easy===1?'· 💛 easy day':''}</div>`}
+else body=`<div class="big" style="font-size:32px">${KC(n).SC.length?'🎮 Screens unlocked!':'🎉 Afternoon done!'}</div><div class="then">${d.screens?'since '+d.screens:''}${d.easy===2?' · 💛 easy day':''}</div>`;
+return `<div class="nx ${cls} ${ph==='free'?'doneP':''}" style="${col(n)}"><div class="who">${P[n].e} ${n} · 🏠 Afternoon</div>${body}</div>`}
+function aftBtn(n,small){const d=DS(n),ph=aPhase(n),sm=small?'sm':'';
+if(ph==='wait')return actOn(n)?`<button class="punch pk ${sm}" style="${col(n)}" onclick="event.stopPropagation();aftPunchIn('${n}')">Punch In 🏠</button>`:`<button class="punch pk wait ${sm}" style="${col(n)}" disabled>⏳ Punch In at ${homeS(n)}</button>`;
+const inB=`<button class="punch pdone ${sm}" onclick="event.stopPropagation()">🏠 Home ${d.in}</button>`;
+if(ph==='land'){const L=lKeys(n).filter(k=>!S[k]).length;return (small?'':inB)+`<button class="punch pk ${sm} ${L?'wait':''}" style="${col(n)}" onclick="event.stopPropagation();${L?`goPage(${KIDL.indexOf(n)+1})`:`aftLand('${n}')`}">${L?(small?`⏳ ${L} left`:`⏳ ${L} landing task${L>1?'s':''} left`):'🛬 Landed! Punch out'}</button>`}
+return (small?'':inB)+`<button class="punch pdone ${sm}" onclick="event.stopPropagation()">✅ Landed ${d.land}</button>`}
+function streakA(n){const t=nowD();let o='';for(let i=6;i>=0;i--){const x=new Date(t);x.setDate(t.getDate()-i);const d=(S.day[dkey(x)]||{})[n]||{};o+=d.easy&&(d.land||d.in)?'💛':d.land?'⭐':d.in?(i===0?'⏳':'🟠'):([0,6].includes(x.getDay())?'·':'▫️')}return o}
+function aftLists(n){const d=DS(n),ph=aPhase(n),n0=mins(nowD());let h=`<div class="card kl" style="${col(n)}"><h3>🏠 Afternoon <span class="streak" title="last 7 days · ⭐ landed · 💛 easy day">${streakA(n)}</span></h3>`;
+if(ph==='wait')h+=`<div class="sub">Punch in first, then the landing list opens 🛬</div>`;
+else{h+=`<div class="grp">🛬 Landing ${d.land?'· ✅ '+d.land:''}</div>`+(d.land?`<div class="mclosed">✅ Landed at ${d.land}</div>`:KC(n).L.map((x,i)=>check(aKey(n,'L',i),x,n)).join(''))}
+if(KC(n).SC.length){const L=sList(n);h+=`<div class="grp">🎮 Before screens ${d.easy===1?'· 💛 easy day (reading only)':d.easy===2?'· 💛 skip today':''}</div>`;
+if(d.screens)h+=`<div class="unlock">🎮 Screens unlocked ${d.screens}</div>`;
+h+=d.easy===2?`<div class="sub">💛 Skipped today – that's OK. Streak stays.</div>`:L.map(([x,k])=>check(k,x,n)).join('');
+if(!readDone(n)&&d.easy!==2&&n0>=1080)h+=`<div class="grp">🌙 Evening</div>`+check(aKey(n,'EV',0),'📖 Evening reading before bed','June'===n?n:n);}
+h+=`<div class="parent"><span>👪 parent:</span><button class="${d.easy===1?'on':''}" onclick="aftEasy('${n}',1)">Easy day 💛</button>${KC(n).SC.length?`<button class="${d.easy===2?'on':''}" onclick="aftEasy('${n}',2)">Skip today</button>`:''}${d.in?`<button onclick="if(confirm('Undo afternoon for ${n}?')){const d=DS('${n}');delete d.in;delete d.land;delete d.screens;save();render()}">undo</button>`:''}</div></div>`;return h}
+function aftPages(){const af=mins(nowD())>=720;KIDL.forEach(n=>{const el=document.getElementById('kp-'+n),html=`<div id="ka-${n}"></div>`+aftLists(n);const kh=el.querySelector('.kh');if(af)kh.insertAdjacentHTML('afterend',html+'<div class="divider">🌅 This morning</div>');else el.insertAdjacentHTML('beforeend','<div class="divider">🏠 Afternoon</div>'+html)})}
+function compactA(n,i){const n0=mins(nowD()),d=DS(n),ph=aPhase(n);let main,pr=0,lab;
+if(ph==='wait'){const T=homeT(n)-n0;main=T>0&&dayType()!=='weekend'?`<div class="cbig">${T>=60?'🏫 '+homeS(n):mmss(T)}</div><div class="csub">${T>=60?'leaving':'until leaving'}</div>`:`<div class="cbig">🚶</div><div class="csub">on the way home${dayType()!=='weekend'?' · '+fmt(-T):''}</div>`;lab=T>0?'leaves '+homeS(n):'🏠 punch in at home';}
+else if(ph==='land'){const ks=lKeys(n),dn=ks.filter(k=>S[k]).length,T=tm(d.in)+S.cfg.landMin-n0;main=`<div class="cbig">${T>=10?Math.ceil(T)+' min':mmss(T)}</div><div class="csub">🛬 landing</div>`;pr=dn/ks.length;lab=`🛬 ${dn}/${ks.length} landing`}
+else if(ph==='screens'){const L=sList(n),dn=L.filter(x=>S[x[1]]).length;main=`<div class="cbig">🎮 ${dn}/${L.length}</div><div class="csub">before screens</div>`;pr=L.length?dn/L.length:1;lab='🎮 tick to unlock'}
+else{main=`<div class="cbig">${KC(n).SC.length?'🎮':'🎉'}</div><div class="csub">${KC(n).SC.length?'screens unlocked':'all done'}</div>`;pr=1;lab='✅ done'}
+const p=punched(n);return `<div class="nx cc ${ph==='free'?'doneP':''}" style="${col(n)}" onclick="goPage(${i+1})"><div class="who">${P[n].e} ${n} ›</div>${main}<div class="ring"><i style="width:${pr*100}%"></i></div><div class="csub">${lab}</div>${aftBtn(n,1)}<div class="csub" style="margin-top:6px">🌅 ${p?'✅ '+p.t:mKeys(n).filter(k=>S[k]).length+'/'+mKeys(n).length}</div></div>`}
+function activityHTML(){const L=S.log.slice().reverse();return `<h2>🔔 Activity <span class="tag">FOR PARENTS</span></h2><div class="card" style="--c:#999">${L.length?L.map(x=>`<div class="row"><span class="t" style="--c:var(${x.kid?P[x.kid].c:'--ryan'})">${x.time}</span><span>${x.text}${x.date!==today_()?` <span class="sub">${x.date}</span>`:''}</span></div>`).join(''):'<div class="sub">No activity yet today.</div>'}</div>`}
+function settingsHTML(){const ta=(v,on)=>`<textarea rows="${Math.max(3,v.length+1)}" onchange="${on}">${v.join('\n')}</textarea>`;
+return `<h2>⚙️ Settings <span class="tag">EDITABLE DEFAULTS</span></h2>`+KIDL.map(n=>`<div class="card set" style="${col(n)}"><h3>${P[n].e} ${n}</h3>
+<label>🌅 Morning checklist (one per line)</label>${ta(R[n][mkName(n)],`setList('${n}','M',this.value)`)}
+<label>🏠 Punch In activates at (leaving ${n==='June'?'Kinderhaus':n==='Jack'?'OGT':'school'})</label><input type="time" value="${homeS(n)}" onchange="S.cfg.kids['${n}'].home=this.value;save();render()">
+${n!=='June'?`<label>🎉 Friday: Punch In activates at ${n==='West'?'<span class="tag">SET REAL TIME</span>':''}</label><input type="time" value="${KC(n).homeFri||KC(n).home}" onchange="S.cfg.kids['${n}'].homeFri=this.value;save();render()">`:''}<label>🛬 Landing checklist</label>${ta(KC(n).L,`setList('${n}','L',this.value)`)}
+${n!=='June'?`<label>🎮 Before screens (keep 📖 on the reading item)</label>${ta(KC(n).SC,`setList('${n}','SC',this.value)`)}`:''}</div>`).join('')+
+`<div class="card set" style="--c:#999"><h3>🔔 Notifications</h3><label>🎉 Friday must-do item (West &amp; Jack)</label><input type="url" value="${S.cfg.whw||'📝 Weekend homework'}" onchange="S.cfg.whw=this.value.trim()||'📝 Weekend homework';save();render()"><label>Landing time allowed (min)</label><input type="number" min="5" max="90" value="${S.cfg.landMin}" onchange="S.cfg.landMin=+this.value||20;save();render()">
+<label>Webhook URL (POST JSON per event)</label><input type="url" placeholder="https://…" value="${S.cfg.hook}" onchange="S.cfg.hook=this.value.trim();save()">
+<label class="tg"><input type="checkbox" ${S.cfg.hookOn?'checked':''} onchange="S.cfg.hookOn=this.checked;save()"> Send events to webhook (off by default)</label>
+<button class="sbtn" onclick="notify('test')">Send test event</button> <button class="sbtn" onclick="if(confirm('Reset all routine lists to defaults?')){S.cfg=JSON.parse(JSON.stringify(CFG_DEF));delete S.Rm;location.reload()}">↺ Reset lists</button></div>`}
+function setList(n,t,v){const L=v.split('\n').map(x=>x.trim()).filter(Boolean);if(t==='M'){R[n][mkName(n)]=L;(S.Rm=S.Rm||{})[n]=L}else S.cfg.kids[n][t]=L;save();render()}
+setInterval(()=>{if(dailyReset())render()},60000);
+
+function compact(n,i){const n0=mins(nowD()),ks=mKeys(n),d=ks.filter(k=>S[k]).length,p=punched(n),out=anchor(n,'out');let main,cls='';
+if(p)main=`<div class="cbig">✅ ${p.t}</div><div class="csub">${p.d<=0?(p.d<0?-p.d+' min early':'on time')+' 🎉':p.d+' min late'}</div>`;
+else if(morningCard(n,n0)&&out){const T=tm(out[0])-n0,sec=Math.abs(T*60);cls=T<0?'red':T<10?'amber':'';main=`<div class="cbig">${T<0?'+':''}${Math.floor(sec/60)}:${String(Math.floor(sec%60)).padStart(2,'0')}</div><div class="csub">until ${out[2].toLowerCase()}</div>`}
+else{const L=evs(n),e=L.find(e=>tm(e[0])>n0);main=e?`<div class="cbig" style="font-size:26px">${e[1]} ${e[0]}</div><div class="csub">${e[2]}</div>`:`<div class="cbig" style="font-size:26px">🌙</div><div class="csub">Sleep tight</div>`}
+return `<div class="nx cc ${cls} ${p?'doneP':''}" style="${col(n)}" onclick="goPage(${i+1})"><div class="who">${P[n].e} ${n} ›</div>${main}<div class="ring"><i style="width:${ks.length?d/ks.length*100:0}%"></i></div><div class="csub">🌅 ${d}/${ks.length} done</div>${punchBtn(n,1)}</div>`}
+function punchBtn(n,small){const p=punched(n),L=mKeys(n).filter(k=>!S[k]).length;
+if(p)return `<button class="punch pdone ${small?'sm':''}" onclick="event.stopPropagation()">✅ Punched out ${p.t}<small>${p.d<0?-p.d+' min early 🎉':p.d===0?'on time 🎉':p.d+' min late'}</small></button>`;
+return `<button class="punch pk ${small?'sm':''} ${L?'wait':''}" style="${col(n)}" onclick="event.stopPropagation();${L?`goPage(${KIDL.indexOf(n)+1})`:`doPunch('${n}')`}">${L?`⏳ ${L} task${L>1?'s':''} left`:"I'm ready! ✅ Punch out"}</button>`}
+function nexts(){document.getElementById('nexts').innerHTML=KIDL.map((n,i)=>mins(nowD())>=720?compactA(n,i):compact(n,i)).join('');KIDL.forEach(n=>{const el=document.getElementById('ka-'+n);if(el)el.innerHTML=aftCard(n)+aftBtn(n)});leftHouse();KIDL.forEach(n=>{const el=document.getElementById('kc-'+n);if(el){const mc=morningCard(n,mins(nowD()));el.innerHTML=(mc?'':`<div class="mwin">🌅 ${mKeys(n).every(k=>S[k])?'Morning: done':'Morning window over'}</div>`)+bigCard(n)+punchBtn(n)}})}
+function kidPages(){KIDL.forEach(n=>{const el=document.getElementById('kp-'+n);const g=mkName(n),p=punched(n);
+el.innerHTML=`<div class="kh" style="${col(n)}"><span class="kname">${P[n].e} ${n}</span><span class="sub">${P[n].d}</span></div><div id="kc-${n}"></div>
+<div class="card kl" style="${col(n)}"><h3>🌅 Morning <span class="streak" title="last 7 days">${streak(n)}</span></h3><div class="wtip"></div>
+${p?`<div class="mclosed">${pmsg(p)}</div>`:R[n][g].map((it,i)=>check(`r_${n}_${g}_${i}`,it,n)).join('')}</div>`})}
+let page=+(Q.get('page')??localStorage.getItem('page')??0);
+function goPage(i,smooth=true){page=Math.max(0,Math.min(3,i));localStorage.setItem('page',page);const pg=document.getElementById('pager');pg.scrollTo({left:page*pg.clientWidth,behavior:smooth?'smooth':'auto'});dots()}
+function dots(){document.getElementById('dots').innerHTML=`<button class="arr" onclick="goPage(page-1)" ${page?'':'disabled'}>‹</button>`+[['🏠','Home'],...KIDL.map(n=>[P[n].e,n])].map(([e,l],i)=>`<button class="dot ${i===page?'on':''}" style="${i?col(KIDL[i-1]):'--c:#2b2b2b'}" onclick="goPage(${i})">${e}<small>${l}</small></button>`).join('')+`<button class="arr" onclick="goPage(page+1)" ${page<3?'':'disabled'}>›</button>`}
+function initPager(){const pg=document.getElementById('pager');let t;pg.addEventListener('scroll',()=>{clearTimeout(t);t=setTimeout(()=>{const i=Math.round(pg.scrollLeft/pg.clientWidth);if(i!==page){page=i;localStorage.setItem('page',page);dots()}},80)});
+let sx=null,sy=0;pg.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'){sx=e.clientX;sy=e.clientY}});pg.addEventListener('pointerup',e=>{if(sx==null)return;const dx=e.clientX-sx;if(Math.abs(dx)>60&&Math.abs(dx)>Math.abs(e.clientY-sy))goPage(page+(dx<0?1:-1));sx=null});
+document.addEventListener('keydown',e=>{if(/INPUT/.test(document.activeElement.tagName))return;if(e.key==='ArrowRight')goPage(page+1);if(e.key==='ArrowLeft')goPage(page-1)});
+addEventListener('resize',()=>goPage(page,false));dots();requestAnimationFrame(()=>goPage(page,false))}
+function tline(){const a=360,b=1290,n0=mins(nowD()),pct=x=>Math.min(100,Math.max(0,(x-a)/(b-a)*100));document.querySelectorAll('.tl').forEach(el=>{const n=el.dataset.n;el.innerHTML=`<div class="past" style="width:${pct(n0)}%"></div>`+evs(n).map(e=>`<span class="ev" style="left:${pct(tm(e[0]))}%" title="${e[0]} ${e[2]}">${e[1]}</span>`).join('')+`<div class="now" style="left:${pct(n0)}%"></div>`})}
+function dls(){const n0=mins(nowD());document.querySelectorAll('.dl').forEach(el=>{const[n,g]=el.dataset.k.split('|');const e=anchor(n,GK(g));if(!e){el.style.display='none';return}
+if(/Morning/.test(g)&&punched(n)){el.style.display='none';return}const done=R[n][g].every((_,i)=>S[`r_${n}_${g}_${i}`]);const left=tm(e[0])-n0;el.className='dl '+(done?'ok':left<0?'red':left<10?'amber':'');el.textContent=done?`✅ Done before ${e[0]}`:left<0?`⏰ Finish by ${e[0]} · ${fmt(-left)} late`:`⏰ Finish by ${e[0]} (${e[1]} ${e[2]}) · ${fmt(left)} left`})}
+function planHTML(){const dt=S.planTab||dayType();return `<h2>🧭 Family day plan <span class="tag">EDITABLE DEFAULTS</span></h2>
+<div class="card" style="--c:#999"><div class="seg"><button class="${dt==='weekday'?'on':''}" onclick="S.planTab='weekday';save();render()">🏫 School days</button><button class="${dt==='friday'?'on':''}" onclick="S.planTab='friday';save();render()">🎉 Friday</button><button class="${dt==='weekend'?'on':''}" onclick="S.planTab='weekend';save();render()">🌤️ Weekend</button></div>
+${['West','Jack','June'].map(n=>`<div style="${col(n)}"><b style="color:var(${P[n].c})">${P[n].e} ${n}</b><div class="tl" data-n="${n}"></div></div>`).join('')}<div class="hrs"><span>06</span><span>09</span><span>12</span><span>15</span><span>18</span><span>21</span></div></div>
+<div class="card" style="--c:#999">${S.plan[dt].map((e,i)=>`<div class="pe"><input type="time" value="${e[0]}" onchange="S.plan['${dt}'][${i}][0]=this.value;save();tick()"><span>${e[1]}</span><input type="text" value="${e[2]}" onchange="S.plan['${dt}'][${i}][2]=this.value;save();tick()"><span class="w">${e[3]===ALL?'Everyone':e[3].replace(/,/g,', ')}</span></div>`).join('')}
+<button class="seg" style="margin-top:10px;border:0;border-radius:14px;padding:10px 14px;background:#e8e4dc;font-size:15px" onclick="if(confirm('Reset to defaults?')){S.plan['${dt}']=JSON.parse(JSON.stringify(DEF['${dt}']||DEF.weekday));save();render()}">↺ Reset to defaults</button></div>`}
+
+let WX=JSON.parse(localStorage.getItem('wx')||'null');
+const wIcon=c=>c==null?'🌡️':c===0?'☀️':c<=2?'🌤️':c===3?'☁️':c<=48?'🌫️':c<=67||(c>=80&&c<=82)?'🌧️':c<=77||c===85||c===86?'❄️':'⛈️';
+function wTip(w){if(!w)return'🌦️ Look outside & check the sky';const rain=w.p>=50||(w.c>=51&&w.c<=67)||(w.c>=80&&w.c<=82)||w.c>=95,snow=(w.c>=71&&w.c<=77)||w.c===85||w.c===86;
+let t=w.t<5?'Hat & gloves 🧤':w.t<12?'Warm jacket 🧥':w.t<18?'Light jacket 🧥':'T-shirt weather 👕';if(snow)t='Snow boots & gloves ❄️🧤';else if(rain)t='Rain jacket today 🌧️'+(w.t<5?' + gloves 🧤':'');return t}
+function walk(){if(!WX)return null;const h=WX.hourly,d=nowD(),day=d.toISOString().slice(0,10);let i=h.time.findIndex(x=>x.startsWith(day+'T07'));if(i<0)i=h.time.findIndex(x=>x.endsWith('T07:00'));if(i<0)return null;
+const ii=[i,i+1].filter(k=>h.time[k]);return{t:Math.round(ii.reduce((a,k)=>a+h.temperature_2m[k],0)/ii.length),p:Math.max(...ii.map(k=>h.precipitation_probability[k]??0)),c:Math.max(...ii.map(k=>h.weathercode[k]))}}
+function wxRender(){const w=walk(),el=document.getElementById('wx');const cur=WX&&WX.current;const off=!WX?'📡 Weather offline — ':(Date.now()-WX.at>3*3600e3?'⏳ last update '+new Date(WX.at).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})+' · ':'');
+el.innerHTML=`<div class="ic">${wIcon(w&&w.c)}</div><div><div class="tp">${w?w.t+'°':'–'}<span class="sub" style="font-size:15px;font-weight:400"> at walk time 07:00–08:00${w?' · 💧'+w.p+'%':''}</span></div><div class="tip">${wTip(w)}</div><div class="sub" style="font-size:13px">${off}Bad Tölz${cur?' · now '+Math.round(cur.temperature_2m)+'°':''}</div></div>`;
+document.querySelectorAll('.wtip').forEach(e=>e.textContent='Today: '+wTip(w))}
+function wxFetch(){fetch('https://api.open-meteo.com/v1/forecast?latitude=47.76&longitude=11.56&current=temperature_2m,weathercode&hourly=temperature_2m,precipitation_probability,weathercode&forecast_days=2&timezone=Europe%2FBerlin').then(r=>r.json()).then(j=>{if(!j.hourly)throw 0;WX={at:Date.now(),current:j.current,hourly:j.hourly};localStorage.setItem('wx',JSON.stringify(WX));wxRender();nexts()}).catch(()=>wxRender())}
+function tick(){clock();nexts();tline();dls();wxRender()}
+if(Q.get('demo')){for(const k in S)if(/^r_/.test(k))delete S[k];S.punch={};const dd=nowD(),past=i=>{const x=new Date(dd);x.setDate(dd.getDate()-i);return dkey(x)};
+const tickN=(n,c)=>mKeys(n).slice(0,c).forEach(k=>S[k]=true);
+if(Q.get('demo')==='ticks'){tickN('West',2);tickN('Jack',4);tickN('June',1)}
+if(Q.get('demo')==='aft'){tickN('West',4);tickN('Jack',5);tickN('June',4);S.punch.West={[dkey(dd)]:{t:'07:06',d:-4}};S.punch.Jack={[dkey(dd)]:{t:'07:09',d:-1}};S.punch.June={[dkey(dd)]:{t:'07:08',d:-2}};S.day={};S.log=[];
+const D=S.day[dkey(dd)]={West:{in:'16:05',land:'16:18',left:'07:10'},Jack:{in:'16:12',left:'07:10'},June:{left:'07:10'}};S[aKey('Jack','L',0)]=S[aKey('Jack','L',1)]=true;S[aKey('West','S',0)]=true;
+S.log=[['07:06','West','morning_punch_out'],['07:08','June','morning_punch_out'],['07:09','Jack','morning_punch_out'],['07:10','West','left_house'],['16:05','West','punch_in'],['16:12','Jack','punch_in'],['16:18','West','landing_done']].map(([t,n,e])=>({ev:e,kid:n,time:t,date:dkey(dd),text:`${P[n].e} ${n} `+({morning_punch_out:'✅ punched out (morning)',left_house:'🚪 left the house',punch_in:'🏠 punched in – home',landing_done:'🛬 landing done'})[e]}))}
+if(Q.get('demo')==='fri'){tickN('West',4);tickN('Jack',5);tickN('June',4);S.punch.West={[dkey(dd)]:{t:'07:05',d:-5}};S.punch.Jack={[dkey(dd)]:{t:'07:08',d:-2}};S.punch.June={[dkey(dd)]:{t:'07:07',d:-3}};S.day={};S.day[dkey(dd)]={West:{in:'13:04',left:'07:10'},Jack:{left:'07:10'},June:{left:'07:10'}};S[aKey('West','L',0)]=S[aKey('West','L',1)]=S[aKey('West','L',2)]=true;S.log=[]}
+if(Q.get('demo')==='way'){tickN('West',4);tickN('Jack',5);tickN('June',4);S.punch.West={[dkey(dd)]:{t:'07:06',d:-4}};S.punch.Jack={[dkey(dd)]:{t:'07:09',d:-1}};S.punch.June={[dkey(dd)]:{t:'07:08',d:-2}};S.day={};S.day[dkey(dd)]={West:{in:'16:07',left:'07:10'},Jack:{left:'07:10'},June:{left:'07:10'}};S[aKey('West','L',0)]=true;S.log=[]}
+if(Q.get('demo')==='jackpunch'){tickN('Jack',9);S.punch.Jack={[dkey(dd)]:{t:'07:04',d:-6}}}
+if(Q.get('demo')==='punch'){tickN('West',9);tickN('Jack',4);tickN('June',4);S.punch.West={[past(1)]:{t:'07:08',d:-2},[past(2)]:{t:'07:12',d:2},[past(5)]:{t:'07:05',d:-5},[past(6)]:{t:'07:09',d:-1},[dkey(dd)]:{t:'07:04',d:-6}};S.punch.June={[dkey(dd)]:{t:'07:02',d:-8}}}
+cur='routines'}
+render();initPager();wxFetch();setInterval(wxFetch,1800e3);setInterval(()=>{clock();nexts()},1000);setInterval(()=>{nexts();tline();dls()},15000);
+</script></body></html>
