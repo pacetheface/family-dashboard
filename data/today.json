@@ -1,0 +1,10 @@
+{
+  "v": 1,
+  "kdf": "PBKDF2-SHA256",
+  "iter": 200000,
+  "salt": "NowJr6dZp1yT69/d1cTcuA==",
+  "iv": "NrtlOTpOwrcvopfO",
+  "ct": "IMWpJCQQP6DfRcoi+3S23JrpBC3UmAR2e10+j7rmVzTLdoVcRnfcJORHxQqw5eqQhumcwnP+NZoaqMfSMiY9BMrwrlhWbmnM6AyskQoPlSLXPSTKq0f8ELMg5+BFO4MWu5T86i5WTjjHyUXnRvraM0ySUnnEhbyMMwLZarfNxwwSFw+SZrD2jDz1BBTBSaQLLRCY79E8H7evziBjSsoIO6Yl+nDUodyNePiulCAh3795EaIcMe1a6ox5beeXPJ96bn6h5bTVSruQl7GZS6/ln9L3RwFg2YSFtUfJhXSDcBLcMMG7imvaajm7nQp3CxdARmtpDjVQs1XxHWppfkrswsqh0fY4SQiiDGB87x7UxrbgTBUUi9YhqednxdSKd9GR/53nHvFEb8njEXLOh95fwnotgAHzbtN8CEx/vx6lI16o5UoS6YlGxQBAsUKWHQhihMq3g9G16jVIzxxY9GqQL2+MB6yWtBvp7idpUi+I1t4lw7lwCmgtH8ktY72SGNzEbAEpgFr1Y70L8EpsPIIqPz/T2tgR1B2CexZkaoW91zfDNjs8R87KNvm9FJBeOl5OnIsrf+c2KCGbFpgV9AJIuPdsKmGpToi9SY7EqI5/HPJAHsvM6TKiH+bSr35be8MZdqb14kzy+bl06suxLDDhz16HIcKrtrQiDJJIM27bTy+cOCo/yXtG9M5718wRYC/NmrRyXa3g84r7tIuFU+y4yiBUMB5IASv2qfb8FMH/6GwAoSX5NbgTkPyGbcjSeFuwx7rB1LUOtgr730qklxymE/9aDb7ux35/u1nFh75eulZuygqCR4mnaYAyKhgC6VbmxRa4LVLjATCcAA0snbvNUXYwHylsjvgp36k4KfrfTJwAVNoJHwkApKzWSJcVo1cPmIo53oX2FFZJnNh1HvnUF3Vr/q5nlQ==",
+  "sample": true,
+  "note": "SAMPLE DATA — example plans, not the real family calendar. The sample password is in the README. Replaced when the Today dashboard action runs with repo secrets."
+}
