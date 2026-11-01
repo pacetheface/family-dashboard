@@ -27,7 +27,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Build encrypted data/today.json
+      - name: Build encrypted data/today.json (today plus Mon–Sun and the next few days)
         env:
           ICAL_WEST: ${{ secrets.ICAL_WEST }}
           ICAL_JACK: ${{ secrets.ICAL_JACK }}

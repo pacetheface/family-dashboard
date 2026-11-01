@@ -4,7 +4,9 @@
  *
  * Default (GitHub Actions): read ICAL_WEST, ICAL_JACK, ICAL_JUNE, ICAL_FAMILY
  * and DASH_PASSWORD from the environment, fetch those secret iCal URLs, keep
- * today's Europe/Berlin events, and write an AES-GCM encrypted JSON file.
+ * Europe/Berlin events for Monday of this week through the following
+ * Wednesday (the week plus the next few days), and write an AES-GCM
+ * encrypted JSON file. `kids` is still today's snapshot.
  * If the password or every calendar URL is missing, exit 0 and leave the
  * file alone so the workflow stays quiet.
  *
@@ -272,6 +274,7 @@ function normalizeEvent(cur) {
     allDay: start ? start.allDay : true,
     endYmd: end ? end.ymd : '',
     dueYmd: due ? due.ymd : '',
+    endTime: end && !end.allDay ? end.time : '',
     rrule: rruleRaw ? parseRrule(rruleRaw.value) : null,
     exdates: collectYmds(props, 'EXDATE'),
     attendees
@@ -419,11 +422,29 @@ function emptyKid() {
   return { noSchool: false, events: [], bring: [], homework: [] };
 }
 
-export function buildPayload(calendars, today) {
+function eventSort(a, b) {
+  if (!a.time && b.time) return -1;
+  if (a.time && !b.time) return 1;
+  if (a.time < b.time) return -1;
+  if (a.time > b.time) return 1;
+  return a.title < b.title ? -1 : a.title > b.title ? 1 : 0;
+}
+
+function pushUnique(list, value) {
+  if (list.indexOf(value) < 0) list.push(value);
+}
+
+/**
+ * One Europe/Berlin day. `kids` keeps the original per-child shape.
+ * `all` is the same day de-duplicated for the week grid, with who / bring /
+ * location / a short detail string for the read-only event card.
+ */
+export function buildDay(calendars, today) {
   const kids = { West: emptyKid(), Jack: emptyKid(), June: emptyKid() };
+  const allMap = {};
   (calendars || []).forEach((cal) => {
-    if (!cal || !cal.text) return;
-    const events = parseIcs(cal.text);
+    if (!cal) return;
+    const events = cal.events || (cal.text ? parseIcs(cal.text) : []);
     events.forEach((ev) => {
       if (ev.status === 'CANCELLED') return;
       if (!occursOn(ev, today) && !(ev.dueYmd === today)) return;
@@ -432,19 +453,41 @@ export function buildPayload(calendars, today) {
       const hw = isHomework(ev, today) && (onDay || ev.dueYmd === today);
       const brings = onDay ? bringItems(ev.description) : [];
       const schoolOff = onDay && noSchoolText(ev);
+      const show = onDay && ev.summary && !(hw && ev.allDay);
       targets.forEach((name) => {
         if (!kids[name]) return;
         const bucket = kids[name];
         if (schoolOff) bucket.noSchool = true;
         brings.forEach((b) => bucket.bring.push(b));
         if (hw && ev.summary) bucket.homework.push(ev.summary.trim().slice(0, 160));
-        if (onDay && ev.summary && !(hw && ev.allDay)) {
+        if (show) {
           bucket.events.push({
             time: ev.allDay ? '' : (ev.startTime || ''),
-            title: ev.summary.trim().slice(0, 140)
+            end: ev.allDay ? '' : (ev.endTime || ''),
+            title: ev.summary.trim().slice(0, 140),
+            location: (ev.location || '').trim().slice(0, 140)
           });
         }
       });
+      if (!show) return;
+      const key = (ev.allDay ? 'd' : (ev.startTime || '')) + '|' + ev.summary.trim().toLowerCase();
+      if (!allMap[key]) {
+        allMap[key] = {
+          time: ev.allDay ? '' : (ev.startTime || ''),
+          end: ev.allDay ? '' : (ev.endTime || ''),
+          title: ev.summary.trim().slice(0, 140),
+          location: (ev.location || '').trim().slice(0, 140),
+          allDay: !!ev.allDay,
+          who: [],
+          bring: [],
+          homework: false,
+          detail: String(ev.description || '').replace(/\s+/g, ' ').trim().slice(0, 500)
+        };
+      }
+      const slot = allMap[key];
+      targets.forEach((name) => { if (kids[name]) pushUnique(slot.who, name); });
+      brings.forEach((b) => pushUnique(slot.bring, b));
+      if (hw) slot.homework = true;
     });
   });
   KIDS.forEach((name) => {
@@ -457,18 +500,35 @@ export function buildPayload(calendars, today) {
       if (seen[key]) return false;
       seen[key] = true;
       return true;
-    }).sort((a, b) => {
-      if (!a.time && b.time) return -1;
-      if (a.time && !b.time) return 1;
-      if (a.time < b.time) return -1;
-      if (a.time > b.time) return 1;
-      return a.title < b.title ? -1 : a.title > b.title ? 1 : 0;
-    });
+    }).sort(eventSort);
   });
+  const all = Object.keys(allMap).map((k) => allMap[k]).sort(eventSort);
+  return { West: kids.West, Jack: kids.Jack, June: kids.June, all };
+}
+
+export function buildPayload(calendars, today) {
+  const parsed = (calendars || []).filter(Boolean).map((cal) => {
+    if (cal.events) return cal;
+    return { kid: cal.kid, events: cal.text ? parseIcs(cal.text) : [] };
+  });
+  const start = mondayOf(today);
+  const end = addDays(start, 9);
+  const days = {};
+  for (let cursor = start; cursor <= end; cursor = addDays(cursor, 1)) {
+    days[cursor] = buildDay(parsed, cursor);
+  }
+  const todayDay = days[today];
   return {
     date: today,
     generatedAt: new Date().toISOString(),
-    kids
+    rangeStart: start,
+    rangeEnd: end,
+    days,
+    kids: {
+      West: todayDay.West,
+      Jack: todayDay.Jack,
+      June: todayDay.June
+    }
   };
 }
 
@@ -558,9 +618,11 @@ async function buildFromNetwork(outFile) {
   writeEncrypted(outFile, payload, password, false);
   KIDS.forEach((name) => {
     const k = payload.kids[name];
-    console.log(name + ': ' + k.events.length + ' events, ' + k.bring.length + ' bring, ' + k.homework.length + ' homework' + (k.noSchool ? ', no school' : ''));
+    let weekN = 0;
+    Object.keys(payload.days).forEach((d) => { weekN += payload.days[d][name].events.length; });
+    console.log(name + ': ' + k.events.length + ' today, ' + weekN + ' from ' + payload.rangeStart + ' to ' + payload.rangeEnd + ', ' + k.bring.length + ' bring, ' + k.homework.length + ' homework' + (k.noSchool ? ', no school' : ''));
   });
-  console.log('Wrote encrypted ' + outFile + ' for ' + today);
+  console.log('Wrote encrypted ' + outFile + ' for ' + today + ' (' + payload.rangeStart + ' to ' + payload.rangeEnd + ')');
 }
 
 function buildFromFile(from, outFile, password, sample) {
@@ -762,6 +824,16 @@ async function selfTest() {
     failed = true;
   } catch (e) { /* expected */ }
   assert(!failed, 'wrong password rejected');
+
+  assert(payload.rangeStart === '2026-10-26', 'week starts Monday, got ' + payload.rangeStart);
+  assert(payload.rangeEnd === '2026-11-04', 'week plus three days, got ' + payload.rangeEnd);
+  assert(payload.days['2026-10-29'].all.some((e) => e.title === 'Football practice' && e.end === '17:30'), 'football keeps its end time');
+  assert(payload.days['2026-10-29'].all.some((e) => e.title === 'Football practice' && e.bring.indexOf('Football boots') >= 0), 'bring on the week event');
+  const dentist = payload.days['2026-10-29'].all.filter((e) => e.title === 'Dentist for West and June')[0];
+  assert(dentist && dentist.who.indexOf('West') >= 0 && dentist.who.indexOf('June') >= 0 && dentist.who.indexOf('Jack') < 0, 'week event names West and June only');
+  assert(payload.days['2026-10-28'].West.events.every((e) => e.title !== 'Football practice'), 'Wednesday has no Thursday football');
+  assert(payload.days['2026-11-04'].West.noSchool === true, 'day map includes Herbstferien');
+  assert(payload.kids.West.events.some((e) => e.title === 'Football practice' && e.end === '17:30'), 'today snapshot keeps end time');
 
   const early = buildPayload([{
     kid: 'West',
