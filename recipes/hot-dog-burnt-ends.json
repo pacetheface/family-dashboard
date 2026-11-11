@@ -1,0 +1,61 @@
+{
+  "title": "Hot Dog Burnt Ends",
+  "slug": "hot-dog-burnt-ends",
+  "source": "https://www.facebook.com/watch/?v=1444169357755745",
+  "servings": 32,
+  "time": {
+    "prep": null,
+    "cook": null,
+    "total": null
+  },
+  "tags": [
+    "Smoker"
+  ],
+  "ingredients": [
+    {
+      "qty": 15,
+      "unit": "",
+      "item": "hot dogs",
+      "section": "Meat & Fish"
+    },
+    {
+      "qty": 2,
+      "unit": "tbsp",
+      "item": "yellow mustard",
+      "section": "Other"
+    },
+    {
+      "qty": 4,
+      "unit": "tbsp",
+      "item": "BBQ rub",
+      "section": "Other"
+    },
+    {
+      "qty": 4,
+      "unit": "tbsp",
+      "item": "butter",
+      "section": "Dairy & Eggs"
+    },
+    {
+      "qty": 3,
+      "unit": "tbsp",
+      "item": "brown sugar",
+      "section": "Pantry"
+    },
+    {
+      "qty": 0.5,
+      "unit": "cup",
+      "item": "favourite BBQ sauce",
+      "section": "Pantry"
+    }
+  ],
+  "steps": [
+    "Score. Score a crosshatch pattern into each hot dog.",
+    "Season. Coat with yellow mustard as a binder, then cover generously with BBQ rub.",
+    "Smoke. Smoke at 250 °F for 1 hour.",
+    "Cut and sauce. Cut each into quarters and put in a disposable foil pan with the butter, brown sugar and BBQ sauce; stir to coat.",
+    "Finish. Cover with foil and smoke another hour, uncovering halfway so the sauce thickens into a sticky glaze. Serve warm."
+  ],
+  "photo": "hot-dog-burnt-ends.jpg",
+  "notes": "Recipe fetched from the creator's linked page: burntpelletbbq.com/hot-dog-burnt-ends"
+}

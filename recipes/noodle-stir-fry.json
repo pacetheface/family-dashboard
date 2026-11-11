@@ -1,0 +1,72 @@
+{
+  "title": "Noodle Stir Fry",
+  "slug": "noodle-stir-fry",
+  "source": "https://www.facebook.com/watch/?v=1484500376706378",
+  "servings": null,
+  "time": {
+    "prep": null,
+    "cook": null,
+    "total": null
+  },
+  "tags": [
+    "Weekend takeout"
+  ],
+  "ingredients": [
+    {
+      "qty": 1,
+      "unit": "tbsp",
+      "item": "soy sauce",
+      "section": "Pantry",
+      "group": "Sauce"
+    },
+    {
+      "qty": 1,
+      "unit": "tsp",
+      "item": "sesame oil",
+      "section": "Pantry",
+      "group": "Sauce"
+    },
+    {
+      "qty": 2,
+      "unit": "tbsp",
+      "item": "vinegar",
+      "section": "Pantry",
+      "group": "Sauce"
+    },
+    {
+      "qty": 0.5,
+      "unit": "tsp",
+      "item": "ginger, grated",
+      "section": "Produce",
+      "group": "Sauce"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "4–6 garlic cloves, minced",
+      "section": "Produce",
+      "group": "Sauce"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "2–3 tbsp fish sauce",
+      "section": "Pantry",
+      "group": "Sauce"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Rice noodles (amount not given)",
+      "section": "Pantry",
+      "group": "Noodles"
+    }
+  ],
+  "steps": [
+    "Soak. Soak the noodles in water; they are not cooked at this stage.",
+    "Sauce. Mix soy sauce, sesame oil, vinegar, ginger, garlic and fish sauce.*",
+    "Stir fry. Drain the noodles and toss them in a hot wok with the sauce until cooked and coated.*"
+  ],
+  "photo": "noodle-stir-fry.jpg",
+  "notes": "* Only the sauce recipe was posted; the method is completed from the sauce ingredients and the reel's description (soak, then wok)."
+}

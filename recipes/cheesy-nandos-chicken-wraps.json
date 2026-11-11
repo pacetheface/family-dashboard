@@ -1,0 +1,94 @@
+{
+  "title": "Cheesy Nando's Chicken Wraps",
+  "slug": "cheesy-nandos-chicken-wraps",
+  "source": "https://www.facebook.com/watch/?v=1350328053636854",
+  "servings": 2,
+  "time": {
+    "prep": null,
+    "cook": null,
+    "total": 15
+  },
+  "tags": [
+    "Air fryer"
+  ],
+  "ingredients": [
+    {
+      "qty": null,
+      "unit": "",
+      "item": "2 chicken breasts (140 g each)",
+      "section": "Meat & Fish",
+      "group": "Chicken"
+    },
+    {
+      "qty": 1,
+      "unit": "tsp",
+      "item": "smoked paprika",
+      "section": "Spices",
+      "group": "Chicken"
+    },
+    {
+      "qty": 1,
+      "unit": "tsp",
+      "item": "peri seasoning",
+      "section": "Spices",
+      "group": "Chicken"
+    },
+    {
+      "qty": 2,
+      "unit": "tsp",
+      "item": "peri marinade",
+      "section": "Other",
+      "group": "Chicken"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Salt, black pepper",
+      "section": "Spices",
+      "group": "Chicken"
+    },
+    {
+      "qty": 2,
+      "unit": "",
+      "item": "reduced-fat cheese slices",
+      "section": "Dairy & Eggs",
+      "group": "To serve"
+    },
+    {
+      "qty": 2,
+      "unit": "",
+      "item": "tortilla wraps",
+      "section": "Bakery",
+      "group": "To serve"
+    },
+    {
+      "qty": 2,
+      "unit": "",
+      "item": "handfuls chopped lettuce (romaine works best)",
+      "section": "Produce",
+      "group": "To serve"
+    },
+    {
+      "qty": 30,
+      "unit": "",
+      "item": "g chilli jam",
+      "section": "Other",
+      "group": "To serve"
+    },
+    {
+      "qty": 30,
+      "unit": "",
+      "item": "g perinaise",
+      "section": "Other",
+      "group": "To serve"
+    }
+  ],
+  "steps": [
+    "Season. Mix the chicken with smoked paprika, peri seasoning, peri marinade, salt and pepper until evenly coated.",
+    "Air fry. Cook at 190 °C for 12–14 minutes, depending on thickness, until cooked through and lightly charred. Add the cheese for the final 1–2 minutes.",
+    "Chop. Cut the chicken into bite-sized pieces.",
+    "Fill. Lay lettuce down the centre of each wrap, top with chicken, then drizzle with perinaise and chilli jam.",
+    "Roll. Fold in the sides, roll up tightly, slice in half and serve immediately."
+  ],
+  "photo": "cheesy-nandos-chicken-wraps.jpg"
+}

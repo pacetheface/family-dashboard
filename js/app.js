@@ -141,7 +141,7 @@
     { id: 'tree', emoji: '🌲', need: 60 },
     { id: 'crown', emoji: '👑', need: 75 }
   ];
-  var SECTIONS = ['Produce', 'Bakery', 'Dairy', 'Meat', 'Frozen', 'Pantry', 'Household', 'Other'];
+  var SECTIONS = ['Produce', 'Meat & Fish', 'Dairy & Eggs', 'Bakery', 'Pantry', 'Spices', 'Frozen', 'Drinks', 'Household', 'Other'];
   var NAV = [
     { id: 'home', label: 'Home', icon: 'home' },
     { id: 'calendar', label: 'Calendar', icon: 'cal' },
@@ -202,6 +202,15 @@
   var kitchen = { running: false, left: 0, endAt: 0, justDone: false };
   var kitchenRang = false;
   var toastTimer = null;
+  var scrollKey = '';
+  var mealsPane = 'plan';
+  var recipeQuery = '';
+  var recipeTag = 'All';
+  var openSlug = '';
+  var cookIndex = 0;
+  var serveNow = 1;
+  var RECIPE_INDEX = [];
+  var RECIPE_FULL = {};
 
   function pad2(n) { n = String(n); return n.length < 2 ? '0' + n : n; }
   function esc(s) {
@@ -572,10 +581,10 @@
       meals: meals,
       recentMeals: recent,
       aldi: [
-        { id: 'a-milk', text: 'Milk', section: 'Dairy', done: false },
+        { id: 'a-milk', text: 'Milk', section: 'Dairy & Eggs', done: false },
         { id: 'a-ban', text: 'Bananas', section: 'Produce', done: false },
         { id: 'a-bread', text: 'Bread', section: 'Bakery', done: false },
-        { id: 'a-eggs', text: 'Eggs', section: 'Dairy', done: false },
+        { id: 'a-eggs', text: 'Eggs', section: 'Dairy & Eggs', done: false },
         { id: 'a-oats', text: 'Oats', section: 'Pantry', done: false }
       ],
       lists: [],
@@ -625,6 +634,12 @@
     });
     if (!hub.awarded) hub.awarded = {};
     if (!hub.choreDone) hub.choreDone = {};
+    var renamed = false;
+    var sectionRename = { Dairy: 'Dairy & Eggs', Meat: 'Meat & Fish' };
+    (hub.aldi || []).forEach(function (item) {
+      if (sectionRename[item.section]) { item.section = sectionRename[item.section]; renamed = true; }
+    });
+    if (renamed) saveHub();
   }
   function loadHub() {
     try {
@@ -715,11 +730,13 @@
   }
   function guessSection(item) {
     var s = item.toLowerCase();
-    if (/apple|banana|salad|tomato|onion|carrot|potato|lettuce|cucumber|pepper|lemon|avocado|leek|mushroom/.test(s)) return 'Produce';
-    if (/milk|cheese|yogurt|butter|cream|mozzarella|emmental|egg/.test(s)) return 'Dairy';
-    if (/bread|bun|roll|dough|spätzle|spaetzle/.test(s)) return 'Bakery';
-    if (/chicken|beef|pork|turkey|sausage|bacon|ham|bratwurst/.test(s)) return 'Meat';
     if (/frozen/.test(s)) return 'Frozen';
+    if (/salt|paprika|cumin|oregano|thyme|seasoning|spice|powder/.test(s)) return 'Spices';
+    if (/broth|stock|flour|pasta|rice|sauce|oil|vinegar|sugar|noodle|honey/.test(s)) return 'Pantry';
+    if (/chicken|beef|pork|turkey|sausage|bacon|ham|bratwurst|fish/.test(s)) return 'Meat & Fish';
+    if (/milk|cheese|yogurt|butter|cream|mozzarella|emmental|egg/.test(s)) return 'Dairy & Eggs';
+    if (/bread|bun|roll|dough|spätzle|spaetzle/.test(s)) return 'Bakery';
+    if (/apple|banana|salad|tomato|onion|carrot|potato|lettuce|cucumber|pepper|lemon|avocado|leek|mushroom/.test(s)) return 'Produce';
     if (/soap|paper|detergent|sponge|towel/.test(s)) return 'Household';
     return 'Pantry';
   }
@@ -999,6 +1016,16 @@
     if (!pw) { toast('Enter the family password.'); return; }
     if (!FILE) { toast('Calendar file is not loaded.'); return; }
     deriveAndDecrypt(pw, FILE, false);
+  }
+  function loadRecipeIndex() {
+    if (!window.fetch) return;
+    fetch('recipes/index.json?v=' + Date.now(), { cache: 'no-store' }).then(function (r) {
+      if (!r.ok) throw new Error('missing');
+      return r.json();
+    }).then(function (list) {
+      RECIPE_INDEX = list || [];
+      if (page === 'meals') render();
+    }).catch(function () {});
   }
   function loadToday() {
     if (!window.fetch) { calMode = 'missing'; return; }
@@ -1555,7 +1582,9 @@
       html += '<div class="task-block"><div class="task-head"><span>' + esc(name) + ' (' + ageOf(name, ymd) + ')</span><span>' + (prog.total ? prog.done + '/' + prog.total + ' · ' : '') + '★ ' + prog.stars + '</span></div><div class="task-next">Next: ' + esc(nextTaskLabel(name, ymd)) + '</div></div>';
     });
     var meal = hub.meals[weekdayKey(ymd)] || { title: 'Dinner', side: '' };
-    html += '<div class="dinner-card"><div class="kicker">Tonight’s dinner</div><h3>' + esc(meal.title || 'Choose a dinner') + '</h3><div class="muted">' + esc(meal.side || '') + '</div></div></article>';
+    html += '<div class="dinner-card"><div class="kicker">Tonight’s dinner</div>';
+    if (meal.recipe) html += '<button type="button" class="meal-pic" data-act="open-recipe" data-id="' + esc(meal.recipe) + '"><img class="meal-thumb" alt="" src="recipes/photos/' + esc(meal.recipe) + '.jpg"></button>';
+    html += '<h3>' + esc(meal.title || 'Choose a dinner') + '</h3><div class="muted">' + esc(meal.side || '') + '</div></div></article>';
     html += '</div>';
     html += wxStrip(p);
     html += '</div>';
@@ -1902,14 +1931,145 @@
   function mealCard(entry, today) {
     var meal = hub.meals[entry.key] || { title: '', side: '', ingredients: '' };
     var tonight = entry.ymd === today;
-    return '<article class="card meal' + (tonight ? ' tonight' : '') + '"><h3>' + esc(wdLong(WD_SHORT[weekdayIndex(entry.ymd)]).toUpperCase()) + ' ' + esc(entry.ymd.slice(8) + '.' + entry.ymd.slice(5, 7)) + (tonight ? ' <span class="tag">Tonight</span>' : '') + '</h3><div class="title">' + esc(meal.title || 'Add a dinner') + '</div><div class="side">' + esc(meal.side || 'Side or notes') + '</div><div class="ings">' + esc(meal.ingredients || '') + '</div><div class="row-actions"><button type="button" class="btn dark small" data-act="meal-aldi" data-day="' + entry.key + '">Add to Aldi list</button><button type="button" class="btn light small" data-act="meal-clear" data-day="' + entry.key + '">Clear</button><button type="button" class="btn ghost small" data-act="meal-edit" data-day="' + entry.key + '">Edit</button></div></article>';
+    var photo = meal.recipe ? '<button type="button" class="meal-pic" data-act="open-recipe" data-id="' + esc(meal.recipe) + '"><img class="meal-thumb" alt="" src="recipes/photos/' + esc(meal.recipe) + '.jpg"></button>' : '';
+    var title = meal.recipe ? '<button type="button" class="title linkish" data-act="open-recipe" data-id="' + esc(meal.recipe) + '">' + esc(meal.title || 'Add a dinner') + '</button>' : '<div class="title">' + esc(meal.title || 'Add a dinner') + '</div>';
+    return '<article class="card meal' + (tonight ? ' tonight' : '') + (meal.recipe ? ' has-photo' : '') + '">' + photo + '<h3>' + esc(wdLong(WD_SHORT[weekdayIndex(entry.ymd)]).toUpperCase()) + ' ' + esc(entry.ymd.slice(8) + '.' + entry.ymd.slice(5, 7)) + (tonight ? ' <span class="tag">Tonight</span>' : '') + '</h3>' + title + '<div class="side">' + esc(meal.side || 'Side or notes') + '</div><div class="ings">' + esc(meal.ingredients || '') + '</div><div class="row-actions"><button type="button" class="btn dark small" data-act="meal-aldi" data-day="' + entry.key + '">Add to Aldi list</button><button type="button" class="btn light small" data-act="meal-clear" data-day="' + entry.key + '">Clear</button><button type="button" class="btn ghost small" data-act="meal-edit" data-day="' + entry.key + '">Edit</button></div></article>';
+  }
+  function prettyQty(n) {
+    if (n == null || isNaN(n)) return '';
+    var rounded = Math.round(n * 100) / 100;
+    var whole = Math.floor(rounded + 1e-6);
+    var frac = rounded - whole;
+    var known = [[0.25, '1/4'], [0.333, '1/3'], [0.5, '1/2'], [0.666, '2/3'], [0.75, '3/4']];
+    var label = '';
+    for (var i = 0; i < known.length; i++) {
+      if (Math.abs(frac - known[i][0]) < 0.05) { label = known[i][1]; break; }
+    }
+    if (!label) {
+      if (frac < 0.05) return String(whole);
+      return String(rounded);
+    }
+    return (whole ? whole + ' ' : '') + label;
+  }
+  function scaleFactor(recipe) {
+    if (!recipe || !recipe.servings) return serveNow || 1;
+    return (serveNow || recipe.servings) / recipe.servings;
+  }
+  function formatIng(ing, factor) {
+    if (ing.qty == null) return ing.item;
+    return [prettyQty(ing.qty * factor), ing.unit, ing.item].filter(function (part) { return part; }).join(' ');
+  }
+  function recipeMinutes(text) {
+    var found = [];
+    var re = /(\d+)(?:\s*[–-]\s*(\d+))?\s*(hours|hour|hrs|hr|h|minutes|minute|mins|min)\b/gi;
+    var match;
+    while ((match = re.exec(text))) {
+      var unit = match[3].toLowerCase();
+      var mult = unit.charAt(0) === 'h' ? 60 : 1;
+      found.push(Number(match[1]) * mult);
+      if (match[2]) found.push(Number(match[2]) * mult);
+    }
+    var seen = {};
+    return found.filter(function (n) { if (seen[n]) return false; seen[n] = true; return n > 0 && n <= 240; });
+  }
+  function filteredRecipes() {
+    var q = recipeQuery.replace(/^\s+|\s+$/g, '').toLowerCase();
+    return RECIPE_INDEX.filter(function (recipe) {
+      if (recipeTag !== 'All' && (recipe.tags || []).indexOf(recipeTag) < 0) return false;
+      if (!q) return true;
+      return recipe.title.toLowerCase().indexOf(q) >= 0 || (recipe.tags || []).join(' ').toLowerCase().indexOf(q) >= 0;
+    });
+  }
+  function recipeCardsHtml() {
+    var list = filteredRecipes();
+    if (!list.length) return '<p class="muted">No recipes match.</p>';
+    return list.map(function (recipe) {
+      var bits = [];
+      if (recipe.servings) bits.push('Serves ' + recipe.servings);
+      if (recipe.time && recipe.time.total) bits.push(recipe.time.total + ' min');
+      return '<button type="button" class="card recipe-card" data-act="open-recipe" data-id="' + esc(recipe.slug) + '"><img alt="" src="recipes/photos/' + esc(recipe.photo) + '"><span class="recipe-body"><b>' + esc(recipe.title) + '</b><span class="muted">' + esc(bits.join(' · ')) + '</span></span></button>';
+    }).join('');
+  }
+  function renderRecipeBrowse() {
+    var tags = { All: true };
+    RECIPE_INDEX.forEach(function (recipe) { (recipe.tags || []).forEach(function (tag) { tags[tag] = true; }); });
+    var html = '<div class="page"><div class="page-head"><h2>Recipes</h2><button type="button" class="btn light" data-act="meals-pane" data-id="plan">Dinners</button></div>';
+    html += '<input class="field" id="recipeSearch" placeholder="Search recipes" value="' + esc(recipeQuery) + '" autocomplete="off">';
+    html += '<div class="pills">';
+    Object.keys(tags).sort(function (a, b) { if (a === 'All') return -1; if (b === 'All') return 1; return a < b ? -1 : 1; }).forEach(function (tag) {
+      html += '<button type="button" class="pill' + (recipeTag === tag ? ' on' : '') + '" data-act="recipe-tag" data-id="' + esc(tag) + '">' + esc(tag) + '</button>';
+    });
+    html += '</div><div class="recipe-grid" id="recipeGrid">' + recipeCardsHtml() + '</div></div>';
+    return html;
+  }
+  function withRecipe(slug, done) {
+    if (RECIPE_FULL[slug]) { done(RECIPE_FULL[slug]); return; }
+    fetch('recipes/' + encodeURIComponent(slug) + '.json').then(function (r) {
+      if (!r.ok) throw new Error('missing');
+      return r.json();
+    }).then(function (data) {
+      RECIPE_FULL[slug] = data;
+      done(data);
+    }).catch(function () { toast('That recipe did not load'); });
+  }
+  function renderRecipeDetail() {
+    var recipe = RECIPE_FULL[openSlug];
+    if (!recipe) return '<div class="page"><p class="muted">Opening the recipe…</p></div>';
+    var factor = scaleFactor(recipe);
+    var groups = [];
+    recipe.ingredients.forEach(function (ing) {
+      var name = ing.group || '';
+      var last = groups[groups.length - 1];
+      if (!last || last.name !== name) groups.push({ name: name, items: [ing] });
+      else last.items.push(ing);
+    });
+    var ingHtml = groups.map(function (group) {
+      var head = group.name ? '<h3>' + esc(group.name) + '</h3>' : '';
+      return head + group.items.map(function (ing) { return '<div class="ing-line">' + esc(formatIng(ing, factor)) + '</div>'; }).join('');
+    }).join('');
+    var days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+    var serveLabel = recipe.servings ? String(serveNow) : '× ' + serveNow;
+    var html = '<div class="page"><div class="page-head"><button type="button" class="btn light" data-act="meals-pane" data-id="recipes">Recipes</button><h2>' + esc(recipe.title) + '</h2></div>';
+    html += '<div class="recipe-detail"><article class="card recipe-hero"><img alt="" src="recipes/photos/' + esc(recipe.photo) + '"><h3 class="recipe-title">' + esc(recipe.title) + '</h3><p class="muted">' + esc((recipe.tags || []).join(' · ')) + '</p>';
+    if (recipe.notes) html += '<p>' + esc(recipe.notes) + '</p>';
+    if (recipe.source) html += '<p class="muted"><a href="' + esc(recipe.source) + '">Original</a></p>';
+    html += '</article><article class="card"><div class="kicker"><span>INGREDIENTS</span><span class="row-actions"><button type="button" class="btn light small" data-act="servings" data-id="-1">−</button><b>' + esc(serveLabel) + '</b><button type="button" class="btn light small" data-act="servings" data-id="1">+</button></span></div>';
+    html += ingHtml;
+    html += '<div class="row-actions" style="margin-top:12px"><button type="button" class="btn dark" data-act="recipe-aldi">Add to Aldi list</button><button type="button" class="btn light" data-act="meals-pane" data-id="cook">Cook</button></div>';
+    html += '<div class="kicker" style="margin-top:14px">Put on a day</div><div class="pills">';
+    days.forEach(function (day) { html += '<button type="button" class="pill" data-act="recipe-day" data-id="' + day + '">' + day.charAt(0).toUpperCase() + day.slice(1) + '</button>'; });
+    html += '</div></article></div><article class="card"><h3>Steps</h3><ol class="steps">';
+    recipe.steps.forEach(function (step) { html += '<li>' + esc(step) + '</li>'; });
+    html += '</ol></article></div>';
+    return html;
+  }
+  function renderCookPage() {
+    var recipe = RECIPE_FULL[openSlug];
+    if (!recipe) return '<div class="page"><p class="muted">Opening the recipe…</p></div>';
+    var step = recipe.steps[cookIndex] || '';
+    var mins = recipeMinutes(step);
+    var html = '<div class="page cook-page"><div class="page-head"><button type="button" class="btn light" data-act="meals-pane" data-id="recipe">Recipe</button><h2>' + esc(recipe.title) + '</h2><span class="muted">' + (cookIndex + 1) + ' of ' + recipe.steps.length + '</span></div>';
+    html += '<article class="card cook-card"><p class="cook-step">' + esc(step) + '</p>';
+    if (mins.length) {
+      html += '<div class="pills">';
+      mins.forEach(function (n) { html += '<button type="button" class="pill" data-act="cook-timer" data-id="' + n + '">Start ' + n + ' min timer</button>'; });
+      html += '</div>';
+    }
+    html += '<div class="row-actions"><button type="button" class="btn light" data-act="cook-prev"' + (cookIndex ? '' : ' disabled') + '>Back</button><button type="button" class="btn dark" data-act="cook-next"' + (cookIndex < recipe.steps.length - 1 ? '' : ' disabled') + '>Next</button></div>';
+    html += '<div class="timer-mini"><div class="kitchen" id="kitchenTime">' + fmtKitchen(kitchenMs()) + '</div><div class="k-keys">';
+    [1, 5, 10, 15, 30].forEach(function (n) { html += '<button type="button" data-act="kadd" data-id="' + n + '">+' + n + '</button>'; });
+    html += '<button type="button" data-act="kstop">Stop</button></div></div></article></div>';
+    return html;
   }
   function renderMeals() {
+    if (mealsPane === 'recipes') return renderRecipeBrowse();
+    if (mealsPane === 'recipe') return renderRecipeDetail();
+    if (mealsPane === 'cook') return renderCookPage();
     var ymd = currentYmd();
     var days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'].map(function (key, i) {
       return { key: key, ymd: addDays(mondayOf(ymd), i) };
     });
-    var html = '<div class="page"><div class="page-head"><h2>Dinners this week</h2><span class="muted">' + esc(prettyDate(days[0].ymd) + ' – ' + prettyDate(days[6].ymd)) + '</span><button type="button" class="btn dark" data-act="week-aldi">Add the week’s ingredients to Aldi list</button></div>';
+    var html = '<div class="page"><div class="page-head"><h2>Dinners this week</h2><span class="muted">' + esc(prettyDate(days[0].ymd) + ' – ' + prettyDate(days[6].ymd)) + '</span><button type="button" class="btn light" data-act="meals-pane" data-id="recipes">Recipes</button><button type="button" class="btn dark" data-act="week-aldi">Add the week’s ingredients to Aldi list</button></div>';
     html += '<div class="recent"><span class="muted">Recent · tap to put on today</span>';
     (hub.recentMeals || []).forEach(function (m, i) {
       html += '<button type="button" data-act="recent" data-id="' + i + '">' + esc(m.title) + '</button>';
@@ -1935,9 +2095,11 @@
       groups[s].push(item);
     });
     var html = '';
-    SECTIONS.forEach(function (section) {
+    var order = SECTIONS.slice();
+    Object.keys(groups).forEach(function (section) { if (order.indexOf(section) < 0) order.push(section); });
+    order.forEach(function (section) {
       if (!groups[section] || !groups[section].length) return;
-      html += '<div class="section-label">' + section + '</div>';
+      html += '<div class="section-label">' + esc(section) + '</div>';
       groups[section].forEach(function (item) {
         html += '<label class="aldi-item"><input type="checkbox" data-act="aldi-toggle" data-id="' + esc(item.id) + '"' + (item.done ? ' checked' : '') + '> <span' + (item.done ? ' style="text-decoration:line-through;color:#8d8276"' : '') + '>' + esc(item.text) + '</span></label>';
       });
@@ -2240,9 +2402,15 @@
         renderSample();
         renderView();
       }
-      renderOverlay();
-      paintSound();
-      restoreFocus();
+    renderOverlay();
+    paintSound();
+    restoreFocus();
+    var view = document.getElementById('view');
+    var key = page + '|' + mealsPane + '|' + openSlug + '|' + cookIndex;
+    if (view && key !== scrollKey) {
+      view.scrollTop = 0;
+      scrollKey = key;
+    }
     } catch (err) {
       if (window.console && console.error) console.error(err);
       var view = document.getElementById('view');
@@ -2603,7 +2771,9 @@
     if (act === 'meal-edit') { openOverlay({ type: 'meal', day: actEl.getAttribute('data-day') }); return; }
     if (act === 'meal-save') {
       var dkey = actEl.getAttribute('data-day');
+      var previous = hub.meals[dkey] || {};
       hub.meals[dkey] = { title: val('mTitle'), side: val('mSide'), ingredients: val('mIng') };
+      if (previous.recipe && previous.title === hub.meals[dkey].title) hub.meals[dkey].recipe = previous.recipe;
       rememberMeal(hub.meals[dkey]);
       saveHub();
       closeOverlay();
@@ -2780,6 +2950,87 @@
       askConfirm('Restore starter meals, chores, and lists? Stars and the PIN stay.', restoreDefaults);
       return;
     }
+    if (act === 'meals-pane') {
+      mealsPane = id || 'plan';
+      if ((mealsPane === 'recipe' || mealsPane === 'cook') && openSlug && !RECIPE_FULL[openSlug]) {
+        withRecipe(openSlug, function () { if (page !== 'meals') go('meals'); else render(); });
+        return;
+      }
+      if (page !== 'meals') go('meals');
+      else render();
+      return;
+    }
+    if (act === 'open-recipe') {
+      openSlug = id;
+      withRecipe(id, function (data) {
+        serveNow = data.servings || 1;
+        cookIndex = 0;
+        mealsPane = 'recipe';
+        if (page !== 'meals') go('meals');
+        else render();
+      });
+      return;
+    }
+    if (act === 'recipe-tag') { recipeTag = id || 'All'; render(); return; }
+    if (act === 'servings') {
+      var currentRecipe = RECIPE_FULL[openSlug];
+      var nextServings = (serveNow || 1) + (+id || 0);
+      if (nextServings < 1) nextServings = 1;
+      serveNow = nextServings;
+      if (currentRecipe) render();
+      return;
+    }
+    if (act === 'recipe-aldi') {
+      var toList = RECIPE_FULL[openSlug];
+      if (!toList) return;
+      var added = 0;
+      var factor = scaleFactor(toList);
+      toList.ingredients.forEach(function (ing) {
+        var text = formatIng(ing, factor);
+        var exists = (hub.aldi || []).some(function (item) { return !item.done && item.text.toLowerCase() === text.toLowerCase(); });
+        if (exists) return;
+        hub.aldi.push({ id: uid('a'), text: text, section: ing.section || 'Other', done: false });
+        added += 1;
+      });
+      saveHub();
+      toast(added ? 'Added ' + added + ' to the Aldi list' : 'Those ingredients are already on the list');
+      mealsPane = 'plan';
+      render();
+      return;
+    }
+    if (act === 'recipe-day') {
+      var planned = RECIPE_FULL[openSlug];
+      if (!planned) return;
+      var factorDay = scaleFactor(planned);
+      var lines = planned.ingredients.map(function (ing) { return formatIng(ing, factorDay); });
+      hub.meals[id] = { title: planned.title, side: (planned.tags && planned.tags[0]) || '', ingredients: lines.join(', '), recipe: planned.slug };
+      rememberMeal(hub.meals[id]);
+      saveHub();
+      toast('On ' + id);
+      mealsPane = 'plan';
+      render();
+      return;
+    }
+    if (act === 'cook-prev') { if (cookIndex > 0) cookIndex -= 1; render(); return; }
+    if (act === 'cook-next') {
+      var cooking = RECIPE_FULL[openSlug];
+      if (cooking && cookIndex < cooking.steps.length - 1) cookIndex += 1;
+      render();
+      return;
+    }
+    if (act === 'cook-timer') {
+      var mins = +id || 0;
+      if (mins > 0) {
+        kitchen.left = mins * 60000;
+        kitchen.running = true;
+        kitchen.endAt = Date.now() + kitchen.left;
+        kitchen.justDone = false;
+        kitchenRang = false;
+        paintKitchen();
+        toast('Timer set for ' + mins + ' min');
+      }
+      return;
+    }
     if (act === 'confirm-yes') {
       var fn = pendingConfirm;
       pendingConfirm = null;
@@ -2844,6 +3095,7 @@
   page = pageFromHash();
   render();
   loadToday();
+  loadRecipeIndex();
   fetchWeather();
   requestWake();
   setInterval(tick, 1000);
@@ -2853,6 +3105,13 @@
     if (document.visibilityState === 'visible') { requestWake(); tick(); }
   });
   document.addEventListener('click', onClick);
+  document.addEventListener('input', function (e) {
+    var t = e.target;
+    if (!t || t.id !== 'recipeSearch') return;
+    recipeQuery = t.value;
+    var grid = document.getElementById('recipeGrid');
+    if (grid) grid.innerHTML = recipeCardsHtml();
+  });
   document.addEventListener('change', onChange);
   document.addEventListener('focusout', onFocusOut);
   document.addEventListener('submit', function (e) {

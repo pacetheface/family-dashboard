@@ -1,0 +1,71 @@
+{
+  "title": "Easy 10-Minute Teriyaki Beef Dinner",
+  "slug": "teriyaki-beef-dinner",
+  "source": "https://www.facebook.com/watch/?v=4098339627124086",
+  "servings": null,
+  "time": {
+    "prep": null,
+    "cook": null,
+    "total": 10
+  },
+  "tags": [
+    "Low carb"
+  ],
+  "ingredients": [
+    {
+      "qty": 1,
+      "unit": "lb",
+      "item": "ground beef",
+      "section": "Meat & Fish"
+    },
+    {
+      "qty": 0.5,
+      "unit": "cup",
+      "item": "sliced onions",
+      "section": "Produce"
+    },
+    {
+      "qty": 0.25,
+      "unit": "cup",
+      "item": "soy sauce",
+      "section": "Pantry"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "2–3 tbsp brown sweetener (sugar-free)",
+      "section": "Pantry"
+    },
+    {
+      "qty": 2,
+      "unit": "tsp",
+      "item": "minced garlic",
+      "section": "Produce"
+    },
+    {
+      "qty": 1,
+      "unit": "tsp",
+      "item": "each: ginger, red pepper flakes and onion powder",
+      "section": "Spices"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Optional: green onions",
+      "section": "Produce"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Cauliflower rice",
+      "section": "Pantry",
+      "group": "To serve"
+    }
+  ],
+  "steps": [
+    "Cook. Cook the beef with all the ingredients over medium heat until fully cooked.",
+    "Serve. Serve over cauliflower rice, topped with green onions."
+  ],
+  "photo": "teriyaki-beef-dinner.jpg",
+  "notes": "Tip from the creator: thinly sliced steak or chicken also works."
+}

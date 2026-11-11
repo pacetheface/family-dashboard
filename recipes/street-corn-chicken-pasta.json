@@ -1,0 +1,76 @@
+{
+  "title": "High Protein Street Corn Chicken Pasta",
+  "slug": "street-corn-chicken-pasta",
+  "source": "https://www.facebook.com/watch/?v=2067937457482298",
+  "servings": null,
+  "time": {
+    "prep": null,
+    "cook": null,
+    "total": null
+  },
+  "tags": [
+    "Slow cooker"
+  ],
+  "ingredients": [
+    {
+      "qty": 8,
+      "unit": "oz",
+      "item": "low carb pasta",
+      "section": "Pantry"
+    },
+    {
+      "qty": 2,
+      "unit": "",
+      "item": "chicken breasts",
+      "section": "Meat & Fish"
+    },
+    {
+      "qty": 1,
+      "unit": "",
+      "item": "block cream cheese",
+      "section": "Dairy & Eggs"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "1–2 cans corn",
+      "section": "Produce"
+    },
+    {
+      "qty": 1,
+      "unit": "cup",
+      "item": "broth",
+      "section": "Pantry"
+    },
+    {
+      "qty": 0.5,
+      "unit": "cup",
+      "item": "shredded cheese (pepper jack)",
+      "section": "Dairy & Eggs"
+    },
+    {
+      "qty": 2,
+      "unit": "tbsp",
+      "item": "chili lime seasoning",
+      "section": "Spices"
+    },
+    {
+      "qty": 1,
+      "unit": "tbsp",
+      "item": "cotija or Parmesan, for topping",
+      "section": "Dairy & Eggs"
+    },
+    {
+      "qty": 1,
+      "unit": "tbsp",
+      "item": "diced cilantro",
+      "section": "Produce"
+    }
+  ],
+  "steps": [
+    "Slow cook. Cook the chicken, cream cheese, broth, corn and seasoning in a slow cooker 3–4 hours on high.",
+    "Finish. Shred the chicken, stir in the boiled and drained pasta and the cheese, and serve topped with cilantro and cotija."
+  ],
+  "photo": "street-corn-chicken-pasta.jpg",
+  "notes": "Time on the card: 3–4 h on high"
+}

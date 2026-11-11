@@ -1,0 +1,76 @@
+{
+  "title": "Crockpot Marry Me Meatballs",
+  "slug": "crockpot-marry-me-meatballs",
+  "source": "https://www.facebook.com/watch/?v=27641839188772001",
+  "servings": 6,
+  "time": {
+    "prep": 5,
+    "cook": 240,
+    "total": null
+  },
+  "tags": [],
+  "ingredients": [
+    {
+      "qty": 1.5,
+      "unit": "lbs",
+      "item": "frozen Italian-style meatballs",
+      "section": "Frozen"
+    },
+    {
+      "qty": 15,
+      "unit": "oz",
+      "item": "jar Alfredo sauce",
+      "section": "Pantry"
+    },
+    {
+      "qty": 0.5,
+      "unit": "tsp",
+      "item": "each pepper, oregano, thyme",
+      "section": "Spices"
+    },
+    {
+      "qty": 1,
+      "unit": "tsp",
+      "item": "each onion powder, garlic powder, smoked paprika",
+      "section": "Spices"
+    },
+    {
+      "qty": 0.25,
+      "unit": "tsp",
+      "item": "red pepper flakes",
+      "section": "Spices"
+    },
+    {
+      "qty": 0.3333333333333333,
+      "unit": "cup",
+      "item": "chopped sun-dried tomatoes, drained",
+      "section": "Other"
+    },
+    {
+      "qty": 0.3333333333333333,
+      "unit": "cup",
+      "item": "Parmesan cheese",
+      "section": "Dairy & Eggs"
+    },
+    {
+      "qty": 0.5,
+      "unit": "cup",
+      "item": "milk",
+      "section": "Dairy & Eggs"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Dried parsley",
+      "section": "Spices"
+    }
+  ],
+  "steps": [
+    "Load. Put the frozen meatballs and Alfredo sauce in the crockpot; add pepper, oregano, thyme, onion powder, garlic powder, smoked paprika and red pepper flakes.",
+    "Stir in. Add sun-dried tomatoes, Parmesan and milk; stir well.",
+    "Cook. Cook on low for 4 hours, stirring now and then. Top with more Parmesan and dried parsley.",
+    "Serve. Over mashed potatoes, rice or pasta. If the sauce separates, stir in a splash of milk."
+  ],
+  "photo": "crockpot-marry-me-meatballs.jpg",
+  "notes": "Recipe fetched from the creator's linked page: cookinginthemidwest.com/blog/crockpot-marry-me-meatballs"
+}

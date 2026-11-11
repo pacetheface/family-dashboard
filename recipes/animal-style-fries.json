@@ -1,0 +1,87 @@
+{
+  "title": "In-N-Out Animal Style Fries",
+  "slug": "animal-style-fries",
+  "source": "https://www.facebook.com/watch/?v=1758738625487044",
+  "servings": null,
+  "time": {
+    "prep": null,
+    "cook": null,
+    "total": null
+  },
+  "tags": [
+    "Copycat"
+  ],
+  "ingredients": [
+    {
+      "qty": 2,
+      "unit": "",
+      "item": "diced yellow onions",
+      "section": "Produce",
+      "group": "Caramelized onions"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Butter or oil",
+      "section": "Pantry",
+      "group": "Caramelized onions"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Pinch of sugar, pinch of salt",
+      "section": "Spices",
+      "group": "Caramelized onions"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Mayo, ketchup, diced dill pickles, pickle juice",
+      "section": "Pantry",
+      "group": "Secret sauce (upgraded)"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Sugar, paprika, grated garlic, MSG",
+      "section": "Spices",
+      "group": "Secret sauce (upgraded)"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Chopped chives, caramelized onions",
+      "section": "Produce",
+      "group": "Secret sauce (upgraded)"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Frozen French fries",
+      "section": "Frozen",
+      "group": "Fries"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Salt",
+      "section": "Spices",
+      "group": "Fries"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "American cheese",
+      "section": "Dairy & Eggs",
+      "group": "Fries"
+    }
+  ],
+  "steps": [
+    "Onions. Cook the onions with butter or oil, sugar and salt on medium-low 25–30 minutes until deep golden and jammy.",
+    "Sauce. Mix the sauce ingredients and chill. (Exact amounts are in the creator's episode 2.)",
+    "Fries. Pat frozen fries lightly dry and fry at 350 °F until crispy. Drain on a wire rack and salt.",
+    "Animal style. Top the hot fries with American cheese, broil until melted, add the caramelized onions and drizzle with sauce."
+  ],
+  "photo": "animal-style-fries.jpg",
+  "notes": "The caption gives no quantities for the sauce or fries; none are added here."
+}
