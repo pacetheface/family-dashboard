@@ -557,6 +557,21 @@
     "servings": null
   },
   {
+    "slug": "sticky-chipotle-lime-chicken-rice-bowl",
+    "title": "Sticky Chipotle Lime Chicken Rice Bowl",
+    "tags": [
+      "Air fryer",
+      "Bowl"
+    ],
+    "time": {
+      "prep": 30,
+      "cook": null,
+      "total": null
+    },
+    "photo": "sticky-chipotle-lime-chicken-rice-bowl.jpg",
+    "servings": 4
+  },
+  {
     "slug": "street-corn-chicken-and-rice-bowls",
     "title": "Street Corn Chicken and Rice Bowls",
     "tags": [

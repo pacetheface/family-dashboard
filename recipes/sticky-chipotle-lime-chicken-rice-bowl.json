@@ -1,0 +1,230 @@
+{
+  "title": "Sticky Chipotle Lime Chicken Rice Bowl",
+  "slug": "sticky-chipotle-lime-chicken-rice-bowl",
+  "source": "https://www.facebook.com/watch/?v=1403073118682723",
+  "servings": 4,
+  "time": {
+    "prep": 30,
+    "cook": null,
+    "total": null
+  },
+  "tags": [
+    "Air fryer",
+    "Bowl"
+  ],
+  "ingredients": [
+    {
+      "group": "Chicken",
+      "qty": 650,
+      "unit": "g",
+      "item": "skinless chicken thighs",
+      "section": "Meat & Fish"
+    },
+    {
+      "group": "Chicken",
+      "qty": 0.5,
+      "unit": "tbsp",
+      "item": "olive oil",
+      "section": "Pantry"
+    },
+    {
+      "group": "Chicken",
+      "qty": 1.5,
+      "unit": "tbsp",
+      "item": "chipotle in adobo",
+      "section": "Pantry"
+    },
+    {
+      "group": "Chicken",
+      "qty": 2,
+      "unit": "tsp",
+      "item": "taco spice mix",
+      "section": "Spices"
+    },
+    {
+      "group": "Chicken",
+      "qty": 1,
+      "unit": "tsp",
+      "item": "garlic powder",
+      "section": "Spices"
+    },
+    {
+      "group": "Chicken",
+      "qty": 0.5,
+      "unit": "tsp",
+      "item": "salt",
+      "section": "Spices"
+    },
+    {
+      "group": "Chicken",
+      "qty": 1.5,
+      "unit": "tbsp",
+      "item": "honey",
+      "section": "Pantry"
+    },
+    {
+      "group": "Chicken",
+      "qty": 1,
+      "unit": "tsp",
+      "item": "lime zest, heaped",
+      "section": "Produce"
+    },
+    {
+      "group": "Chicken",
+      "qty": 2,
+      "unit": "tbsp",
+      "item": "lime juice",
+      "section": "Produce"
+    },
+    {
+      "group": "Rice",
+      "qty": 4,
+      "unit": "cups",
+      "item": "cooked white rice",
+      "section": "Pantry"
+    },
+    {
+      "group": "Rice",
+      "qty": 0.5,
+      "unit": "cup",
+      "item": "coriander, chopped",
+      "section": "Produce"
+    },
+    {
+      "group": "Rice",
+      "qty": 2,
+      "unit": "tsp",
+      "item": "lime zest",
+      "section": "Produce"
+    },
+    {
+      "group": "Charred street corn salad",
+      "qty": 3,
+      "unit": "",
+      "item": "small corn cobs",
+      "section": "Produce"
+    },
+    {
+      "group": "Charred street corn salad",
+      "qty": 2,
+      "unit": "tsp",
+      "item": "taco seasoning",
+      "section": "Spices"
+    },
+    {
+      "group": "Charred street corn salad",
+      "qty": 1,
+      "unit": "",
+      "item": "small red pepper, finely diced",
+      "section": "Produce"
+    },
+    {
+      "group": "Charred street corn salad",
+      "qty": 0.5,
+      "unit": "",
+      "item": "red onion, finely diced",
+      "section": "Produce"
+    },
+    {
+      "group": "Charred street corn salad",
+      "qty": 0.333,
+      "unit": "cup",
+      "item": "coriander, chopped",
+      "section": "Produce"
+    },
+    {
+      "group": "Charred street corn salad",
+      "qty": 1,
+      "unit": "",
+      "item": "jalapeño, deseeded and diced",
+      "section": "Produce"
+    },
+    {
+      "group": "Charred street corn salad",
+      "qty": 2,
+      "unit": "tbsp",
+      "item": "lime juice",
+      "section": "Produce"
+    },
+    {
+      "group": "Charred street corn salad",
+      "qty": 1,
+      "unit": "tsp",
+      "item": "salt",
+      "section": "Spices"
+    },
+    {
+      "group": "Guacamole",
+      "qty": 1,
+      "unit": "",
+      "item": "large ripe avocado, mashed",
+      "section": "Produce"
+    },
+    {
+      "group": "Guacamole",
+      "qty": 1,
+      "unit": "",
+      "item": "Roma tomato, finely diced",
+      "section": "Produce"
+    },
+    {
+      "group": "Guacamole",
+      "qty": 0.25,
+      "unit": "cup",
+      "item": "red onion, finely diced",
+      "section": "Produce"
+    },
+    {
+      "group": "Guacamole",
+      "qty": 3,
+      "unit": "tbsp",
+      "item": "coriander, chopped",
+      "section": "Produce"
+    },
+    {
+      "group": "Guacamole",
+      "qty": 1.5,
+      "unit": "tbsp",
+      "item": "lime juice",
+      "section": "Produce"
+    },
+    {
+      "group": "Guacamole",
+      "qty": 0.5,
+      "unit": "tsp",
+      "item": "salt",
+      "section": "Spices"
+    },
+    {
+      "group": "Guacamole",
+      "qty": 0.5,
+      "unit": "tsp",
+      "item": "garlic powder",
+      "section": "Spices"
+    },
+    {
+      "group": "Garnish",
+      "qty": null,
+      "unit": "",
+      "item": "Pickled onions",
+      "section": "Other"
+    },
+    {
+      "group": "Garnish",
+      "qty": null,
+      "unit": "",
+      "item": "Fresh coriander",
+      "section": "Produce"
+    }
+  ],
+  "steps": [
+    "Marinate the chicken. Mix the chipotle in adobo, taco seasoning, garlic powder, honey, lime juice, lime zest and salt. Add the chicken, toss to coat, and marinate at least 30 minutes.",
+    "Corn salad. Husk the corn, spray lightly with oil, and season with taco seasoning. Cook in a large pan over medium-high heat 8–12 minutes, turning, until tender and charred. Slice off the kernels and toss with the pepper, onion, coriander, jalapeño, lime juice and salt.",
+    "Cook the chicken. Preheat the air fryer to 200 °C for 5 minutes. Lay the chicken in one layer, pour over the marinade, cook 7–8 minutes, flip, then 6 more minutes until charred and cooked through. Rest 5 minutes, then slice. Or use a lightly oiled pan over medium-high heat.",
+    "Guacamole. Mash the avocado until mostly smooth, then fold in the tomato, onion, coriander, garlic powder, lime juice and salt.",
+    "Rice. Toss the cooked rice with the chopped coriander and lime zest.",
+    "Assemble. Divide the rice between four bowls. Top with the sliced chicken, corn salad, guacamole, pickled onions and coriander."
+  ],
+  "notes": "By Fit Foodie Lulu. The card lists 560 kcal, 39 g protein, 65 g carbs and 15 g fat per serving. The original caption cuts off after \"corn salad\"; the rest of the assembly step is completed from the listed ingredients.",
+  "photo": "sticky-chipotle-lime-chicken-rice-bowl.jpg"
+}
