@@ -83,6 +83,40 @@
     "servings": null
   },
   {
+    "slug": "easy-fresh-corn-salad",
+    "title": "Corn Salad",
+    "tags": [
+      "salad",
+      "side",
+      "summer",
+      "vegetarian"
+    ],
+    "time": {
+      "prep": 10,
+      "cook": 0,
+      "total": 15
+    },
+    "photo": "easy-fresh-corn-salad.jpg",
+    "servings": 6
+  },
+  {
+    "slug": "creamy-balsamic-vinaigrette",
+    "title": "Creamy Balsamic Vinaigrette",
+    "tags": [
+      "dressing",
+      "salad",
+      "sauce",
+      "quick"
+    ],
+    "time": {
+      "prep": 10,
+      "cook": 0,
+      "total": 10
+    },
+    "photo": "creamy-balsamic-vinaigrette.jpg",
+    "servings": 6
+  },
+  {
     "slug": "crispy-chicken-sandwich-spicy-pickle-slaw",
     "title": "Crispy Chicken Sandwich with Spicy Pickle Slaw",
     "tags": [

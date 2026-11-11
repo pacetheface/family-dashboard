@@ -1,0 +1,78 @@
+{
+  "title": "Corn Salad",
+  "slug": "easy-fresh-corn-salad",
+  "source": "https://www.delish.com/cooking/recipe-ideas/a19695472/easy-fresh-corn-salad-recipe/",
+  "servings": 6,
+  "time": {
+    "prep": 10,
+    "cook": 0,
+    "total": 15
+  },
+  "tags": [
+    "salad",
+    "side",
+    "summer",
+    "vegetarian"
+  ],
+  "ingredients": [
+    {
+      "qty": 0.25,
+      "unit": "",
+      "item": "red onion, finely chopped",
+      "section": "Produce"
+    },
+    {
+      "qty": 4,
+      "unit": "cups",
+      "item": "fresh or frozen corn, rinsed and drained if frozen, and steamed, boiled, or grilled if fresh",
+      "section": "Produce"
+    },
+    {
+      "qty": 1,
+      "unit": "cup",
+      "item": "cherry tomatoes, halved",
+      "section": "Produce"
+    },
+    {
+      "qty": 0.333,
+      "unit": "cup",
+      "item": "crumbled feta",
+      "section": "Dairy & Eggs"
+    },
+    {
+      "qty": 0.25,
+      "unit": "cup",
+      "item": "fresh basil, thinly sliced",
+      "section": "Produce"
+    },
+    {
+      "qty": 3,
+      "unit": "tbsp",
+      "item": "extra-virgin olive oil",
+      "section": "Pantry"
+    },
+    {
+      "qty": 1,
+      "unit": "",
+      "item": "lime, juiced",
+      "section": "Produce"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "kosher salt",
+      "section": "Spices"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "freshly ground black pepper",
+      "section": "Spices"
+    }
+  ],
+  "steps": [
+    "In a large bowl, toss onion, corn, tomatoes, feta, basil, oil and lime juice; season with salt and pepper."
+  ],
+  "notes": "Total time on the source page is 15 min (prep 10 min; cook time listed as 0). Nutrition is 174 kcal, 4 g protein, 19 g carbs, and 9 g fat per serving. Delish says it can be made a day ahead and refrigerated; add the feta just before serving. Leftovers keep 2–3 days in an airtight container in the fridge. The ingredient list on the page is written as “1 limes, juiced”; this is recorded as 1 lime. Author: Lena Abraham.",
+  "photo": "easy-fresh-corn-salad.jpg"
+}
