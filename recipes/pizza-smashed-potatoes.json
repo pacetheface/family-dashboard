@@ -1,0 +1,68 @@
+{
+  "title": "Crispy Pizza Smashed Potatoes",
+  "slug": "pizza-smashed-potatoes",
+  "source": "https://www.facebook.com/watch/?v=2745481532517859",
+  "servings": 6,
+  "time": {
+    "prep": null,
+    "cook": null,
+    "total": null
+  },
+  "tags": [
+    "Air fryer or oven",
+    "Gluten free"
+  ],
+  "ingredients": [
+    {
+      "qty": 2,
+      "unit": "lbs",
+      "item": "small creamer potatoes, washed",
+      "section": "Other"
+    },
+    {
+      "qty": 1,
+      "unit": "tbsp",
+      "item": "salt",
+      "section": "Spices"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Olive oil spray (or melted butter)",
+      "section": "Pantry"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "1½ cups shredded mozzarella",
+      "section": "Dairy & Eggs"
+    },
+    {
+      "qty": 0.3333333333333333,
+      "unit": "cup",
+      "item": "marinara sauce",
+      "section": "Pantry"
+    },
+    {
+      "qty": 2,
+      "unit": "oz",
+      "item": "mini pepperonis",
+      "section": "Other"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Chili pepper flakes, to garnish",
+      "section": "Spices"
+    }
+  ],
+  "steps": [
+    "Preheat. Air fryer to 400 °F (oven 425 °F).",
+    "Boil. Cover the potatoes with water, add 1 tbsp salt and boil 10–15 minutes until just fork tender. Drain and cool slightly.",
+    "Smash. Score each potato in a criss-cross about halfway down, cover with a square of parchment and flatten with the bottom of a glass.",
+    "Crisp. Spray with oil, season with salt and pepper and air fry or roast 20–25 minutes until the edges are golden.",
+    "Top. Brush with marinara, add mozzarella and mini pepperonis, and return until melted and golden. Garnish with chili flakes."
+  ],
+  "photo": "pizza-smashed-potatoes.jpg",
+  "notes": "Recipe fetched from the creator's linked page: hungryhappens.net/crispy-pizza-smashed-potatoes"
+}

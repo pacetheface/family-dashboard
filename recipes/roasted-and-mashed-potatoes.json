@@ -1,0 +1,74 @@
+{
+  "title": "Two Potato Recipes: Roasted & Mashed",
+  "slug": "roasted-and-mashed-potatoes",
+  "source": "https://www.facebook.com/watch/?v=1248906043432699",
+  "servings": null,
+  "time": {
+    "prep": null,
+    "cook": null,
+    "total": null
+  },
+  "tags": [
+    "Yukon Gold",
+    "Oven"
+  ],
+  "ingredients": [
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Yukon Gold potatoes",
+      "section": "Other",
+      "group": "Roasted"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Butter, olive oil",
+      "section": "Pantry",
+      "group": "Roasted"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Salt and pepper (optional)",
+      "section": "Spices",
+      "group": "Roasted"
+    },
+    {
+      "qty": 2,
+      "unit": "lbs",
+      "item": "Yukon Gold potatoes",
+      "section": "Other",
+      "group": "Mashed (per 2 lbs potatoes)"
+    },
+    {
+      "qty": 1,
+      "unit": "stick",
+      "item": "butter",
+      "section": "Dairy & Eggs",
+      "group": "Mashed (per 2 lbs potatoes)"
+    },
+    {
+      "qty": 0.5,
+      "unit": "cup",
+      "item": "heavy cream",
+      "section": "Dairy & Eggs",
+      "group": "Mashed (per 2 lbs potatoes)"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Salt and pepper",
+      "section": "Spices",
+      "group": "Mashed (per 2 lbs potatoes)"
+    }
+  ],
+  "steps": [
+    "Roasted: par-cook. Cook the Yukon Golds in simmering water.",
+    "Roasted: roast. Toss in the fat and roast at 425 °F until crispy outside and fluffy inside, stirring every 15–20 minutes.",
+    "Mashed: cook and steam. Cook the potatoes in simmering water, strain, and return to the pot over low heat for 5–10 minutes to steam.",
+    "Mashed: mash. Add 1 stick butter and 1/2 cup heavy cream per 2 lbs potatoes; season and mash to the texture you like.",
+    "Keep hot. Spread the mash into a casserole dish and keep it hot in the oven; the top may turn golden brown."
+  ],
+  "photo": "roasted-and-mashed-potatoes.jpg"
+}

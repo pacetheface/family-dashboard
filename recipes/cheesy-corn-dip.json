@@ -1,0 +1,73 @@
+{
+  "title": "Cheesy Corn Dip",
+  "slug": "cheesy-corn-dip",
+  "source": "https://www.facebook.com/watch/?v=839844892528665",
+  "servings": null,
+  "time": {
+    "prep": null,
+    "cook": null,
+    "total": null
+  },
+  "tags": [
+    "Party dip",
+    "Nachos"
+  ],
+  "ingredients": [
+    {
+      "qty": 3,
+      "unit": "ears",
+      "item": "corn, kernels removed and milked",
+      "section": "Produce"
+    },
+    {
+      "qty": 0.5,
+      "unit": "",
+      "item": "onion",
+      "section": "Produce"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "4–6 garlic cloves",
+      "section": "Produce"
+    },
+    {
+      "qty": 2,
+      "unit": "tbsp",
+      "item": "olive oil",
+      "section": "Pantry"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "1/4–1/2 cup pickled peppers (banana or Fresno)",
+      "section": "Produce"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "2–3 tbsp pickled pepper juice",
+      "section": "Produce"
+    },
+    {
+      "qty": 1,
+      "unit": "cup",
+      "item": "shredded cheddar",
+      "section": "Dairy & Eggs"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Cotija, to finish",
+      "section": "Dairy & Eggs"
+    }
+  ],
+  "steps": [
+    "Corn. Stand each cob up, slice off the kernels and scrape (\"milk\") the cob for its juices.",
+    "Sauté. Cook the diced onion and garlic in the olive oil until soft, then add the corn and its milk and cook until tender.*",
+    "Peppers. Stir in the chopped pickled peppers and pepper juice.*",
+    "Cheese. Melt in the cheddar and top with crumbled cotija. Serve warm with chips.*"
+  ],
+  "photo": "cheesy-corn-dip.jpg",
+  "notes": "* The post lists only ingredients; the method is written from the listed ingredients and the reel, with no quantities added."
+}

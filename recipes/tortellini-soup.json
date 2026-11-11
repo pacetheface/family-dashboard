@@ -1,0 +1,117 @@
+{
+  "title": "Tortellini Soup",
+  "slug": "tortellini-soup",
+  "source": "https://www.facebook.com/watch/?v=1784127716155932",
+  "servings": null,
+  "time": {
+    "prep": null,
+    "cook": null,
+    "total": null
+  },
+  "tags": [
+    "One pot",
+    "Weeknight"
+  ],
+  "ingredients": [
+    {
+      "qty": 1,
+      "unit": "lb",
+      "item": "mild Italian sausage",
+      "section": "Meat & Fish"
+    },
+    {
+      "qty": 1,
+      "unit": "",
+      "item": "yellow onion, chopped",
+      "section": "Produce"
+    },
+    {
+      "qty": 3,
+      "unit": "",
+      "item": "carrots, chopped",
+      "section": "Produce"
+    },
+    {
+      "qty": 3,
+      "unit": "stalks",
+      "item": "celery, chopped",
+      "section": "Produce"
+    },
+    {
+      "qty": 0.5,
+      "unit": "tsp",
+      "item": "ground black pepper",
+      "section": "Spices"
+    },
+    {
+      "qty": 2,
+      "unit": "tsp",
+      "item": "Italian seasoning",
+      "section": "Spices"
+    },
+    {
+      "qty": 1,
+      "unit": "tsp",
+      "item": "salt",
+      "section": "Spices"
+    },
+    {
+      "qty": 1,
+      "unit": "tsp",
+      "item": "fennel seed, lightly crushed",
+      "section": "Spices"
+    },
+    {
+      "qty": 6,
+      "unit": "oz",
+      "item": "tomato paste",
+      "section": "Pantry"
+    },
+    {
+      "qty": 0.5,
+      "unit": "cup",
+      "item": "all-purpose flour",
+      "section": "Pantry"
+    },
+    {
+      "qty": 7,
+      "unit": "cups",
+      "item": "beef broth",
+      "section": "Pantry"
+    },
+    {
+      "qty": 20,
+      "unit": "oz",
+      "item": "cheese tortellini",
+      "section": "Pantry"
+    },
+    {
+      "qty": 2,
+      "unit": "cups",
+      "item": "heavy cream, half-and-half or coconut cream",
+      "section": "Dairy & Eggs"
+    },
+    {
+      "qty": 2,
+      "unit": "cups",
+      "item": "fresh spinach",
+      "section": "Produce"
+    },
+    {
+      "qty": 0.5,
+      "unit": "cup",
+      "item": "grated Parmesan, plus more to serve",
+      "section": "Dairy & Eggs"
+    }
+  ],
+  "steps": [
+    "Sausage. In a large stockpot over medium-high heat, sauté the onion 1 minute, add the sausage, then the spices; cook until almost browned.",
+    "Veg. Add carrots and celery; sauté about 5 minutes until softening.",
+    "Tomato paste. Stir in and cook 5 minutes until fragrant.",
+    "Flour. Sprinkle in and stir 1 minute (it will look dry).",
+    "Broth. Gradually pour in the broth, stirring. Boil, then simmer 15 minutes.",
+    "Tortellini. Stir in cream, tortellini and spinach; simmer 2–3 minutes until tender.",
+    "Finish. Stir in the Parmesan until melted and serve with extra cheese."
+  ],
+  "photo": "tortellini-soup.jpg"
+}

@@ -1,0 +1,83 @@
+{
+  "title": "Air Fryer Chicken Fajita Bowls",
+  "slug": "air-fryer-chicken-fajita-bowls",
+  "source": "https://www.facebook.com/watch/?v=1561283166042155",
+  "servings": 4,
+  "time": {
+    "prep": null,
+    "cook": null,
+    "total": 26
+  },
+  "tags": [
+    "Air fryer"
+  ],
+  "ingredients": [
+    {
+      "qty": 900,
+      "unit": "",
+      "item": "g chicken breast, diced",
+      "section": "Meat & Fish"
+    },
+    {
+      "qty": 1,
+      "unit": "",
+      "item": "red pepper, diced",
+      "section": "Produce"
+    },
+    {
+      "qty": 1,
+      "unit": "",
+      "item": "yellow pepper, diced",
+      "section": "Produce"
+    },
+    {
+      "qty": 1,
+      "unit": "",
+      "item": "orange pepper, diced",
+      "section": "Produce"
+    },
+    {
+      "qty": 1,
+      "unit": "",
+      "item": "green pepper, diced",
+      "section": "Produce"
+    },
+    {
+      "qty": 1,
+      "unit": "",
+      "item": "medium red onion, diced",
+      "section": "Produce"
+    },
+    {
+      "qty": 2,
+      "unit": "packets",
+      "item": "fajita seasoning",
+      "section": "Spices"
+    },
+    {
+      "qty": 1,
+      "unit": "tbsp",
+      "item": "fresh lime juice",
+      "section": "Produce"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Cooking spray",
+      "section": "Other"
+    },
+    {
+      "qty": 250,
+      "unit": "",
+      "item": "g dry white rice",
+      "section": "Pantry"
+    }
+  ],
+  "steps": [
+    "Mix. Put the chicken, peppers and onion in a large bowl with the fajita seasoning and lime juice; mix well.",
+    "Air fry. Lightly spray the basket and air fry at 200 °C for 16–18 minutes, tossing halfway, until the chicken is fully cooked.",
+    "Rice. Meanwhile, cook the rice per the packet.",
+    "Serve. Divide the rice between 4 bowls and top with the chicken and veg."
+  ],
+  "photo": "air-fryer-chicken-fajita-bowls.jpg"
+}

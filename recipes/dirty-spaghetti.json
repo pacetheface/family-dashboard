@@ -1,0 +1,108 @@
+{
+  "title": "Dirty Spaghetti",
+  "slug": "dirty-spaghetti",
+  "source": "https://www.facebook.com/watch/?v=776861952061498",
+  "servings": 4,
+  "time": {
+    "prep": null,
+    "cook": null,
+    "total": 18
+  },
+  "tags": [],
+  "ingredients": [
+    {
+      "qty": 1,
+      "unit": "lb",
+      "item": "spaghetti",
+      "section": "Other"
+    },
+    {
+      "qty": 1,
+      "unit": "lb",
+      "item": "ground beef",
+      "section": "Meat & Fish"
+    },
+    {
+      "qty": 8,
+      "unit": "oz",
+      "item": "smoked andouille sausage, chopped",
+      "section": "Meat & Fish"
+    },
+    {
+      "qty": 4,
+      "unit": "",
+      "item": "vine-ripened tomatoes, halved",
+      "section": "Other"
+    },
+    {
+      "qty": 2,
+      "unit": "stalks",
+      "item": "celery",
+      "section": "Produce"
+    },
+    {
+      "qty": 0.5,
+      "unit": "",
+      "item": "yellow onion",
+      "section": "Produce"
+    },
+    {
+      "qty": 0.5,
+      "unit": "",
+      "item": "red bell pepper",
+      "section": "Produce"
+    },
+    {
+      "qty": 4,
+      "unit": "cloves",
+      "item": "garlic",
+      "section": "Produce"
+    },
+    {
+      "qty": 1.5,
+      "unit": "cups",
+      "item": "beef broth",
+      "section": "Pantry"
+    },
+    {
+      "qty": 3,
+      "unit": "tbsp",
+      "item": "tomato paste",
+      "section": "Pantry"
+    },
+    {
+      "qty": 5,
+      "unit": "oz",
+      "item": "Boursin cheese",
+      "section": "Dairy & Eggs"
+    },
+    {
+      "qty": 3,
+      "unit": "tbsp",
+      "item": "Back 9 Blends seasoning",
+      "section": "Spices"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Olive oil",
+      "section": "Pantry"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Parmesan cheese",
+      "section": "Dairy & Eggs"
+    }
+  ],
+  "steps": [
+    "Tomatoes. Heat olive oil in a large skillet over medium heat. Add the tomatoes cut side down, cover and cook 8 minutes until blistered. Remove the skins and mash gently.",
+    "Sauce base. Add celery, onion, pepper, garlic and seasoning. Add tomato paste and cook until brick red; let simmer.",
+    "Meat. In another pan, crisp the sausage, then add the beef and brown. Drain and set aside.",
+    "Boursin. After about 10 minutes of simmering, stir in the broth and Boursin. Add the meat.",
+    "Pasta. Cook the spaghetti until al dente, add to the sauce, mix well and simmer a few minutes.",
+    "Serve. Top with fresh Parmesan."
+  ],
+  "photo": "dirty-spaghetti.jpg",
+  "notes": "The reel caption has no recipe. Recipe found on the creator's own site: icanmakethat.com (DJ's Clubhouse, Dirty Spaghetti)"
+}

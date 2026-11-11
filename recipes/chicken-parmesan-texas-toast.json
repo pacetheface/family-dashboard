@@ -1,0 +1,59 @@
+{
+  "title": "Chicken Parmesan Texas Toast",
+  "slug": "chicken-parmesan-texas-toast",
+  "source": "https://www.facebook.com/watch/?v=1421443879888387",
+  "servings": 5,
+  "time": {
+    "prep": null,
+    "cook": null,
+    "total": 15
+  },
+  "tags": [],
+  "ingredients": [
+    {
+      "qty": 1,
+      "unit": "",
+      "item": "pack (8 count) frozen Texas toast",
+      "section": "Frozen"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Frozen chicken tenders/nuggets",
+      "section": "Frozen"
+    },
+    {
+      "qty": 1.5,
+      "unit": "cups",
+      "item": "marinara sauce",
+      "section": "Pantry"
+    },
+    {
+      "qty": 6,
+      "unit": "oz",
+      "item": "shredded mozzarella",
+      "section": "Dairy & Eggs"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Italian seasoning",
+      "section": "Spices"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Crushed red pepper (optional)",
+      "section": "Produce"
+    }
+  ],
+  "steps": [
+    "Prep. Preheat the oven per the Texas toast packaging. Cook the chicken tenders in the air fryer per the packet, then cut into smaller pieces.",
+    "Toast. Lay the Texas toast in a 13x9 pan and bake 6 minutes.",
+    "Make a bowl. Press down the middle of each toast without going all the way through.",
+    "Layer. Mozzarella, then marinara sprinkled with Italian seasoning and crushed red pepper, then the chicken, then more marinara and mozzarella.",
+    "Bake. Bake another 5 minutes until the cheese melts; broil on low 2–3 minutes for extra crisp."
+  ],
+  "photo": "chicken-parmesan-texas-toast.jpg",
+  "notes": "Recipe fetched from the creator's linked page: theeverydaycookbook.com/chicken-parmesan-texas-toast"
+}

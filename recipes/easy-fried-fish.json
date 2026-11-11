@@ -1,0 +1,63 @@
+{
+  "title": "Easy Fried Fish",
+  "slug": "easy-fried-fish",
+  "source": "https://www.facebook.com/watch/?v=2003810766693366",
+  "servings": null,
+  "time": {
+    "prep": null,
+    "cook": null,
+    "total": null
+  },
+  "tags": [],
+  "ingredients": [
+    {
+      "qty": null,
+      "unit": "",
+      "item": "1 cup AP flour, plus 1–2 tbsp",
+      "section": "Pantry",
+      "group": "Batter"
+    },
+    {
+      "qty": 0.5,
+      "unit": "tbsp",
+      "item": "baking powder",
+      "section": "Other",
+      "group": "Batter"
+    },
+    {
+      "qty": 0.5,
+      "unit": "cup",
+      "item": "water",
+      "section": "Other",
+      "group": "Batter"
+    },
+    {
+      "qty": 1,
+      "unit": "",
+      "item": "egg",
+      "section": "Dairy & Eggs",
+      "group": "Batter"
+    },
+    {
+      "qty": 1,
+      "unit": "lb",
+      "item": "fish",
+      "section": "Meat & Fish",
+      "group": "To fry"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Oil for frying",
+      "section": "Pantry",
+      "group": "To fry"
+    }
+  ],
+  "steps": [
+    "Batter. Whisk 1 cup flour, baking powder, water and egg into a smooth batter.*",
+    "Dredge. Pat the fish dry and dust with the extra 1–2 tbsp flour.*",
+    "Fry. Dip in the batter, let the excess drip off, and fry in hot oil until golden and cooked through. Drain and season.*"
+  ],
+  "photo": "easy-fried-fish.jpg",
+  "notes": "* The post lists only ingredients; the method is written from the listed ingredients and the reel, with no quantities added."
+}

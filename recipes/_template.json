@@ -1,0 +1,18 @@
+{
+  "title": "Recipe title",
+  "slug": "recipe-title",
+  "source": "",
+  "servings": 4,
+  "time": { "prep": 10, "cook": 20, "total": 30 },
+  "tags": ["Weeknight"],
+  "ingredients": [
+    { "qty": 1, "unit": "tbsp", "item": "olive oil", "section": "Pantry" },
+    { "group": "To serve", "qty": null, "unit": "", "item": "Salt", "section": "Spices" }
+  ],
+  "steps": [
+    "Do the first thing.",
+    "Simmer 10 minutes, then serve."
+  ],
+  "notes": "",
+  "photo": "recipe-title.jpg"
+}

@@ -1,0 +1,92 @@
+{
+  "title": "Cheeseburger Bombs",
+  "slug": "cheeseburger-bombs",
+  "source": "https://www.facebook.com/watch/?v=986210454035723",
+  "servings": 6,
+  "time": {
+    "prep": null,
+    "cook": null,
+    "total": 25
+  },
+  "tags": [
+    "Freezer friendly"
+  ],
+  "ingredients": [
+    {
+      "qty": null,
+      "unit": "",
+      "item": "1 (8 oz) package crescent rolls",
+      "section": "Bakery"
+    },
+    {
+      "qty": 0.5,
+      "unit": "lb",
+      "item": "ground beef",
+      "section": "Meat & Fish"
+    },
+    {
+      "qty": 0.25,
+      "unit": "cup",
+      "item": "chopped onions",
+      "section": "Produce"
+    },
+    {
+      "qty": 0.25,
+      "unit": "tsp",
+      "item": "salt",
+      "section": "Spices"
+    },
+    {
+      "qty": 0.25,
+      "unit": "tsp",
+      "item": "black pepper",
+      "section": "Spices"
+    },
+    {
+      "qty": 0.25,
+      "unit": "tsp",
+      "item": "garlic powder",
+      "section": "Spices"
+    },
+    {
+      "qty": 0.25,
+      "unit": "tsp",
+      "item": "paprika",
+      "section": "Spices"
+    },
+    {
+      "qty": 0.25,
+      "unit": "cup",
+      "item": "ketchup",
+      "section": "Pantry"
+    },
+    {
+      "qty": 0.5,
+      "unit": "cup",
+      "item": "cheddar cheese, plus more for the bombs",
+      "section": "Dairy & Eggs"
+    },
+    {
+      "qty": 1,
+      "unit": "",
+      "item": "egg, for egg wash (optional)",
+      "section": "Dairy & Eggs"
+    },
+    {
+      "qty": null,
+      "unit": "",
+      "item": "Sesame seeds, to top (optional)",
+      "section": "Other"
+    }
+  ],
+  "steps": [
+    "Preheat. Oven to 350 °F; line a 9x13 baking sheet with parchment.",
+    "Filling. Brown the beef over medium heat, then add the onion and seasonings and cook until no longer pink and the onion is soft. Drain.",
+    "Cheese. Stir in the ketchup, turn off the heat and stir in the cheese. Cool slightly.",
+    "Dough. Unroll the crescent dough, pinch the seams into one rectangle, roll lightly and cut into 6 squares.",
+    "Fill. Add about 2 tbsp filling and a little extra cheddar to each, fold and pinch to seal, and place seam side down.",
+    "Bake. Brush with egg, add sesame seeds if you like, and bake 15 minutes until golden."
+  ],
+  "photo": "cheeseburger-bombs.jpg",
+  "notes": "Recipe fetched from the creator's linked page: feedingtinybellies.com/cheeseburger-bombs"
+}

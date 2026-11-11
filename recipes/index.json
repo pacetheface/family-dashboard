@@ -1,0 +1,660 @@
+[
+  {
+    "slug": "air-fryer-chicken-fajita-bowls",
+    "title": "Air Fryer Chicken Fajita Bowls",
+    "tags": [
+      "Air fryer"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 26
+    },
+    "photo": "air-fryer-chicken-fajita-bowls.jpg",
+    "servings": 4
+  },
+  {
+    "slug": "cheeseburger-bombs",
+    "title": "Cheeseburger Bombs",
+    "tags": [
+      "Freezer friendly"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 25
+    },
+    "photo": "cheeseburger-bombs.jpg",
+    "servings": 6
+  },
+  {
+    "slug": "cheesy-corn-dip",
+    "title": "Cheesy Corn Dip",
+    "tags": [
+      "Party dip",
+      "Nachos"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "cheesy-corn-dip.jpg",
+    "servings": null
+  },
+  {
+    "slug": "cheesy-nandos-chicken-wraps",
+    "title": "Cheesy Nando's Chicken Wraps",
+    "tags": [
+      "Air fryer"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 15
+    },
+    "photo": "cheesy-nandos-chicken-wraps.jpg",
+    "servings": 2
+  },
+  {
+    "slug": "chicken-parmesan-texas-toast",
+    "title": "Chicken Parmesan Texas Toast",
+    "tags": [],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 15
+    },
+    "photo": "chicken-parmesan-texas-toast.jpg",
+    "servings": 5
+  },
+  {
+    "slug": "chili-crunch-chicken-tenders",
+    "title": "Chili Crunch Chicken Tenders",
+    "tags": [
+      "Deep fried"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "chili-crunch-chicken-tenders.jpg",
+    "servings": null
+  },
+  {
+    "slug": "easy-fresh-corn-salad",
+    "title": "Corn Salad",
+    "tags": [
+      "salad",
+      "side",
+      "summer",
+      "vegetarian"
+    ],
+    "time": {
+      "prep": 10,
+      "cook": 0,
+      "total": 15
+    },
+    "photo": "easy-fresh-corn-salad.jpg",
+    "servings": 6
+  },
+  {
+    "slug": "creamy-balsamic-vinaigrette",
+    "title": "Creamy Balsamic Vinaigrette",
+    "tags": [
+      "dressing",
+      "salad",
+      "sauce",
+      "quick"
+    ],
+    "time": {
+      "prep": 10,
+      "cook": 0,
+      "total": 10
+    },
+    "photo": "creamy-balsamic-vinaigrette.jpg",
+    "servings": 6
+  },
+  {
+    "slug": "crispy-chicken-sandwich-spicy-pickle-slaw",
+    "title": "Crispy Chicken Sandwich with Spicy Pickle Slaw",
+    "tags": [
+      "Fried chicken",
+      "Sandwich"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "crispy-chicken-sandwich-spicy-pickle-slaw.jpg",
+    "servings": null
+  },
+  {
+    "slug": "pizza-smashed-potatoes",
+    "title": "Crispy Pizza Smashed Potatoes",
+    "tags": [
+      "Air fryer or oven",
+      "Gluten free"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "pizza-smashed-potatoes.jpg",
+    "servings": 6
+  },
+  {
+    "slug": "crockpot-marry-me-meatballs",
+    "title": "Crockpot Marry Me Meatballs",
+    "tags": [],
+    "time": {
+      "prep": 5,
+      "cook": 240,
+      "total": null
+    },
+    "photo": "crockpot-marry-me-meatballs.jpg",
+    "servings": 6
+  },
+  {
+    "slug": "dill-pickle-chicken-smash-burgers",
+    "title": "Dill Pickle Chicken Smash Burgers with Creamy Slaw",
+    "tags": [],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 25
+    },
+    "photo": "dill-pickle-chicken-smash-burgers.jpg",
+    "servings": 4
+  },
+  {
+    "slug": "dirty-spaghetti",
+    "title": "Dirty Spaghetti",
+    "tags": [],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 18
+    },
+    "photo": "dirty-spaghetti.jpg",
+    "servings": 4
+  },
+  {
+    "slug": "teriyaki-beef-dinner",
+    "title": "Easy 10-Minute Teriyaki Beef Dinner",
+    "tags": [
+      "Low carb"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 10
+    },
+    "photo": "teriyaki-beef-dinner.jpg",
+    "servings": null
+  },
+  {
+    "slug": "easy-fried-fish",
+    "title": "Easy Fried Fish",
+    "tags": [],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "easy-fried-fish.jpg",
+    "servings": null
+  },
+  {
+    "slug": "easy-garlic-pasta",
+    "title": "Easy Garlic Pasta",
+    "tags": [
+      "Quick",
+      "Pantry"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "easy-garlic-pasta.jpg",
+    "servings": null
+  },
+  {
+    "slug": "fish-tacos-mango-salsa-avocado-crema",
+    "title": "Fish Tacos with Mango Salsa & Lime Avocado Crema",
+    "tags": [],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "fish-tacos-mango-salsa-avocado-crema.jpg",
+    "servings": null
+  },
+  {
+    "slug": "five-guys-style-fry-sauce",
+    "title": "Five Guys-Style \"Secret\" Fry Sauce",
+    "tags": [
+      "Sauce",
+      "Chill"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "five-guys-style-fry-sauce.jpg",
+    "servings": null
+  },
+  {
+    "slug": "garlic-herb-steak-bites-loaded-potatoes",
+    "title": "Garlic Herb Steak Bites Loaded Baked Potatoes",
+    "tags": [
+      "Grill"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 95
+    },
+    "photo": "garlic-herb-steak-bites-loaded-potatoes.jpg",
+    "servings": 4
+  },
+  {
+    "slug": "garlic-meatball-bombs",
+    "title": "Garlic Meatball Bombs in the Air Fryer",
+    "tags": [
+      "Air fryer"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "garlic-meatball-bombs.jpg",
+    "servings": null
+  },
+  {
+    "slug": "garlic-parmesan-chicken-and-potatoes",
+    "title": "Garlic Parmesan Chicken and Potatoes",
+    "tags": [
+      "Air fryer skillet"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 35
+    },
+    "photo": "garlic-parmesan-chicken-and-potatoes.jpg",
+    "servings": 4
+  },
+  {
+    "slug": "street-corn-chicken-pasta",
+    "title": "High Protein Street Corn Chicken Pasta",
+    "tags": [
+      "Slow cooker"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "street-corn-chicken-pasta.jpg",
+    "servings": null
+  },
+  {
+    "slug": "hot-dog-burnt-ends",
+    "title": "Hot Dog Burnt Ends",
+    "tags": [
+      "Smoker"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "hot-dog-burnt-ends.jpg",
+    "servings": 32
+  },
+  {
+    "slug": "hot-honey-chicken-pasta",
+    "title": "Hot Honey Chicken Pasta",
+    "tags": [
+      "Weeknight"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "hot-honey-chicken-pasta.jpg",
+    "servings": 2
+  },
+  {
+    "slug": "animal-style-fries",
+    "title": "In-N-Out Animal Style Fries",
+    "tags": [
+      "Copycat"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "animal-style-fries.jpg",
+    "servings": null
+  },
+  {
+    "slug": "korean-style-beef-pockets",
+    "title": "Korean-Style Beef Pockets",
+    "tags": [
+      "Oven"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 30
+    },
+    "photo": "korean-style-beef-pockets.jpg",
+    "servings": null
+  },
+  {
+    "slug": "kotopoulo-lemonato-me-patates",
+    "title": "Kotopoulo Lemonato me Patates",
+    "tags": [
+      "One tray"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 90
+    },
+    "photo": "kotopoulo-lemonato-me-patates.jpg",
+    "servings": null
+  },
+  {
+    "slug": "meal-prep-chipotle-lime-chicken",
+    "title": "Meal Prep Chipotle Lime Chicken",
+    "tags": [],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "meal-prep-chipotle-lime-chicken.jpg",
+    "servings": 10
+  },
+  {
+    "slug": "molten-brownies",
+    "title": "Molten Brownies",
+    "tags": [],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 22
+    },
+    "photo": "molten-brownies.jpg",
+    "servings": null
+  },
+  {
+    "slug": "mushroom-cream-pan-sauce-for-chicken",
+    "title": "Mushroom Cream Pan Sauce for Chicken",
+    "tags": [],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "mushroom-cream-pan-sauce-for-chicken.jpg",
+    "servings": null
+  },
+  {
+    "slug": "noodle-stir-fry",
+    "title": "Noodle Stir Fry",
+    "tags": [
+      "Weekend takeout"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "noodle-stir-fry.jpg",
+    "servings": null
+  },
+  {
+    "slug": "one-pan-cheesy-taco-mac",
+    "title": "One Pan Cheesy Taco Mac",
+    "tags": [
+      "One pan"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 30
+    },
+    "photo": "one-pan-cheesy-taco-mac.jpg",
+    "servings": 6
+  },
+  {
+    "slug": "creamy-smothered-chicken-and-potatoes",
+    "title": "One Pan Creamy Smothered Chicken & Potatoes",
+    "tags": [
+      "Dutch oven",
+      "Toddler friendly"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "creamy-smothered-chicken-and-potatoes.jpg",
+    "servings": null
+  },
+  {
+    "slug": "one-pan-creamy-spicy-tomato-pasta",
+    "title": "One Pan Dump Creamy Spicy Tomato Pasta",
+    "tags": [
+      "One pan",
+      "Dump and simmer"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "one-pan-creamy-spicy-tomato-pasta.jpg",
+    "servings": null
+  },
+  {
+    "slug": "one-pan-smash-burger-skillet",
+    "title": "One Pan Smash Burger Skillet",
+    "tags": [
+      "Gluten free"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 30
+    },
+    "photo": "one-pan-smash-burger-skillet.jpg",
+    "servings": 4
+  },
+  {
+    "slug": "one-pot-creamy-sausage-pasta",
+    "title": "One Pot Creamy Sausage Pasta",
+    "tags": [
+      "One pot"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 30
+    },
+    "photo": "one-pot-creamy-sausage-pasta.jpg",
+    "servings": 6
+  },
+  {
+    "slug": "pici-allaglione",
+    "title": "Pici all'Aglione (Tuscan Garlic Pasta)",
+    "tags": [
+      "Hand-made pasta",
+      "Vegan"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "pici-allaglione.jpg",
+    "servings": 2
+  },
+  {
+    "slug": "raising-canes-sauce",
+    "title": "Raising Cane's Sauce",
+    "tags": [
+      "Sauce",
+      "Rest or overnight"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "raising-canes-sauce.jpg",
+    "servings": null
+  },
+  {
+    "slug": "sheet-pan-chipotle-chicken-tacos",
+    "title": "Sheet Pan Chipotle Chicken Tacos",
+    "tags": [
+      "Sheet pan"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": 25
+    },
+    "photo": "sheet-pan-chipotle-chicken-tacos.jpg",
+    "servings": null
+  },
+  {
+    "slug": "slow-cooker-chicken-pot-pie-pasta",
+    "title": "Slow Cooker Low Carb Chicken Pot Pie Pasta",
+    "tags": [
+      "Slow cooker"
+    ],
+    "time": {
+      "prep": null,
+      "cook": 360,
+      "total": null
+    },
+    "photo": "slow-cooker-chicken-pot-pie-pasta.jpg",
+    "servings": null
+  },
+  {
+    "slug": "sticky-chipotle-lime-chicken-rice-bowl",
+    "title": "Sticky Chipotle Lime Chicken Rice Bowl",
+    "tags": [
+      "Air fryer",
+      "Bowl"
+    ],
+    "time": {
+      "prep": 30,
+      "cook": null,
+      "total": null
+    },
+    "photo": "sticky-chipotle-lime-chicken-rice-bowl.jpg",
+    "servings": 4
+  },
+  {
+    "slug": "street-corn-chicken-and-rice-bowls",
+    "title": "Street Corn Chicken and Rice Bowls",
+    "tags": [
+      "Sheet pan",
+      "Marinate"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "street-corn-chicken-and-rice-bowls.jpg",
+    "servings": null
+  },
+  {
+    "slug": "street-corn-pasta-salad",
+    "title": "Street Corn Pasta Salad",
+    "tags": [
+      "Chill"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "street-corn-pasta-salad.jpg",
+    "servings": null
+  },
+  {
+    "slug": "brown-butter-roasted-new-potatoes",
+    "title": "Swedish Midsummer Brown Butter Roasted New Potatoes",
+    "tags": [
+      "Grill or oven",
+      "Foil parcel"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "brown-butter-roasted-new-potatoes.jpg",
+    "servings": null
+  },
+  {
+    "slug": "torta-di-mele",
+    "title": "Torta di Mele (Italian Apple Cake)",
+    "tags": [],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "torta-di-mele.jpg",
+    "servings": null
+  },
+  {
+    "slug": "tortellini-soup",
+    "title": "Tortellini Soup",
+    "tags": [
+      "One pot",
+      "Weeknight"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "tortellini-soup.jpg",
+    "servings": null
+  },
+  {
+    "slug": "roasted-and-mashed-potatoes",
+    "title": "Two Potato Recipes: Roasted & Mashed",
+    "tags": [
+      "Yukon Gold",
+      "Oven"
+    ],
+    "time": {
+      "prep": null,
+      "cook": null,
+      "total": null
+    },
+    "photo": "roasted-and-mashed-potatoes.jpg",
+    "servings": null
+  }
+]
