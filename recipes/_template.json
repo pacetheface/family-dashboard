@@ -14,5 +14,13 @@
     "Simmer 10 minutes, then serve."
   ],
   "notes": "",
-  "photo": "recipe-title.jpg"
+  "photo": "recipe-title.jpg",
+  "variations": [
+    {
+      "name": "A variation",
+      "notes": "Optional. Leave this array out when the recipe has no variations.",
+      "changes": ["Swap one ingredient"],
+      "serve_with": ["Something to eat it with"]
+    }
+  ]
 }

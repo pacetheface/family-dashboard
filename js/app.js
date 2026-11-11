@@ -1972,10 +1972,35 @@
     var seen = {};
     return found.filter(function (n) { if (seen[n]) return false; seen[n] = true; return n > 0 && n <= 240; });
   }
+  var TAG_SMALL = { and: 1, or: 1, of: 1, the: 1, a: 1, an: 1, to: 1, for: 1, in: 1, on: 1, with: 1 };
+  function tagLabel(tag) {
+    var wordIndex = 0;
+    return String(tag || '').replace(/^\s+|\s+$/g, '').split(/(\s+|-)/).map(function (part) {
+      if (!part || /^\s+$/.test(part) || part === '-') return part;
+      var lower = part.toLowerCase();
+      var cap = lower.charAt(0).toUpperCase() + lower.slice(1);
+      var out = wordIndex > 0 && TAG_SMALL[lower] ? lower : cap;
+      wordIndex += 1;
+      return out;
+    }).join('');
+  }
+  function recipeTagLabels(tags) {
+    var seen = {};
+    var labels = [];
+    (tags || []).forEach(function (tag) {
+      var label = tagLabel(tag);
+      var key = label.toLowerCase();
+      if (!label || seen[key]) return;
+      seen[key] = true;
+      labels.push(label);
+    });
+    return labels;
+  }
   function filteredRecipes() {
     var q = recipeQuery.replace(/^\s+|\s+$/g, '').toLowerCase();
+    var want = recipeTag === 'All' ? '' : tagLabel(recipeTag).toLowerCase();
     return RECIPE_INDEX.filter(function (recipe) {
-      if (recipeTag !== 'All' && (recipe.tags || []).indexOf(recipeTag) < 0) return false;
+      if (want && recipeTagLabels(recipe.tags).map(function (label) { return label.toLowerCase(); }).indexOf(want) < 0) return false;
       if (!q) return true;
       return recipe.title.toLowerCase().indexOf(q) >= 0 || (recipe.tags || []).join(' ').toLowerCase().indexOf(q) >= 0;
     });
@@ -1991,13 +2016,23 @@
     }).join('');
   }
   function renderRecipeBrowse() {
-    var tags = { All: true };
-    RECIPE_INDEX.forEach(function (recipe) { (recipe.tags || []).forEach(function (tag) { tags[tag] = true; }); });
+    var labels = ['All'];
+    var seen = { all: true };
+    RECIPE_INDEX.forEach(function (recipe) {
+      recipeTagLabels(recipe.tags).forEach(function (label) {
+        var key = label.toLowerCase();
+        if (seen[key]) return;
+        seen[key] = true;
+        labels.push(label);
+      });
+    });
+    labels.sort(function (a, b) { if (a === 'All') return -1; if (b === 'All') return 1; return a < b ? -1 : 1; });
     var html = '<div class="page"><div class="page-head"><h2>Recipes</h2><button type="button" class="btn light" data-act="meals-pane" data-id="plan">Dinners</button></div>';
     html += '<input class="field" id="recipeSearch" placeholder="Search recipes" value="' + esc(recipeQuery) + '" autocomplete="off">';
     html += '<div class="pills">';
-    Object.keys(tags).sort(function (a, b) { if (a === 'All') return -1; if (b === 'All') return 1; return a < b ? -1 : 1; }).forEach(function (tag) {
-      html += '<button type="button" class="pill' + (recipeTag === tag ? ' on' : '') + '" data-act="recipe-tag" data-id="' + esc(tag) + '">' + esc(tag) + '</button>';
+    labels.forEach(function (tag) {
+      var on = tag === 'All' ? recipeTag === 'All' : tagLabel(recipeTag).toLowerCase() === tag.toLowerCase();
+      html += '<button type="button" class="pill' + (on ? ' on' : '') + '" data-act="recipe-tag" data-id="' + esc(tag) + '">' + esc(tag) + '</button>';
     });
     html += '</div><div class="recipe-grid" id="recipeGrid">' + recipeCardsHtml() + '</div></div>';
     return html;
@@ -2030,11 +2065,29 @@
     var days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
     var serveLabel = recipe.servings ? String(serveNow) : '× ' + serveNow;
     var html = '<div class="page"><div class="page-head"><button type="button" class="btn light" data-act="meals-pane" data-id="recipes">Recipes</button><h2>' + esc(recipe.title) + '</h2></div>';
-    html += '<div class="recipe-detail"><article class="card recipe-hero"><img alt="" src="recipes/photos/' + esc(recipe.photo) + '"><h3 class="recipe-title">' + esc(recipe.title) + '</h3><p class="muted">' + esc((recipe.tags || []).join(' · ')) + '</p>';
+    var variations = '';
+    if (recipe.variations && recipe.variations.length) {
+      variations = '<h3 class="variation-head">Variations</h3>';
+      recipe.variations.forEach(function (variation) {
+        variations += '<div class="variation"><h3>' + esc(variation.name) + '</h3>';
+        if (variation.notes) variations += '<p class="muted">' + esc(variation.notes) + '</p>';
+        if (variation.changes && variation.changes.length) {
+          variations += '<ul>';
+          variation.changes.forEach(function (change) { variations += '<li>' + esc(change) + '</li>'; });
+          variations += '</ul>';
+        }
+        if (variation.serve_with && variation.serve_with.length) {
+          variations += '<p class="serve-with"><b>Serve with</b> ' + esc(variation.serve_with.join(', ')) + '</p>';
+        }
+        variations += '</div>';
+      });
+    }
+    html += '<div class="recipe-detail"><article class="card recipe-hero"><img alt="" src="recipes/photos/' + esc(recipe.photo) + '"><h3 class="recipe-title">' + esc(recipe.title) + '</h3><p class="muted">' + esc(recipeTagLabels(recipe.tags).join(' · ')) + '</p>';
     if (recipe.notes) html += '<p>' + esc(recipe.notes) + '</p>';
     if (recipe.source) html += '<p class="muted"><a href="' + esc(recipe.source) + '">Original</a></p>';
     html += '</article><article class="card"><div class="kicker"><span>INGREDIENTS</span><span class="row-actions"><button type="button" class="btn light small" data-act="servings" data-id="-1">−</button><b>' + esc(serveLabel) + '</b><button type="button" class="btn light small" data-act="servings" data-id="1">+</button></span></div>';
     html += ingHtml;
+    html += variations;
     html += '<div class="row-actions" style="margin-top:12px"><button type="button" class="btn dark" data-act="recipe-aldi">Add to Aldi list</button><button type="button" class="btn light" data-act="meals-pane" data-id="cook">Cook</button></div>';
     html += '<div class="kicker" style="margin-top:14px">Put on a day</div><div class="pills">';
     days.forEach(function (day) { html += '<button type="button" class="pill" data-act="recipe-day" data-id="' + day + '">' + day.charAt(0).toUpperCase() + day.slice(1) + '</button>'; });

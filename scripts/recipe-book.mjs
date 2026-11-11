@@ -31,6 +31,46 @@ function line(ing) {
   return [qty(ing.qty), ing.unit, ing.item].filter(Boolean).join(' ');
 }
 
+const SMALL_WORDS = new Set(['and', 'or', 'of', 'the', 'a', 'an', 'to', 'for', 'in', 'on', 'with']);
+
+function titleTag(tag) {
+  let wordIndex = 0;
+  return String(tag).trim().split(/(\s+|-)/).map((part) => {
+    if (!part || /^\s+$/.test(part) || part === '-') return part;
+    const lower = part.toLowerCase();
+    const cap = lower.charAt(0).toUpperCase() + lower.slice(1);
+    const out = wordIndex > 0 && SMALL_WORDS.has(lower) ? lower : cap;
+    wordIndex += 1;
+    return out;
+  }).join('');
+}
+
+function tagLine(tags) {
+  const seen = new Set();
+  const labels = [];
+  (tags || []).forEach((tag) => {
+    const label = titleTag(tag);
+    const key = label.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    labels.push(label);
+  });
+  return labels.join(' · ');
+}
+
+function variationsHtml(recipe) {
+  if (!Array.isArray(recipe.variations) || !recipe.variations.length) return '';
+  const blocks = recipe.variations.map((variation) => {
+    const notes = variation.notes ? '<p class="notes">' + esc(variation.notes) + '</p>' : '';
+    const changes = (variation.changes || []).map((change) => '<li>' + esc(change) + '</li>').join('');
+    const serve = (variation.serve_with || []).length
+      ? '<p><b>Serve with</b> ' + esc(variation.serve_with.join(', ')) + '</p>'
+      : '';
+    return '<h3>' + esc(variation.name) + '</h3>' + notes + (changes ? '<ul>' + changes + '</ul>' : '') + serve;
+  }).join('');
+  return '<h2>Variations</h2>' + blocks;
+}
+
 const files = fs.readdirSync(root).filter((name) => name.endsWith('.json') && name !== 'index.json' && name !== '_template.json');
 const recipes = files.map((name) => JSON.parse(fs.readFileSync(path.join(root, name), 'utf8')));
 recipes.sort((a, b) => a.title.localeCompare(b.title));
@@ -48,8 +88,8 @@ const cards = recipes.map((recipe) => {
     return head + '<ul>' + group.items.map((ing) => '<li>' + esc(line(ing)) + '</li>').join('') + '</ul>';
   }).join('');
   const time = [recipe.time.prep != null ? 'Prep ' + recipe.time.prep + ' min' : '', recipe.time.cook != null ? 'Cook ' + recipe.time.cook + ' min' : '', recipe.time.total != null ? recipe.time.total + ' min' : ''].filter(Boolean).join(' · ');
-  const meta = [recipe.servings != null ? 'Serves ' + recipe.servings : '', time, (recipe.tags || []).join(' · ')].filter(Boolean).join(' · ');
-  return '<article class="card"><header><h1>' + esc(recipe.title) + '</h1><p>' + esc(meta) + '</p></header><div class="cols"><div><h2>Ingredients</h2>' + ingHtml + '</div><div><img src="photos/' + esc(recipe.photo) + '" alt=""><h2>Method</h2><ol>' + recipe.steps.map((step) => '<li>' + esc(step) + '</li>').join('') + '</ol>' + (recipe.notes ? '<p class="notes">' + esc(recipe.notes) + '</p>' : '') + (recipe.source ? '<p class="src">' + esc(recipe.source) + '</p>' : '') + '</div></div></article>';
+  const meta = [recipe.servings != null ? 'Serves ' + recipe.servings : '', time, tagLine(recipe.tags)].filter(Boolean).join(' · ');
+  return '<article class="card"><header><h1>' + esc(recipe.title) + '</h1><p>' + esc(meta) + '</p></header><div class="cols"><div><h2>Ingredients</h2>' + ingHtml + '</div><div><img src="photos/' + esc(recipe.photo) + '" alt=""><h2>Method</h2><ol>' + recipe.steps.map((step) => '<li>' + esc(step) + '</li>').join('') + '</ol>' + (recipe.notes ? '<p class="notes">' + esc(recipe.notes) + '</p>' : '') + (recipe.source ? '<p class="src">' + esc(recipe.source) + '</p>' : '') + '</div></div>' + variationsHtml(recipe) + '</article>';
 }).join('\n');
 
 const html = `<!DOCTYPE html>

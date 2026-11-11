@@ -418,6 +418,11 @@ h1, h2, h3, .serif { font-family: var(--serif); font-weight: 560; letter-spacing
 .recipe-hero img { width: 100%; max-height: 380px; object-fit: cover; border-radius: 16px; display: block; }
 .recipe-title { font-family: var(--serif); font-size: 32px; margin: 12px 0 4px; }
 .ing-line { padding: 7px 0; font-weight: 700; border-bottom: 1px solid var(--line); }
+.variation-head { margin: 18px 0 4px; font-size: 13px; letter-spacing: .14em; color: #9a8e82; font-family: var(--sans); font-weight: 800; }
+.variation h3 { margin: 10px 0 4px; font-size: 22px; }
+.variation ul { margin: 4px 0 8px; padding-left: 18px; }
+.variation li { margin: 4px 0; font-weight: 700; }
+.serve-with { margin: 4px 0 0; }
 .steps { margin: 0; padding-left: 22px; }
 .steps li { margin: 10px 0; padding-right: 8px; }
 .cook-card { padding: 28px 32px; }
