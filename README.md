@@ -12,7 +12,7 @@ Ryan is Dad. Jessica is Mom. West (born 1 Apr 2016), Jack (born 19 Mar 2018), an
 
 The left rail is Home, Calendar, Playroom, Meals, House, Sports, Spice, Date, and Sleep.
 
-- **Home** is the day: a house reminder, the weekend, today’s events, what to bring, homework, each child’s next task, tonight’s dinner, a short quote, and a 7-day forecast. On a school morning the leave countdown and the three ready-timers sit above that.
+- **Home** is the family overview: today’s weather and clothing, a tile for each child (live from the Kids tab), today’s calendar, tonight’s dinner, the 7-day forecast, and a short list of pickups, appointments, and things to bring. The morning countdown stays on Kids. House reminders such as airing the bedrooms stay as a small banner.
 - **Calendar** is a Monday-first week (plus day and month). Tap an event for the time, who it is for, location, what to bring, and homework. Google events are read-only.
 - **Playroom** is chores and stars. Morning / Weekend chores / Bedtime, then Today, Learn, Star Store, My Rewards, Stickers, My Week, and Parent. The side of the page has a joke, an animal, the moon, a kindness jar, and thank-you notes.
 - **Meals** is the repeating week of dinners, the family recipe book, an Aldi list with sections, other lists, and a kitchen timer. Recipes live in `recipes/` as public JSON. See `recipes/README.md` to add one.

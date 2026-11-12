@@ -189,6 +189,7 @@
   var focusSel = '';
   var homeMorning = false;
   var morningLive = false;
+  var homePhase = '';
   var kidsShown = 'morning';
   var calView = 'week';
   var calAnchor = '';
@@ -1209,6 +1210,32 @@
       rain: day.rain
     };
   }
+  function windowRain(ymd, startH, endH) {
+    if (!WX || !WX.data || !WX.data.hourly || !WX.data.hourly.time) return null;
+    var times = WX.data.hourly.time;
+    var probs = WX.data.hourly.precipitation_probability || [];
+    var max = null;
+    for (var i = 0; i < times.length; i++) {
+      var stamp = String(times[i] || '');
+      if (stamp.slice(0, 10) !== ymd) continue;
+      var hour = +stamp.slice(11, 13);
+      if (hour < startH || hour >= endH) continue;
+      if (probs[i] == null) continue;
+      if (max == null || probs[i] > max) max = probs[i];
+    }
+    return max == null ? null : Math.round(max);
+  }
+  function plainClothes(temp, rainPct, code) {
+    var snow = code != null && ((code >= 71 && code <= 77) || code === 85 || code === 86);
+    var wet = rainPct != null && rainPct >= 40;
+    if (snow || temp <= 3) return 'Hat & gloves';
+    if (wet && temp <= 12) return 'Rain jacket + boots';
+    if (wet) return 'Umbrella';
+    if (temp <= 8) return 'Hat & gloves';
+    if (temp >= 22) return 'Sunscreen';
+    if (temp <= 15) return 'Warm jacket';
+    return 'Light layers';
+  }
   function fetchWeather() {
     if (!window.fetch) return;
     var url = 'https://api.open-meteo.com/v1/forecast?latitude=47.76&longitude=11.56&current=temperature_2m,weather_code&hourly=temperature_2m,precipitation_probability,precipitation,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe%2FBerlin&forecast_days=7';
@@ -1640,55 +1667,176 @@
     }
   }
 
-  function renderHome() {
-    var p = nowParts();
-    var mp = morningParts();
-    var ymd = p.ymd;
-    homeMorning = schoolMorning(mp);
-    morningLive = homeMorning;
-    var html = '<div class="page home">';
-    if (homeMorning) html += morningBoardHtml(mp, true);
-    html += parentMorningCard();
-    html += parentAfternoonCard();
-    if (!homeMorning && hardOff(ymd)) {
-      html += '<div class="holo">No school today · ' + esc(dayOffReason(ymd) || 'Day off') + '</div>';
+  function aftPeek(name) {
+    var ymd = morningParts().ymd;
+    var root = TEST_MODE ? testAfternoon : hub.afternoon;
+    if (!root || !root.days || !root.days[ymd]) return null;
+    return root.days[ymd][name] || null;
+  }
+  function kidStatusBits(name) {
+    var aft = aftPeek(name);
+    var k = kidState(name);
+    if (aft && aft.screensAt) return { status: 'Screens unlocked', sub: fmtAt(aft.screensAt) };
+    if (aft && aft.inAt) return { status: 'Home at ' + fmtAt(aft.inAt), sub: '' };
+    if (k.outAt) return { status: 'Left at ' + fmtAt(k.outAt), sub: k.inAt ? 'Checked in ' + fmtAt(k.inAt) : '' };
+    if (k.inAt) {
+      var tasks = morningTasks(name);
+      var done = 0;
+      tasks.forEach(function (t) { if (k.checks[t.id]) done++; });
+      return { status: 'Getting ready', sub: 'Checked in ' + fmtAt(k.inAt) + ' · ' + done + '/' + tasks.length };
     }
+    return { status: 'Not checked in', sub: '' };
+  }
+  function nextForKid(name, p) {
+    var nowMin = p.h * 60 + p.mi;
+    for (var d = 0; d < 7; d++) {
+      var ymd = addDays(p.ymd, d);
+      var bucket = dayBucket(ymd);
+      var events = (bucket && bucket[name] && bucket[name].events) ? bucket[name].events.slice() : [];
+      events.sort(function (a, b) { return (a.time || '') < (b.time || '') ? -1 : (a.time || '') > (b.time || '') ? 1 : 0; });
+      for (var i = 0; i < events.length; i++) {
+        var ev = events[i];
+        if (!ev.title) continue;
+        var start = ev.time ? minutesOf(ev.time) : null;
+        var end = ev.end ? minutesOf(ev.end) : null;
+        if (d === 0 && end != null && end <= nowMin) continue;
+        if (d === 0 && start != null && end == null && start + 45 <= nowMin) continue;
+        var dayBit = d === 0 ? '' : WD_SHORT[weekdayIndex(ymd)] + ' · ';
+        if (ev.end) return dayBit + ev.title + ' until ' + prettyTime(ev.end);
+        if (ev.time) return dayBit + ev.title + ' · ' + prettyTime(ev.time);
+        return dayBit + ev.title;
+      }
+    }
+    return '';
+  }
+  function needsParent(ev) {
+    if (!ev || ev.synthetic || !ev.title) return false;
+    var t = String(ev.title).toLowerCase();
+    if (/pickup|pick up|pick-up|abhol|ogt/.test(t)) return true;
+    if (/arzt|zahn|dentist|doctor|praxis|impf|appointment|termin/.test(t)) return true;
+    return kindOf(ev) === 'appt';
+  }
+  function parentNeedItems(p) {
+    var items = [];
+    for (var d = 0; d < 7; d++) {
+      var ymd = addDays(p.ymd, d);
+      var when = d === 0 ? 'Today' : WD_SHORT[weekdayIndex(ymd)] + ' ' + (+ymd.slice(8, 10));
+      dayEvents(ymd, false).forEach(function (ev) {
+        if (!needsParent(ev)) return;
+        var who = ev.who && ev.who.length && ev.who.length < 3 ? ev.who.join(', ') : '';
+        var text = ev.title + (ev.time ? ' · ' + (ev.end ? fmtRange(ev.time, ev.end) : prettyTime(ev.time)) : '');
+        items.push({ when: when, who: who, text: text });
+      });
+      aggField(ymd, 'bring').forEach(function (b) {
+        items.push({ when: when, who: b.who.join(', '), text: 'Bring ' + b.item });
+      });
+    }
+    return items.slice(0, 7);
+  }
+  function homeTodayRows(ymd) {
+    var events = dayEvents(ymd, false);
+    if (!events.length) {
+      if (calMode === 'open' || calMode === 'locked' || calMode === 'missing') return '<p class="muted">A clear day on the calendar.</p>';
+      return '<p class="muted">Opening the calendar…</p>';
+    }
+    return events.map(function (ev) {
+      var kind = kindOf(ev);
+      var who = ev.who && ev.who.length && ev.who.length < 3 ? ev.who.join(', ') : '';
+      return '<button type="button" class="today-row ' + kind + '" data-act="event" data-key="' + esc(evKey(ymd, ev)) + '"><span class="t-time">' + esc(ev.time ? prettyTime(ev.time) : 'All day') + '</span><span class="t-title">' + esc(ev.title) + '</span>' + (who ? '<span class="t-who">' + esc(who) + '</span>' : '') + '</button>';
+    }).join('');
+  }
+  function kidTile(name, p) {
+    var bits = kidStatusBits(name);
+    var aft = aftPeek(name);
+    var next = nextForKid(name, p);
+    var html = '<article class="kid-tile ' + name.toLowerCase() + '">';
+    html += '<button type="button" class="kid-tile-main" data-act="nav" data-id="kids">';
+    html += '<h2>' + esc(name) + '</h2>';
+    html += '<div class="kid-status">' + esc(bits.status) + '</div>';
+    if (bits.sub) html += '<div class="kid-detail">' + esc(bits.sub) + '</div>';
+    if (aft && aft.homework) html += '<div class="kid-detail">Homework: ' + esc(homeworkWord(aft.homework)) + '</div>';
+    if (aft && ((aft.needs && aft.needs.length) || aft.needNote)) {
+      html += '<div class="kid-detail">Needs: ' + esc((aft.needs || []).concat(aft.needNote ? [aft.needNote] : []).join(', ')) + '</div>';
+    }
+    if (aft && aft.message) html += '<div class="kid-detail kid-msg">“' + esc(aft.message) + '”</div>';
+    if (next) html += '<div class="kid-detail">Next: ' + esc(next) + '</div>';
+    else if (calMode !== 'open') html += '<div class="kid-detail">Calendar locked</div>';
+    html += '</button>';
+    if (aft && aft.inAt && !aft.seenAt) html += '<button type="button" class="btn light small" data-act="aft-seen" data-kid="' + name + '">Seen</button>';
+    else if (aft && aft.seenAt) html += '<div class="kid-detail">Seen</div>';
+    html += '</article>';
+    return html;
+  }
+  function weatherHero(p) {
+    var view = currentWeather(p);
+    var day = forecastMap()[p.ymd] || {};
+    var schoolRain = windowRain(p.ymd, 7, 8);
+    var aftRain = windowRain(p.ymd, 12, 16);
+    var rainForClothes = day.rain;
+    if (schoolRain != null && (rainForClothes == null || schoolRain > rainForClothes)) rainForClothes = schoolRain;
+    if (aftRain != null && (rainForClothes == null || aftRain > rainForClothes)) rainForClothes = aftRain;
+    if (!view && day.high == null) return '<section class="card wx-hero"><p class="muted">Weather for Bad Tölz will show when it loads.</p></section>';
+    var temp = view ? view.temp : day.high;
+    var code = view && WX && WX.data && WX.data.current ? (WX.data.current.weather_code != null ? WX.data.current.weather_code : WX.data.current.weathercode) : day.code;
+    var kind = view ? view.kind : weatherKind(day.code);
+    var high = day.high != null ? day.high : (view ? view.high : null);
+    var low = day.low != null ? day.low : (view ? view.low : null);
+    var rain = day.rain != null ? Math.round(day.rain) : null;
+    var html = '<section class="card wx-hero">';
+    html += '<div class="wx-hero-main">' + weatherSvg(kind);
+    html += '<div><div class="wx-temp">' + temp + '°</div>';
+    html += '<div class="wx-range">' + (high == null ? '' : 'High ' + high + '°') + (low == null ? '' : (high == null ? '' : ' · ') + 'Low ' + low + '°') + '</div></div></div>';
+    html += '<div class="wx-hero-side"><div class="wx-cond">' + esc(weatherWord(kind)) + '</div>';
+    html += '<div class="wx-rain">Rain ' + (rain == null ? '—' : rain + '%') + '</div>';
+    html += '<div class="wx-clothes">' + esc(plainClothes(temp, rainForClothes, code)) + '</div>';
+    html += '<div class="wx-windows"><span>School run 7–8 <b>' + (schoolRain == null ? '—' : schoolRain + '%') + '</b></span>';
+    html += '<span>Afternoon 12–16 <b>' + (aftRain == null ? '—' : aftRain + '%') + '</b></span></div></div></section>';
+    return html;
+  }
+  function renderHome() {
+    var mp = morningParts();
+    var ymd = mp.ymd;
+    homeMorning = false;
+    morningLive = schoolMorning(mp);
+    homePhase = kidsMode(mp);
+    var html = '<div class="page home">';
+    html += weatherHero(mp);
     var due = null;
     (hub.house || []).some(function (task) { if (houseDue(task, ymd)) { due = task; return true; } return false; });
     var bits = weekendBits(ymd);
-    html += '<div class="home-top">';
+    html += '<div class="home-banners">';
     html += '<article class="card banner teal">' + (due
       ? '<div><h3>' + esc(due.title) + '</h3><p>' + esc(due.detail) + '</p></div><button type="button" class="btn light" data-act="house-done" data-id="' + esc(due.id) + '">Done</button>'
       : '<div><h3>House is quiet</h3><p>Nothing due right now.</p></div>') + '</article>';
     html += '<article class="card banner green"><div><div class="kicker">This weekend</div><p>' + esc(bits.length ? bits.join(' · ') : 'Nothing planned yet.') + '</p></div></article>';
+    html += '<button type="button" class="sticky" data-act="note">' + (hub.note ? esc(hub.note.slice(0, 42)) : 'Sticky note') + '</button>';
+    html += '</div>';
+    html += '<div class="kid-strip">';
+    KIDS.forEach(function (name) { html += kidTile(name, mp); });
     html += '</div>';
     var chips = holidayChips(ymd);
-    var view = currentWeather(p);
-    var map = forecastMap()[ymd];
-    html += '<div class="home-mid">';
-    html += '<article class="card"><div class="dayname">' + esc(wdLong(p.weekday)) + '</div><div class="daymonth">' + esc(MONTHS[p.mo - 1] + ' ' + p.d) + '</div>';
-    if (view) html += '<div class="wxline">' + weatherSvg(view.kind) + '<span>' + esc(view.word) + ' · ' + (map && map.high != null ? map.high : view.temp) + '°' + (map && map.low != null ? ' / ' + map.low + '°' : '') + '</span></div><div class="muted">' + esc(view.hint) + '</div>';
-    else html += '<div class="muted">Weather for Bad Tölz will show when it loads.</div>';
-    html += '<div>' + chips.map(function (c) { return '<span class="holo">' + esc(c) + '</span>'; }).join('') + '</div>';
-    html += '<p class="quote">“' + esc(pick(QUOTES, ymd)) + '”</p>';
-    html += '<button type="button" class="sticky" data-act="note">' + (hub.note ? esc(hub.note.slice(0, 42)) : 'Sticky note') + '</button></article>';
-    html += '<article class="card"><div class="kicker"><span>TODAY</span><button type="button" class="linkish" data-act="nav" data-id="calendar">Calendar ›</button></div>' + todayRows(ymd) + bringBlock(ymd);
+    html += '<article class="card home-cal"><div class="kicker"><span>TODAY</span><button type="button" class="linkish" data-act="nav" data-id="calendar">Calendar ›</button></div>';
+    if (hardOff(ymd)) html += '<div class="holo">No school today · ' + esc(dayOffReason(ymd) || 'Day off') + '</div>';
+    if (chips.length) html += '<div>' + chips.map(function (c) { return '<span class="holo">' + esc(c) + '</span>'; }).join('') + '</div>';
+    html += homeTodayRows(ymd) + bringBlock(ymd);
     if (calMode !== 'open') html += '<p class="muted">Unlock the family password in Settings to see Google Calendar. Holidays still show.</p>';
     var note = rangeNote();
     if (note && calMode === 'open') html += '<p class="muted">' + esc(note) + '</p>';
     html += '</article>';
-    html += '<article class="card tasks-col"><div class="kicker"><span>TASKS</span><button type="button" class="linkish" data-act="nav" data-id="playroom">Playroom ›</button></div>';
-    KIDS.forEach(function (name) {
-      var prog = chipProgress(name, ymd);
-      html += '<div class="task-block"><div class="task-head"><span>' + esc(name) + ' (' + ageOf(name, ymd) + ')</span><span>' + (prog.total ? prog.done + '/' + prog.total + ' · ' : '') + '★ ' + prog.stars + '</span></div><div class="task-next">Next: ' + esc(nextTaskLabel(name, ymd)) + '</div></div>';
-    });
     var meal = hub.meals[weekdayKey(ymd)] || { title: 'Dinner', side: '' };
-    html += '<div class="dinner-card"><div class="kicker">Tonight’s dinner</div>';
+    html += '<div class="home-late"><article class="card dinner-card"><div class="kicker">Tonight’s dinner</div>';
     if (meal.recipe) html += '<button type="button" class="meal-pic" data-act="open-recipe" data-id="' + esc(meal.recipe) + '"><img class="meal-thumb" alt="" src="recipes/photos/' + esc(meal.recipe) + '.jpg"></button>';
-    html += '<h3>' + esc(meal.title || 'Choose a dinner') + '</h3><div class="muted">' + esc(meal.side || '') + '</div></div></article>';
+    html += '<h3>' + esc(meal.title || 'Choose a dinner') + '</h3><div class="muted">' + esc(meal.side || '') + '</div></article>';
+    html += wxStrip(mp);
     html += '</div>';
-    html += wxStrip(p);
-    html += '</div>';
+    var needs = parentNeedItems(mp);
+    html += '<article class="card needs-card"><div class="kicker">Needs a parent</div>';
+    if (calMode !== 'open' && !needs.length) html += '<p class="muted">Unlock the calendar to see pickups, appointments, and things to bring.</p>';
+    else if (!needs.length) html += '<p class="muted">Nothing that needs a parent this week.</p>';
+    else needs.forEach(function (item) {
+      html += '<div class="needs-row"><span class="needs-when">' + esc(item.when) + '</span><span>' + esc(item.text) + (item.who ? ' · ' + esc(item.who) : '') + '</span></div>';
+    });
+    html += '</article></div>';
     return html;
   }
   function morningBoardHtml(mp, live) {
@@ -3798,7 +3946,9 @@
     if (!TEST_MORNING && state.date !== p.ymd) {
       ensureToday(p.ymd);
       render();
-    } else if ((page === 'home' || page === 'kids') && !overlay && (schoolMorning(mp) !== morningLive || (page === 'kids' && kidsShown !== kidsMode(mp)))) {
+    } else if (page === 'home' && !overlay && (schoolMorning(mp) !== morningLive || homePhase !== kidsMode(mp))) {
+      render();
+    } else if (page === 'kids' && !overlay && (schoolMorning(mp) !== morningLive || kidsShown !== kidsMode(mp))) {
       render();
     }
     setText('clockTime', fmtClock(p));
