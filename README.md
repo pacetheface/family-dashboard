@@ -67,6 +67,7 @@ The Aldi list, dinners, chores, sports, spices, and date ideas start with editab
 - Use fullscreen / zoom 100% on a 1920×1080 screen. On an iPad the columns reflow and the targets stay large enough to tap.
 - Turn off the TV’s auto power-off, sleep timer, and screensaver (Samsung: Settings → General → System Manager → Auto Power Off → Off). The page asks to stay awake where the browser allows a screen wake lock, and reloads itself once around 03:00 so the new day and the new calendar file show up.
 - Tap **Enable sound** once (on the morning card, or in Settings). The TV remembers. At 15, 10, and 5 minutes before each leave time it plays a short chime and, if the browser can talk, says for example “10 minutes until West and Jack leave”. Browsers block sound until that tap.
+- **Morning** in the left nav always shows the leave countdown and the three checklists. From 5:30 to 9:30 on a school day it matches Home, including chimes and stars. At other times it counts down to the next school morning and the lists stay visible but cannot be ticked. Bookmark `?view=morning` on the TV. It works with `?test=morning`.
 - Add `?test=morning` to practice that countdown. The morning clock starts at 6:45 on the next school day and then runs at real speed, so the 15, 10, and 5 minute chimes can play. A Test mode badge shows. Stars and on-time mornings are not saved. Leave the parameter off for a normal day.
 - Enter the family password once, in Settings. The clock, countdown, weather, holidays, and checklists work even while the calendar is locked.
 
