@@ -75,7 +75,7 @@ The Aldi list, dinners, chores, sports, spices, and date ideas start with editab
 
 ## Calendar secrets
 
-The morning file is built by the **Today dashboard** action (`.github/workflows/today.yml`). It runs on weekdays at **04:15 and 05:15 UTC**, which is **05:15 and 06:15** Berlin time in winter (CET) and **06:15 and 07:15** in summer (CEST). It also runs when you start it by hand.
+The morning file is built by the **Today dashboard** action (`.github/workflows/today.yml`). It runs every day at **15 minutes past each hour from 04:15 through 20:15 UTC**, which is **05:15–21:15** Berlin time in winter (CET). In summer (CEST) those runs land an hour later. It also runs when you start it by hand.
 
 The encrypted file holds **Monday of the current week through the following Wednesday** (the week, plus the next few days), with each day’s events, what to bring, and homework. `kids` is still today’s snapshot. Until the action has run once with this version of the script, an older file only contains today, and the calendar says so.
 

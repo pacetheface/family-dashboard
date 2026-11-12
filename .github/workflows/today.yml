@@ -2,10 +2,9 @@ name: Today dashboard
 
 on:
   schedule:
-    # Weekdays only. 04:15 and 05:15 UTC cover 05:15 and 06:15 Europe/Berlin
-    # in winter (CET, UTC+1) and 06:15 and 07:15 in summer (CEST, UTC+2).
-    - cron: '15 4 * * 1-5'
-    - cron: '15 5 * * 1-5'
+    # Every day, 04:15 through 20:15 UTC. That is 05:15–21:15 Europe/Berlin
+    # in winter (CET, UTC+1). In summer (CEST, UTC+2) it lands an hour later.
+    - cron: '15 4-20 * * *'
   workflow_dispatch:
 
 permissions:
