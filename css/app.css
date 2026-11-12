@@ -257,6 +257,7 @@ h1, h2, h3, .serif { font-family: var(--serif); font-weight: 560; letter-spacing
 .chk.done .box { background: #7dca9a; border-color: #7dca9a; }
 .chk.done .lbl { text-decoration: line-through; color: #8d8276; }
 .chk.meds .lbl { color: #9a6230; }
+.chk:disabled, .checkin:disabled { opacity: 0.55; cursor: default; }
 .tick { width: 7px; height: 12px; border: solid #143222; border-width: 0 3px 3px 0; transform: rotate(45deg); display: none; margin-top: -2px; }
 .chk.done .tick, .chore.done .tick { display: block; }
 .chore.done .box { background: #7dca9a; border-color: #7dca9a; }

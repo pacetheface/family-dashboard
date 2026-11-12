@@ -144,6 +144,7 @@
   var SECTIONS = ['Produce', 'Meat & Fish', 'Dairy & Eggs', 'Bakery', 'Pantry', 'Spices', 'Frozen', 'Drinks', 'Household', 'Other'];
   var NAV = [
     { id: 'home', label: 'Home', icon: 'home' },
+    { id: 'morning', label: 'Morning', icon: 'morning' },
     { id: 'calendar', label: 'Calendar', icon: 'cal' },
     { id: 'playroom', label: 'Playroom', icon: 'star' },
     { id: 'meals', label: 'Meals', icon: 'meals' },
@@ -187,6 +188,7 @@
   var pendingConfirm = null;
   var focusSel = '';
   var homeMorning = false;
+  var morningLive = false;
   var calView = 'week';
   var calAnchor = '';
   var kidOn = { West: true, Jack: true, June: true };
@@ -850,6 +852,32 @@
     }
     return { mode: 'gone', title: 'Have a good day', big: 'All out', sub: 'See you this afternoon', pct: 100, urg: 'gone' };
   }
+  function nextSchoolMorning(p) {
+    var mins = p.h * 60 + p.mi;
+    var start = p.ymd;
+    if ((leaveWho(p.ymd).boys.length || leaveWho(p.ymd).june) && mins >= 9 * 60 + 30) start = addDays(p.ymd, 1);
+    for (var i = 0; i < 21; i++) {
+      var day = addDays(start, i);
+      var who = leaveWho(day);
+      if (!who.boys.length && !who.june) continue;
+      if (day === p.ymd && mins >= 9 * 60 + 30) continue;
+      return { ymd: day, who: who };
+    }
+    return null;
+  }
+  function waitingMorningModel(p) {
+    var next = nextSchoolMorning(p);
+    if (!next) return { mode: 'off', title: 'Next school morning', big: '—', sub: 'No school morning in the next three weeks', pct: 0, urg: 'off', ymd: p.ymd };
+    var leaveMin = next.who.boys.length ? LEAVE.West : LEAVE.June;
+    var stamp = next.ymd + 'T' + pad2(Math.floor(leaveMin / 60)) + ':' + pad2(leaveMin % 60) + ':00';
+    var leftSec = Math.max(0, Math.round((berlinLocalToEpoch(stamp) - morningNowMs()) / 1000));
+    var when = WD_SHORT[weekdayIndex(next.ymd)] + ' ' + (+next.ymd.slice(8, 10)) + ' ' + MONTHS_S[+next.ymd.slice(5, 7) - 1];
+    var bits = [];
+    if (next.who.boys.length > 1) bits.push('boys leave 7:10');
+    else if (next.who.boys.length === 1) bits.push(next.who.boys[0] + ' leaves 7:10');
+    if (next.who.june) bits.push(next.who.boys.length ? 'June 7:30' : 'June leaves 7:30');
+    return { mode: 'wait', title: 'Next school morning', big: fmtLeft(leftSec), sub: when + ' · ' + bits.join(' · '), pct: 0, urg: 'off', ymd: next.ymd };
+  }
   function dayOffReason(ymd) {
     return HOLIDAYS[ymd] || ferienName(ymd) || (weekdayIndex(ymd) === 0 ? 'Sunday' : weekdayIndex(ymd) === 6 ? 'Saturday' : '');
   }
@@ -1220,7 +1248,7 @@
     remind('Sound is on');
   }
   function maybeChime(p) {
-    if (!soundOn || !audioReady) return;
+    if (!soundOn || !audioReady || !schoolMorning(p)) return;
     var who = leaveWho(p.ymd);
     var groups = [];
     if (who.boys.length) groups.push({ id: 'boys', min: LEAVE.West, who: who.boys.join(' and ') });
@@ -1312,6 +1340,7 @@
   function icon(name) {
     var paths = {
       home: '<path d="M4 11.5 12 4l8 7.5V20h-5.5v-6h-5V20H4z"/>',
+      morning: '<path d="M4 17h16M8 17a4 4 0 0 1 8 0M12 5v2.5M5.5 9.5l1.5 1.5M18.5 9.5 17 11"/>',
       cal: '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M8 3.5v4M16 3.5v4"/>',
       star: '<path d="M12 3.5 14.4 9l6 .5-4.6 3.9 1.5 5.8L12 16.2 6.7 19.2 8.2 13.4 3.6 9.5 9.6 9z"/>',
       meals: '<path d="M8 3v8a2 2 0 0 1-2 2H6m2-10v18M6 3v5M10 3v5M16 3c1.5 2 2 4 2 7v11"/>',
@@ -1469,9 +1498,9 @@
     }
     return tasks.length ? 'All done for now' : 'Nothing on the list';
   }
-  function timerBlock(name, ymd, compact) {
+  function timerBlock(name, ymd, compact, live) {
     if (!kidHasSchool(name, ymd)) return '<div class="dayoff">No school today</div>';
-    var k = kidState(name);
+    var k = live ? kidState(name) : { checks: {} };
     var started = !!k.inAt;
     var done = !!(k.inAt && k.doneAt);
     var onTime = done && finishOnTime(name, k.doneAt);
@@ -1492,17 +1521,18 @@
     var html = '<div class="kid-head"><h3>' + esc(name) + '</h3><span class="badge' + (onTime ? ' good' : '') + '">★ ' + esc(badge) + '</span></div>';
     html += '<div class="sw"><div class="elapsed' + (onTime ? ' good' : '') + '" id="elapsed-' + name + '"' + (started && !done ? ' data-run="1"' : '') + '>' + elapsed + (onTime ? ' ★' : '') + '</div>';
     html += '<div class="meta">' + lines.map(function (line) { return '<div>' + esc(line) + '</div>'; }).join('') + '</div></div>';
-    if (!started) html += '<button type="button" class="checkin" data-act="checkin" data-kid="' + name + '">Check in</button>';
+    if (!live) html += '<button type="button" class="checkin" disabled>Check in</button>';
+    else if (!started) html += '<button type="button" class="checkin" data-act="checkin" data-kid="' + name + '">Check in</button>';
     return html;
   }
-  function checklistBlock(name, ymd) {
+  function checklistBlock(name, ymd, live) {
     if (!kidHasSchool(name, ymd)) return '';
     var tasks = morningTasks(name);
-    var k = kidState(name);
+    var k = live ? kidState(name) : { checks: {} };
     var html = '';
     tasks.forEach(function (t) {
       var on = !!k.checks[t.id];
-      html += '<button type="button" class="chk' + (on ? ' done' : '') + (t.id === 'meds' ? ' meds' : '') + '" data-act="toggle" data-kid="' + name + '" data-id="' + esc(t.id) + '" aria-pressed="' + (on ? 'true' : 'false') + '"><span class="box"><span class="tick"></span></span><span class="lbl">' + esc(t.label) + '</span></button>';
+      html += '<button type="button" class="chk' + (on ? ' done' : '') + (t.id === 'meds' ? ' meds' : '') + '" data-act="toggle" data-kid="' + name + '" data-id="' + esc(t.id) + '" aria-pressed="' + (on ? 'true' : 'false') + '"' + (live ? '' : ' disabled') + '><span class="box"><span class="tick"></span></span><span class="lbl">' + esc(t.label) + '</span></button>';
     });
     if (k.inAt) html += '<button type="button" class="btn ghost small" data-act="reset" data-kid="' + name + '">' + esc(resetLabel(name)) + '</button>';
     return html;
@@ -1581,18 +1611,10 @@
     var mp = morningParts();
     var ymd = p.ymd;
     homeMorning = schoolMorning(mp);
+    morningLive = homeMorning;
     var html = '<div class="page home">';
-    if (homeMorning) {
-      var model = countdownModel(mp);
-      var cur = currentWeather(p);
-      html += '<section class="card count-card urg-' + model.urg + '" id="countCard"><div class="mid"><div class="count-title" id="countTitle">' + esc(model.title) + '</div><div class="count-big" id="countBig">' + esc(model.big) + '</div><div class="count-sub" id="countSub">' + esc(model.sub) + (cur ? ' · ' + esc(cur.hint) : '') + '</div></div>';
-      html += '<button type="button" class="sound" id="soundBtn" data-act="sound" data-role="sound">Enable sound</button><div class="bar"><i id="barFill" style="width:' + model.pct + '%"></i></div></section>';
-      html += '<div class="morn-kids">';
-      KIDS.forEach(function (name) {
-        html += '<section class="card kid-card ' + name.toLowerCase() + '">' + timerBlock(name, mp.ymd, true) + checklistBlock(name, mp.ymd) + '</section>';
-      });
-      html += '</div>';
-    } else if (hardOff(ymd)) {
+    if (homeMorning) html += morningBoardHtml(mp, true);
+    else if (hardOff(ymd)) {
       html += '<div class="holo">No school today · ' + esc(dayOffReason(ymd) || 'Day off') + '</div>';
     }
     var due = null;
@@ -1633,6 +1655,24 @@
     html += wxStrip(p);
     html += '</div>';
     return html;
+  }
+  function morningBoardHtml(mp, live) {
+    var model = live ? countdownModel(mp) : waitingMorningModel(mp);
+    var day = live ? mp.ymd : model.ymd;
+    var cur = live ? currentWeather(nowParts()) : null;
+    var html = '<section class="card count-card urg-' + model.urg + '" id="countCard"><div class="mid"><div class="count-title" id="countTitle">' + esc(model.title) + '</div><div class="count-big" id="countBig">' + esc(model.big) + '</div><div class="count-sub" id="countSub">' + esc(model.sub) + (cur && cur.hint ? ' · ' + esc(cur.hint) : '') + '</div></div>';
+    html += '<button type="button" class="sound" id="soundBtn" data-act="sound" data-role="sound">Enable sound</button><div class="bar"><i id="barFill" style="width:' + model.pct + '%"></i></div></section>';
+    html += '<div class="morn-kids">';
+    KIDS.forEach(function (name) {
+      html += '<section class="card kid-card ' + name.toLowerCase() + '">' + timerBlock(name, day, true, live) + checklistBlock(name, day, live) + '</section>';
+    });
+    html += '</div>';
+    return html;
+  }
+  function renderMorning() {
+    var mp = morningParts();
+    morningLive = schoolMorning(mp);
+    return '<div class="page morning-page">' + morningBoardHtml(mp, morningLive) + '</div>';
   }
 
   function shiftAnchor(dir) {
@@ -2300,6 +2340,7 @@
   function renderView() {
     var html = '';
     if (page === 'home') html = renderHome();
+    else if (page === 'morning') html = renderMorning();
     else if (page === 'calendar') html = renderCalendar();
     else if (page === 'playroom') html = renderPlayroom();
     else if (page === 'meals') html = renderMeals();
@@ -2341,12 +2382,13 @@
   function paintCountdown(p) {
     var card = document.getElementById('countCard');
     if (!card) return;
-    var model = countdownModel(p);
+    var live = schoolMorning(p);
+    var model = live || page !== 'morning' ? countdownModel(p) : waitingMorningModel(p);
     card.className = 'card count-card urg-' + model.urg;
     setText('countTitle', model.title);
     setText('countBig', model.big);
-    var cur = currentWeather(p);
-    setText('countSub', model.sub + (cur ? ' · ' + cur.hint : ''));
+    var cur = live ? currentWeather(nowParts()) : null;
+    setText('countSub', model.sub + (cur && cur.hint ? ' · ' + cur.hint : ''));
     var fill = document.getElementById('barFill');
     if (fill) fill.style.width = model.pct + '%';
   }
@@ -2545,6 +2587,7 @@
   }
 
   function toggleMorning(name, id) {
+    if (page === 'morning' && !schoolMorning(morningParts())) return;
     if (!kidHasSchool(name, morningParts().ymd)) return;
     var k = kidState(name);
     if (!k.inAt) k.inAt = morningNowMs();
@@ -2558,6 +2601,7 @@
     syncMorningStar(name);
   }
   function checkIn(name) {
+    if (page === 'morning' && !schoolMorning(morningParts())) return;
     if (!kidHasSchool(name, morningParts().ymd)) return;
     var k = kidState(name);
     if (!k.inAt) k.inAt = morningNowMs();
@@ -2567,6 +2611,7 @@
     syncMorningStar(name);
   }
   function resetKid(name) {
+    if (page === 'morning' && !schoolMorning(morningParts())) return;
     var now = Date.now();
     if (!resetArm[name] || now - resetArm[name] > 5000) {
       resetArm[name] = now;
@@ -3174,7 +3219,7 @@
     if (!TEST_MORNING && state.date !== p.ymd) {
       ensureToday(p.ymd);
       render();
-    } else if (page === 'home' && schoolMorning(mp) !== homeMorning && !overlay) {
+    } else if ((page === 'home' || page === 'morning') && schoolMorning(mp) !== morningLive && !overlay) {
       render();
     }
     setText('clockTime', fmtClock(p));
@@ -3197,6 +3242,7 @@
   ensureToday(currentYmd());
   calAnchor = currentYmd();
   page = pageFromHash();
+  if (!location.hash && Q.view === 'morning') page = 'morning';
   render();
   loadToday();
   loadRecipeIndex();
