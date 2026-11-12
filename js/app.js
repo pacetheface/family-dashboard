@@ -1644,7 +1644,8 @@
     morningLive = homeMorning;
     var html = '<div class="page home">';
     if (homeMorning) html += morningBoardHtml(mp, true);
-    else if (hardOff(ymd)) {
+    html += parentAfternoonCard();
+    if (!homeMorning && hardOff(ymd)) {
       html += '<div class="holo">No school today · ' + esc(dayOffReason(ymd) || 'Day off') + '</div>';
     }
     var due = null;
@@ -1856,12 +1857,81 @@
     if (sc.length && !rec.screensAt) return 'screens';
     return 'free';
   }
+  var ARRIVAL = [
+    { key: 'coat', label: 'Coat on hook' },
+    { key: 'shoes', label: 'Shoes away' },
+    { key: 'bag', label: 'Backpack unpacked' },
+    { key: 'box', label: 'Lunchbox to the kitchen' }
+  ];
+  var NEED_BUTTONS = ['Signature', 'Money', 'Permission slip', 'Help with homework', 'Something for tomorrow'];
+  function notifyParents(event) {
+    // Phone notifications for Mom and Dad can send this later.
+    // event: { kind, kid, at, ymd, homework, needs, needNote, message }
+    return event;
+  }
+  function aftChoreItems(name, p) {
+    var seen = {};
+    var items = [];
+    function add(key, label, fri) {
+      var norm = String(label).toLowerCase().replace(/[^a-z]/g, '');
+      if (seen[norm]) return;
+      seen[norm] = true;
+      items.push({ key: key, label: label, fri: !!fri });
+    }
+    ARRIVAL.forEach(function (item) { add(item.key, item.label, false); });
+    var easy = aftRec(name).easy || 0;
+    if (easy !== 2) {
+      (aftKid(name).L || []).forEach(function (label, i) { add('L' + i, label, false); });
+      aftScreenItems(name, p).forEach(function (it) { add(it.key, it.label, it.fri); });
+    }
+    return items;
+  }
   function aftMaybeScreens(name) {
     var rec = aftRec(name);
-    var sc = aftKid(name).SC || [];
-    if (!rec.landAt || rec.screensAt || !sc.length) return;
-    var items = aftScreenItems(name, morningParts());
-    if (!items.length || items.every(function (it) { return aftOn(name, it.key); })) rec.screensAt = morningNowMs();
+    if (!rec.inAt) return;
+    var items = aftChoreItems(name, morningParts());
+    var done = items.length && items.every(function (it) { return aftOn(name, it.key); });
+    if (done && !rec.screensAt) {
+      rec.screensAt = morningNowMs();
+      notifyParents({ kind: 'screens-unlocked', kid: name, at: rec.screensAt, ymd: morningParts().ymd, homework: rec.homework || '', needs: rec.needs || [], needNote: rec.needNote || '', message: rec.message || '' });
+    } else if (!done) rec.screensAt = null;
+  }
+  function aftMarkFresh(name) {
+    aftRec(name).seenAt = null;
+  }
+  function aftHomework(name, value) {
+    var rec = aftRec(name);
+    rec.homework = value;
+    aftMarkFresh(name);
+    notifyParents({ kind: 'homework', kid: name, at: morningNowMs(), ymd: morningParts().ymd, homework: value, needs: rec.needs || [], needNote: rec.needNote || '', message: rec.message || '' });
+    aftSave();
+  }
+  function aftNeed(name, label) {
+    var rec = aftRec(name);
+    if (!rec.needs) rec.needs = [];
+    var at = rec.needs.indexOf(label);
+    if (at >= 0) rec.needs.splice(at, 1);
+    else rec.needs.push(label);
+    aftMarkFresh(name);
+    notifyParents({ kind: 'needs', kid: name, at: morningNowMs(), ymd: morningParts().ymd, homework: rec.homework || '', needs: rec.needs, needNote: rec.needNote || '', message: rec.message || '' });
+    aftSave();
+  }
+  function aftText(name, field, value) {
+    var rec = aftRec(name);
+    rec[field] = String(value || '').slice(0, field === 'message' ? 160 : 80);
+    aftMarkFresh(name);
+    notifyParents({ kind: field, kid: name, at: morningNowMs(), ymd: morningParts().ymd, homework: rec.homework || '', needs: rec.needs || [], needNote: rec.needNote || '', message: rec.message || '' });
+    aftSave();
+  }
+  function aftSeen(name) {
+    aftRec(name).seenAt = morningNowMs();
+    aftSave();
+  }
+  function homeworkWord(value) {
+    if (value === 'yes') return 'Yes';
+    if (value === 'notyet') return 'Not yet';
+    if (value === 'none') return 'No homework';
+    return 'Not answered';
   }
   function aftCanIn(name, p) {
     if (isWeekendYmd(p.ymd) || hardOff(p.ymd)) return true;
@@ -1877,6 +1947,8 @@
     var rec = aftRec(name);
     if (rec.inAt) return;
     rec.inAt = morningNowMs();
+    aftMarkFresh(name);
+    notifyParents({ kind: 'check-in', kid: name, at: rec.inAt, ymd: p.ymd, homework: '', needs: [], needNote: '', message: '' });
     aftSave();
   }
   function aftLand(name) {
@@ -1913,59 +1985,67 @@
   }
   function aftColumn(name, p) {
     var rec = aftRec(name);
-    var phase = aftPhase(name);
     var home = aftHomeStr(name, p);
     var left = aftHomeMin(name, p) - aftNowMin(p);
     var school = !isWeekendYmd(p.ymd) && !hardOff(p.ymd);
     var who = name === 'June' ? 'Leaving Kinderhaus' : (name === 'Jack' ? 'Leaving OGT' : 'Leaving school');
-    var html = '<section class="m-col ' + name.toLowerCase() + '"><div class="m-head"><h2>' + esc(name) + '</h2><span class="badge">Home ' + esc(home) + '</span></div>';
-    html += '<div class="aft-card">';
-    if (phase === 'wait') {
-      if (left > 0 && school) {
-        html += '<div class="aft-kicker">Afternoon</div><div class="aft-huge" id="aftBig-' + name + '">' + aftLeftLabel(left) + '</div><div class="aft-line">' + esc(who) + ' at ' + esc(home) + '</div>';
+    var html = '<section class="m-col ' + name.toLowerCase() + '">';
+    if (!rec.inAt) {
+      if (left > 0 && school && !aftCanIn(name, p)) {
+        html += '<div class="m-head"><h2>' + esc(name) + '</h2></div>';
+        html += '<div class="aft-huge" id="aftBig-' + name + '">' + aftLeftLabel(left) + '</div><div class="aft-line">' + esc(who) + ' at ' + esc(home) + '</div>';
+        html += '<p class="m-muted">Your name appears when it is time to check in.</p>';
       } else {
-        html += '<div class="aft-kicker">Afternoon</div><div class="aft-huge" id="aftBig-' + name + '">Home</div><div class="aft-line">On the way home' + (school ? ' · left ' + esc(home) : '') + '</div>';
+        html += '<button type="button" class="kid-name ' + name.toLowerCase() + '" data-act="aft-in" data-kid="' + name + '">' + esc(name) + '</button>';
+        html += '<p class="m-muted">Tap your name when you get home.</p>';
       }
-      html += aftCanIn(name, p)
-        ? '<button type="button" class="checkin ' + name.toLowerCase() + '" data-act="aft-in" data-kid="' + name + '">Punch in</button>'
-        : '<button type="button" class="checkin ' + name.toLowerCase() + '" disabled>Punch in at ' + esc(home) + '</button>';
-    } else if (phase === 'land') {
-      var landLeft = (rec.inAt + aftRoot().landMin * 60000 - morningNowMs()) / 60000;
-      var leftN = aftLandingKeys(name).filter(function (key) { return !aftOn(name, key); }).length;
-      html += '<div class="aft-kicker">Landing · ' + aftRoot().landMin + ' min</div><div class="aft-huge" id="aftBig-' + name + '">' + aftLeftLabel(landLeft) + '</div>';
-      html += '<div class="aft-line">Finish the landing list, then punch out</div>';
-      html += leftN
-        ? '<button type="button" class="checkin ' + name.toLowerCase() + '" disabled>' + leftN + ' landing task' + (leftN === 1 ? '' : 's') + ' left</button>'
-        : '<button type="button" class="checkin ' + name.toLowerCase() + '" data-act="aft-land" data-kid="' + name + '">Landed</button>';
-    } else if (phase === 'screens') {
-      var remain = aftScreenItems(name, p).filter(function (it) { return !aftOn(name, it.key); }).length;
-      html += '<div class="aft-kicker">Before screens</div><div class="aft-huge" id="aftBig-' + name + '">' + remain + '</div><div class="aft-line">' + remain + ' must-do' + (remain === 1 ? '' : 's') + ' left' + (rec.easy === 1 ? ' · easy day' : '') + '</div>';
-    } else {
-      html += '<div class="aft-kicker">Afternoon</div><div class="aft-huge" id="aftBig-' + name + '">' + ((aftKid(name).SC || []).length ? 'Screens' : 'Done') + '</div>';
-      html += '<div class="aft-line">' + ((aftKid(name).SC || []).length ? 'Screens unlocked' + (rec.screensAt ? ' · ' + fmtAt(rec.screensAt) : '') : 'Afternoon done') + (rec.easy === 2 ? ' · skipped' : '') + '</div>';
+      html += '</section>';
+      return html;
     }
-    html += '</div>';
-    if (phase === 'wait') html += '<p class="m-muted">Punch in first, then the landing list opens.</p>';
-    else {
-      html += '<div class="m-lbl">Landing' + (rec.landAt ? ' · ' + fmtAt(rec.landAt) : '') + '</div>';
-      if (rec.landAt) html += '<p class="m-muted">Landed at ' + fmtAt(rec.landAt) + '.</p>';
-      else (aftKid(name).L || []).forEach(function (label, i) { html += aftCheckHtml(name, 'L' + i, label, false); });
+    html += '<div class="m-head"><h2>' + esc(name) + '</h2><span class="badge">Home ' + fmtAt(rec.inAt) + '</span></div>';
+    html += '<div class="m-lbl">Is your homework all done?</div><div class="q-pills">';
+    [['yes', 'Yes'], ['notyet', 'Not yet'], ['none', 'No homework']].forEach(function (pair) {
+      html += '<button type="button" class="q-pill' + (rec.homework === pair[0] ? ' on' : '') + '" data-act="aft-hw" data-kid="' + name + '" data-id="' + pair[0] + '">' + pair[1] + '</button>';
+    });
+    html += '</div><div class="m-lbl">Do you need anything from Mom or Dad?</div><div class="q-pills">';
+    NEED_BUTTONS.forEach(function (label) {
+      var on = (rec.needs || []).indexOf(label) >= 0;
+      html += '<button type="button" class="q-pill' + (on ? ' on' : '') + '" data-act="aft-need" data-kid="' + name + '" data-id="' + esc(label) + '">' + esc(label) + '</button>';
+    });
+    html += '</div><input class="field aft-field" data-act="aft-note" data-kid="' + name + '" maxlength="80" placeholder="A short note" value="' + esc(rec.needNote || '') + '" inputmode="text" enterkeyhint="done">';
+    html += '<div class="m-lbl">Want to tell us something?</div><textarea class="field aft-field" data-act="aft-msg" data-kid="' + name + '" maxlength="160" rows="2" placeholder="A message for Mom or Dad">' + esc(rec.message || '') + '</textarea>';
+    html += '<div class="m-lbl">Before screens</div>';
+    aftChoreItems(name, p).forEach(function (it) { html += aftCheckHtml(name, it.key, it.label, it.fri); });
+    if (!aftReadDone(name, p) && rec.easy !== 2 && aftNowMin(p) >= 18 * 60) {
+      html += '<div class="m-lbl">Evening</div>' + aftCheckHtml(name, 'EV', 'Evening reading before bed', false);
     }
-    if ((aftKid(name).SC || []).length) {
-      var items = aftScreenItems(name, p);
-      html += '<div class="m-lbl">Before screens' + (rec.easy === 1 ? ' · easy day, reading only' : rec.easy === 2 ? ' · skip today' : '') + '</div>';
-      if (rec.screensAt) html += '<div class="aft-unlock">Screens unlocked ' + fmtAt(rec.screensAt) + '</div>';
-      if (rec.easy === 2) html += '<p class="m-muted">Skipped today. That is OK.</p>';
-      else items.forEach(function (it) { html += aftCheckHtml(name, it.key, it.label, it.fri); });
-      if (!aftReadDone(name, p) && rec.easy !== 2 && aftNowMin(p) >= 18 * 60) {
-        html += '<div class="m-lbl">Evening</div>' + aftCheckHtml(name, 'EV', 'Evening reading before bed', false);
-      }
-    }
+    if (rec.screensAt) html += '<div class="aft-unlock">Screens unlocked ' + fmtAt(rec.screensAt) + '</div>';
     html += '<div class="aft-parent"><span>Parent</span>';
     html += '<button type="button" class="' + (rec.easy === 1 ? 'on' : '') + '" data-act="aft-easy" data-kid="' + name + '" data-id="1">Easy day</button>';
     if ((aftKid(name).SC || []).length) html += '<button type="button" class="' + (rec.easy === 2 ? 'on' : '') + '" data-act="aft-easy" data-kid="' + name + '" data-id="2">Skip today</button>';
-    if (rec.inAt) html += '<button type="button" data-act="aft-undo" data-kid="' + name + '">Undo</button>';
-    html += '</div></section>';
+    html += '<button type="button" data-act="aft-undo" data-kid="' + name + '">Undo</button></div></section>';
+    return html;
+  }
+  function parentAfternoonCard() {
+    var p = morningParts();
+    if (kidsMode(p) !== 'afternoon') return '';
+    var html = '<article class="card aft-summary"><div class="kicker"><span>AFTER SCHOOL</span></div>';
+    KIDS.forEach(function (name) {
+      var rec = aftRec(name);
+      html += '<div class="aft-sum' + (rec.seenAt ? ' seen' : '') + '"><div><b>' + esc(name) + '</b> ';
+      if (!rec.inAt) html += '<span class="muted">Not home yet</span>';
+      else {
+        html += '<span class="muted">Home ' + fmtAt(rec.inAt) + ' · Homework: ' + esc(homeworkWord(rec.homework)) + '</span>';
+        if ((rec.needs || []).length || rec.needNote) html += '<div>Needs: ' + esc((rec.needs || []).concat(rec.needNote ? [rec.needNote] : []).join(', ')) + '</div>';
+        if (rec.message) html += '<div>“' + esc(rec.message) + '”</div>';
+        if (rec.screensAt) html += '<div class="muted">Screens unlocked ' + fmtAt(rec.screensAt) + '</div>';
+      }
+      html += '</div>';
+      if (rec.inAt && !rec.seenAt) html += '<button type="button" class="btn light small" data-act="aft-seen" data-kid="' + name + '">Seen</button>';
+      else if (rec.seenAt) html += '<span class="muted">Seen</span>';
+      html += '</div>';
+    });
+    html += '</article>';
     return html;
   }
   function afternoonBanner(p) {
@@ -1981,7 +2061,7 @@
     if (soon) {
       return { title: 'Home at ' + soon.home, big: soon.left >= 60 ? fmtLeft(soon.left * 60) : aftLeftLabel(soon.left), sub: bits.join(' · '), pct: 0, urg: soon.left < 10 ? 'yellow' : 'ok', mode: 'wait' };
     }
-    return { title: 'Afternoon', big: 'Home', sub: 'Punch in when you get home · ' + bits.join(' · '), pct: 0, urg: 'ok', mode: 'wait' };
+    return { title: 'Afternoon', big: 'Home', sub: 'Tap your name when you get home · ' + bits.join(' · '), pct: 0, urg: 'ok', mode: 'wait' };
   }
   function renderAfternoon() {
     var p = morningParts();
@@ -3164,9 +3244,13 @@
     if (act === 'nav') { closeOverlay(); go(id === 'morning' ? 'kids' : id); return; }
     if (act === 'aft-in') { aftPunchIn(kid); render(); return; }
     if (act === 'aft-land') { aftLand(kid); render(); return; }
-    if (act === 'aft-check') { aftToggle(kid, id); render(); return; }
+    if (act === 'aft-check') { aftToggle(kid, id); aftMaybeScreens(kid); aftSave(); render(); return; }
+    if (act === 'aft-hw') { aftHomework(kid, id); render(); return; }
+    if (act === 'aft-need') { aftNeed(kid, id); render(); return; }
+    if (act === 'aft-note' || act === 'aft-msg') return;
     if (act === 'aft-easy') { aftEasy(kid, +id); render(); return; }
     if (act === 'aft-undo') { aftUndo(kid); render(); return; }
+    if (act === 'aft-seen') { aftSeen(kid); render(); return; }
     if (act === 'wake') { go(lastPage || 'home'); return; }
     if (act === 'close') { closeOverlay(); return; }
     if (act === 'sound') {
@@ -3592,6 +3676,10 @@
     var t = e.target;
     if (!t || !t.getAttribute) return;
     var act = t.getAttribute('data-act');
+    if (act === 'aft-note' || act === 'aft-msg') {
+      aftText(t.getAttribute('data-kid'), act === 'aft-msg' ? 'message' : 'needNote', t.value);
+      return;
+    }
     if (act === 'aldi-toggle') {
       (hub.aldi || []).forEach(function (item) { if (item.id === t.getAttribute('data-id')) item.done = t.checked; });
       saveHub();
@@ -3657,7 +3745,13 @@
   document.addEventListener('click', onClick);
   document.addEventListener('input', function (e) {
     var t = e.target;
-    if (!t || t.id !== 'recipeSearch') return;
+    if (!t) return;
+    var act = t.getAttribute && t.getAttribute('data-act');
+    if (act === 'aft-note' || act === 'aft-msg') {
+      aftText(t.getAttribute('data-kid'), act === 'aft-msg' ? 'message' : 'needNote', t.value);
+      return;
+    }
+    if (t.id !== 'recipeSearch') return;
     recipeQuery = t.value;
     var grid = document.getElementById('recipeGrid');
     if (grid) grid.innerHTML = recipeCardsHtml();
