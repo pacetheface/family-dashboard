@@ -34,10 +34,10 @@ This is the same routine as the previous wall.
 - Before 7:10 the countdown is the boys, with “then June · 7:30” underneath. After 7:10 it switches to June.
 - The countdown turns yellow, then orange, then red as the deadline gets close.
 - No countdown and no ready-timers on weekends, Bavarian public holidays, or Bavarian school holidays for 2026/27 (including Herbstferien 2–6 Nov 2026, and Sommerferien 2027). An all-day calendar event containing `Ferien`, `schulfrei`, `no school`, or `holiday` also marks that child off.
-- Each child checks in, or ticks a task, to start their own timer. It stops when their last morning task is ticked. The goal is ready on time, not a race.
+- On the Kids tab each column starts locked. A child taps **Check in** at the top to record when they started getting ready and to unlock that list. Until then the to-dos are visible, grey, and cannot be tapped. **Check out** at the bottom records when they left. If items are still open, the wall asks before checking out. Home’s morning card shows each check-in and check-out, with a parent Undo. The same morning check-in time also shows on the afternoon flow. The ready timer still stops when the last morning task is ticked. The goal is ready on time, not a race.
 - Finished by **7:05** (boys) or **7:25** (June): the timer turns green with a star, and that child also earns a star in the Playroom.
 - The badge `★ 3 of 5 this week` counts on-time school mornings. It starts again each Monday. A short school week shows a smaller total. A missed morning is not called out anywhere else. There are no streaks.
-- The morning list lives on the Playroom **Morning** tab and on the Home cards during a school morning. It resets each morning on that device. There is no breakfast item.
+- The morning list lives on the Playroom **Morning** tab and on the Home cards during a school morning. Those ticks stay locked until that child has checked in. It resets each morning on that device. There is no breakfast item.
 
 Seeded morning tasks, which a parent can edit:
 
@@ -70,7 +70,7 @@ The Aldi list, dinners, chores, sports, spices, and date ideas start with editab
 - Turn off the TV’s auto power-off, sleep timer, and screensaver (Samsung: Settings → General → System Manager → Auto Power Off → Off). The page asks to stay awake where the browser allows a screen wake lock, and reloads itself once around 03:00 so the new day and the new calendar file show up.
 - Tap **Enable sound** once (on the morning card, or in Settings). The TV remembers. At 15, 10, and 5 minutes before each leave time it plays a short chime and, if the browser can talk, says for example “10 minutes until West and Jack leave”. Browsers block sound until that tap.
 - **Kids** in the left nav is the countdown wall. Before noon it is the morning countdown. From 12:00 a child taps their name to check in. They answer homework (Yes, Not yet, or No homework), tap anything they need from Mom or Dad, and can leave a short note and a message. Then they tick arrival chores: coat, shoes, backpack, lunchbox, plus that child’s own list. When those are done the screen says Screens unlocked. Nothing is sent to a phone yet. Home shows a parent card with the check-in time, homework, needs, and messages, and a Seen button. Bookmark `?view=kids`. `?test=afternoon` starts at 15:55 and does not save the check-in.
-- Add `?test=morning` to practice that countdown. The morning clock starts at 6:45 on the next school day and then runs at real speed, so the 15, 10, and 5 minute chimes can play. A Test mode badge shows. Stars and on-time mornings are not saved. Leave the parameter off for a normal day.
+- Add `?test=morning` to practice that countdown, including check-in and check-out. The morning clock starts at 6:45 on the next school day and then runs at real speed, so the 15, 10, and 5 minute chimes can play. A Test mode badge shows. Stars, on-time mornings, and the practice check-in are not saved. Leave the parameter off for a normal day.
 - Enter the family password once, in Settings. The clock, countdown, weather, holidays, and checklists work even while the calendar is locked.
 
 ## Calendar secrets

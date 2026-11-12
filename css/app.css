@@ -658,6 +658,33 @@ button, .btn, .pill, .q-pill, .badge, .checkin { font-weight: 600; }
   border-radius: 6px;
   text-decoration: none;
 }
+.morning-wall .m-col { display: flex; flex-direction: column; }
+.morning-wall .m-foot { margin-top: auto; padding-top: 12px; }
+.morning-wall .m-top .count-big { font-size: 96px; }
+.morning-wall .m-top .count-title { font-size: 28px; }
+.morning-wall .m-top .count-sub { font-size: 22px; }
+.morning-wall .m-clock-time { font-size: 72px; }
+.morning-wall .m-clock-date { font-size: 20px; }
+.morning-wall .m-head h2 { font-size: 42px; }
+.morning-wall .m-temp { font-size: 48px; }
+.morning-wall .chk { font-size: 24px; min-height: 58px; padding: 12px 8px; }
+.morning-wall .box { width: 34px; height: 34px; }
+.morning-wall .checkin { font-size: 28px; padding: 16px 14px; border-radius: 16px; margin-bottom: 10px; }
+.morning-wall .checkout {
+  display: block; width: 100%; border: 0; border-radius: 16px; padding: 16px 14px;
+  font-size: 28px; font-weight: 800; background: #003253; color: #fff; cursor: pointer;
+}
+.morning-wall .m-lbl { font-size: 16px; }
+.morning-wall .m-meta, .morning-wall .m-muted, .morning-wall .m-ev, .morning-wall .m-hw { font-size: 20px; }
+.morning-wall .m-status { font-size: 32px; font-weight: 800; line-height: 1.15; margin-bottom: 8px; color: #003253; }
+.morning-wall .m-status .sub { display: block; margin-top: 4px; font-size: 24px; font-weight: 600; color: #3d5c78; }
+.morning-wall .chk:disabled, .morning-wall .chk.locked { opacity: 0.4; }
+.morning-wall .kid-name { font-size: 44px; padding: 20px 14px; }
+.morning-wall .q-pill { font-size: 20px; padding: 12px 16px; }
+.morning-wall .aft-huge { font-size: 68px; }
+.morning-wall .aft-line, .morning-wall .morn-stamp { font-size: 22px; }
+.morning-wall .badge { font-size: 16px; }
+.morning-wall .m-dayoff { font-size: 26px; }
 @supports ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))) {
   .card, .m-col, .banner, .side-card, .sheet, .meal, .wxday, .m-sw, .aft-card, .count-card,
   .m-top, .m-top.urg-ok, .m-top.urg-yellow, .m-top.urg-orange, .m-top.urg-red, .m-top.urg-gone, .m-top.urg-off {
