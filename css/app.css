@@ -102,6 +102,7 @@ h1, h2, h3, .serif { font-family: var(--serif); font-weight: 560; letter-spacing
 .brand { display: flex; align-items: center; gap: 14px; min-width: 0; flex-wrap: wrap; }
 .brand h1 { margin: 0; font-size: 34px; }
 .clock { font-family: var(--serif); font-size: 32px; font-variant-numeric: tabular-nums; }
+.test-badge { background: #fff4d2; color: #6d5414; border-radius: 999px; padding: 4px 10px; font-size: 13px; font-weight: 800; }
 .wxchip { display: inline-flex; align-items: center; gap: 6px; color: #5c534b; font-weight: 800; font-size: 15px; }
 .wxchip b { font-size: 16px; }
 .today-word { letter-spacing: 0.12em; font-size: 12px; color: #9a8e82; }
