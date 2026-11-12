@@ -584,6 +584,18 @@ h1, h2, h3, .serif { font-family: var(--serif); font-weight: 560; letter-spacing
 .aft-parent { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 14px; padding-top: 10px; border-top: 1px dashed #e6dccf; color: #8d8276; font-size: 13px; font-weight: 800; }
 .aft-parent button { border: 1px solid #e6dccf; background: #fff; border-radius: 999px; padding: 6px 10px; font-weight: 800; cursor: pointer; }
 .aft-parent button.on { background: #ffe9a8; border-color: #e2b13c; }
+.kid-name { display: block; width: 100%; border: 0; border-radius: 16px; padding: 18px 12px; font-family: var(--serif); font-size: 36px; color: #fff; cursor: pointer; }
+.kid-name.west { background: #3d7ec4; }
+.kid-name.jack { background: #2f9a62; }
+.kid-name.june { background: #d45a8e; }
+.q-pills { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 8px; }
+.q-pill { border: 1px solid #e6dccf; background: #fff; border-radius: 999px; padding: 8px 12px; font-weight: 800; cursor: pointer; }
+.q-pill.on { background: #2c261f; color: #fff; border-color: #2c261f; }
+.aft-field { width: 100%; margin: 4px 0 8px; }
+.aft-summary { margin-bottom: 0; }
+.aft-sum { display: flex; justify-content: space-between; gap: 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--line); font-weight: 700; }
+.aft-sum:first-of-type { border-top: 0; }
+.aft-sum.seen { opacity: 0.55; }
 .chk.fri .lbl { background: #ffe08a; border-radius: 8px; padding: 1px 6px; }
 @media (max-width: 1180px) {
   .m-top { flex-wrap: wrap; }
