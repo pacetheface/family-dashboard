@@ -144,7 +144,7 @@
   var SECTIONS = ['Produce', 'Meat & Fish', 'Dairy & Eggs', 'Bakery', 'Pantry', 'Spices', 'Frozen', 'Drinks', 'Household', 'Other'];
   var NAV = [
     { id: 'home', label: 'Home', icon: 'home' },
-    { id: 'morning', label: 'Morning', icon: 'morning' },
+    { id: 'kids', label: 'Kids', icon: 'morning' },
     { id: 'calendar', label: 'Calendar', icon: 'cal' },
     { id: 'playroom', label: 'Playroom', icon: 'star' },
     { id: 'meals', label: 'Meals', icon: 'meals' },
@@ -189,6 +189,7 @@
   var focusSel = '';
   var homeMorning = false;
   var morningLive = false;
+  var kidsShown = 'morning';
   var calView = 'week';
   var calAnchor = '';
   var kidOn = { West: true, Jack: true, June: true };
@@ -308,13 +309,15 @@
   function nowParts() { return berlinParts(new Date(nowMs())); }
   function currentYmd() { return nowParts().ymd; }
 
-  // ?test=morning starts a private clock at 06:45 on the next school day and
-  // lets it run at real speed. The wall clock, calendar, and saved progress stay put.
-  var TEST_MORNING = Q.test === 'morning';
+  // ?test=morning starts at 06:45, ?test=afternoon at 15:55, on the next school
+  // day, then both run at real speed. Saved stars and afternoon progress stay put.
+  var TEST_MODE = Q.test === 'afternoon' ? 'afternoon' : (Q.test === 'morning' ? 'morning' : '');
+  var TEST_MORNING = TEST_MODE === 'morning';
   var testBootMs = Date.now();
   var testOriginMs = 0;
   var testKids = {};
   var testChimed = {};
+  var testAfternoon = { days: {} };
   function isSchoolDay(ymd) {
     if (hardOff(ymd)) return false;
     if (!DATA) return true;
@@ -323,7 +326,8 @@
   }
   function nextSchoolYmd(real) {
     var mins = real.h * 60 + real.mi;
-    var start = (isSchoolDay(real.ymd) && mins < 6 * 60 + 45) ? real.ymd : addDays(real.ymd, 1);
+    var cut = TEST_MODE === 'afternoon' ? 15 * 60 + 55 : 6 * 60 + 45;
+    var start = (isSchoolDay(real.ymd) && mins < cut) ? real.ymd : addDays(real.ymd, 1);
     var ymd = start;
     for (var i = 0; i < 21; i++) {
       ymd = addDays(start, i);
@@ -331,15 +335,16 @@
     }
     return ymd;
   }
-  if (TEST_MORNING) {
-    testOriginMs = berlinLocalToEpoch(nextSchoolYmd(berlinParts(new Date(testBootMs))) + 'T06:45:00');
+  if (TEST_MODE) {
+    var testClock = TEST_MODE === 'afternoon' ? 'T15:55:00' : 'T06:45:00';
+    testOriginMs = berlinLocalToEpoch(nextSchoolYmd(berlinParts(new Date(testBootMs))) + testClock);
   }
   function morningNowMs() {
-    if (!TEST_MORNING || !testOriginMs) return nowMs();
+    if (!TEST_MODE || !testOriginMs) return nowMs();
     return testOriginMs + (Date.now() - testBootMs);
   }
   function morningParts() {
-    if (!TEST_MORNING || !testOriginMs) return nowParts();
+    if (!TEST_MODE || !testOriginMs) return nowParts();
     return berlinParts(new Date(morningNowMs()));
   }
   function doy(ymd) { return daysBetween(ymd.slice(0, 4) + '-01-01', ymd); }
@@ -658,7 +663,32 @@
         { id: 'd5', title: 'Saturday breakfast out', detail: 'Leave before the day fills up. Anywhere that pours coffee.', planned: false }
       ],
       localEvents: [],
-      note: ''
+      note: '',
+      afternoon: afternoonDefaults()
+    };
+  }
+  function afternoonDefaults() {
+    return {
+      landMin: 20,
+      whw: 'Weekend homework',
+      kids: {
+        West: {
+          home: '16:00', homeFri: '13:00',
+          L: ['Snack', 'Unpack backpack', 'Give lunchbox to Dad', 'Put backpack away', 'Homework done? (finished at OGT)'],
+          SC: ['Reading 15 min, out loud', 'Laundry to basket', 'Empty dishwasher']
+        },
+        Jack: {
+          home: '16:00', homeFri: '16:00',
+          L: ['Snack', 'Unpack backpack', 'Give lunchbox to Dad', 'Put backpack away', 'Homework done? (finished at OGT)'],
+          SC: ['Reading 15 min, out loud', 'Line up shoes', 'Set the table']
+        },
+        June: {
+          home: '16:00', homeFri: '',
+          L: ['Snack', 'Unpack Brotbox', 'Shoes away'],
+          SC: []
+        }
+      },
+      days: {}
     };
   }
   function ensureHubShape() {
@@ -1589,7 +1619,7 @@
     var n = noticeCount(p);
     var voice = canVoice();
     document.getElementById('topbar').innerHTML =
-      '<div class="brand"><h1>The Knapps</h1><div class="clock" id="clockTime">' + esc(fmtClock(p)) + '</div>' + (TEST_MORNING ? '<span class="test-badge">Test mode</span>' : '') + '<div class="wxchip" id="wxTop">' + wxTopHtml(p) + '</div></div>' +
+      '<div class="brand"><h1>The Knapps</h1><div class="clock" id="clockTime">' + esc(fmtClock(p)) + '</div>' + (TEST_MODE ? '<span class="test-badge">Test mode</span>' : '') + '<div class="wxchip" id="wxTop">' + wxTopHtml(p) + '</div></div>' +
       '<div class="top-actions"><button type="button" class="iconbtn" data-act="bell" aria-label="Notifications">' + icon('bell') + (n ? '<span class="dot"></span>' : '') + '</button>' +
       '<button type="button" class="iconbtn" data-act="settings" aria-label="Settings">' + icon('gear') + '</button>' +
       '<button type="button" class="quick" data-act="quick">' + icon(voice ? 'mic' : 'plus') + ' Quick add</button></div>';
@@ -1758,6 +1788,216 @@
     }
     return html;
   }
+  function kidsMode(p) {
+    return p.h * 60 + p.mi >= 12 * 60 ? 'afternoon' : 'morning';
+  }
+  function aftRoot() {
+    if (TEST_MODE) {
+      if (!testAfternoon.kids) {
+        var seed = afternoonDefaults();
+        testAfternoon.landMin = seed.landMin;
+        testAfternoon.whw = seed.whw;
+        testAfternoon.kids = seed.kids;
+        if (!testAfternoon.days) testAfternoon.days = {};
+      }
+      return testAfternoon;
+    }
+    if (!hub.afternoon) hub.afternoon = afternoonDefaults();
+    return hub.afternoon;
+  }
+  function aftSave() { if (!TEST_MODE) saveHub(); }
+  function aftNowMin(p) { return p.h * 60 + p.mi + p.s / 60; }
+  function aftFri(p) { return weekdayIndex(p.ymd) === 5; }
+  function aftKid(name) { return aftRoot().kids[name]; }
+  function aftHomeStr(name, p) {
+    var kid = aftKid(name);
+    if (aftFri(p) && kid.homeFri) return kid.homeFri;
+    return kid.home || '16:00';
+  }
+  function aftHomeMin(name, p) {
+    var parts = aftHomeStr(name, p).split(':');
+    return (+parts[0]) * 60 + (+parts[1] || 0);
+  }
+  function aftRec(name) {
+    var ymd = morningParts().ymd;
+    var root = aftRoot();
+    if (!root.days) root.days = {};
+    if (!root.days[ymd]) root.days[ymd] = {};
+    if (!root.days[ymd][name]) root.days[ymd][name] = { easy: 0, checks: {} };
+    if (!root.days[ymd][name].checks) root.days[ymd][name].checks = {};
+    return root.days[ymd][name];
+  }
+  function aftOn(name, key) { return !!aftRec(name).checks[key]; }
+  function aftLandingKeys(name) {
+    return (aftKid(name).L || []).map(function (_, i) { return 'L' + i; });
+  }
+  function aftScreenItems(name, p) {
+    var sc = aftKid(name).SC || [];
+    var items = sc.map(function (label, i) { return { key: 'S' + i, label: label, read: /reading/i.test(label), fri: false }; });
+    if (aftFri(p) && name !== 'June' && sc.length) items.unshift({ key: 'WH', label: aftRoot().whw || 'Weekend homework', read: false, fri: true });
+    var easy = aftRec(name).easy || 0;
+    if (easy === 2) return [];
+    if (easy === 1) {
+      var wh = items.filter(function (it) { return it.fri; });
+      var reading = items.filter(function (it) { return it.read; });
+      return wh.concat(reading.length ? reading : items.filter(function (it) { return !it.fri; }).slice(0, 1));
+    }
+    return items;
+  }
+  function aftReadDone(name, p) {
+    if (aftScreenItems(name, p).some(function (it) { return it.read && aftOn(name, it.key); })) return true;
+    return aftOn(name, 'EV');
+  }
+  function aftPhase(name) {
+    var rec = aftRec(name);
+    var sc = aftKid(name).SC || [];
+    if (!rec.inAt) return 'wait';
+    if (!rec.landAt) return 'land';
+    if (sc.length && !rec.screensAt) return 'screens';
+    return 'free';
+  }
+  function aftMaybeScreens(name) {
+    var rec = aftRec(name);
+    var sc = aftKid(name).SC || [];
+    if (!rec.landAt || rec.screensAt || !sc.length) return;
+    var items = aftScreenItems(name, morningParts());
+    if (!items.length || items.every(function (it) { return aftOn(name, it.key); })) rec.screensAt = morningNowMs();
+  }
+  function aftCanIn(name, p) {
+    if (isWeekendYmd(p.ymd) || hardOff(p.ymd)) return true;
+    return aftNowMin(p) >= aftHomeMin(name, p);
+  }
+  function aftLeftLabel(minsFloat) {
+    var sec = Math.round(Math.abs(minsFloat) * 60);
+    return (minsFloat < 0 ? '+' : '') + Math.floor(sec / 60) + ':' + pad2(sec % 60);
+  }
+  function aftPunchIn(name) {
+    var p = morningParts();
+    if (!aftCanIn(name, p)) return;
+    var rec = aftRec(name);
+    if (rec.inAt) return;
+    rec.inAt = morningNowMs();
+    aftSave();
+  }
+  function aftLand(name) {
+    if (aftLandingKeys(name).some(function (key) { return !aftOn(name, key); })) return;
+    var rec = aftRec(name);
+    if (!rec.inAt || rec.landAt) return;
+    rec.landAt = morningNowMs();
+    aftMaybeScreens(name);
+    aftSave();
+  }
+  function aftToggle(name, key) {
+    var rec = aftRec(name);
+    rec.checks[key] = !rec.checks[key];
+    if (!rec.checks[key]) rec.screensAt = null;
+    aftMaybeScreens(name);
+    aftSave();
+  }
+  function aftEasy(name, value) {
+    var rec = aftRec(name);
+    rec.easy = rec.easy === value ? 0 : value;
+    rec.screensAt = null;
+    aftMaybeScreens(name);
+    aftSave();
+  }
+  function aftUndo(name) {
+    var ymd = morningParts().ymd;
+    var root = aftRoot();
+    if (root.days && root.days[ymd]) delete root.days[ymd][name];
+    aftSave();
+  }
+  function aftCheckHtml(name, key, label, fri) {
+    var on = aftOn(name, key);
+    return '<button type="button" class="chk' + (on ? ' done' : '') + (fri ? ' fri' : '') + '" data-act="aft-check" data-kid="' + name + '" data-id="' + esc(key) + '" aria-pressed="' + (on ? 'true' : 'false') + '"><span class="box"><span class="tick"></span></span><span class="lbl">' + esc(label) + '</span></button>';
+  }
+  function aftColumn(name, p) {
+    var rec = aftRec(name);
+    var phase = aftPhase(name);
+    var home = aftHomeStr(name, p);
+    var left = aftHomeMin(name, p) - aftNowMin(p);
+    var school = !isWeekendYmd(p.ymd) && !hardOff(p.ymd);
+    var who = name === 'June' ? 'Leaving Kinderhaus' : (name === 'Jack' ? 'Leaving OGT' : 'Leaving school');
+    var html = '<section class="m-col ' + name.toLowerCase() + '"><div class="m-head"><h2>' + esc(name) + '</h2><span class="badge">Home ' + esc(home) + '</span></div>';
+    html += '<div class="aft-card">';
+    if (phase === 'wait') {
+      if (left > 0 && school) {
+        html += '<div class="aft-kicker">Afternoon</div><div class="aft-huge" id="aftBig-' + name + '">' + aftLeftLabel(left) + '</div><div class="aft-line">' + esc(who) + ' at ' + esc(home) + '</div>';
+      } else {
+        html += '<div class="aft-kicker">Afternoon</div><div class="aft-huge" id="aftBig-' + name + '">Home</div><div class="aft-line">On the way home' + (school ? ' · left ' + esc(home) : '') + '</div>';
+      }
+      html += aftCanIn(name, p)
+        ? '<button type="button" class="checkin ' + name.toLowerCase() + '" data-act="aft-in" data-kid="' + name + '">Punch in</button>'
+        : '<button type="button" class="checkin ' + name.toLowerCase() + '" disabled>Punch in at ' + esc(home) + '</button>';
+    } else if (phase === 'land') {
+      var landLeft = (rec.inAt + aftRoot().landMin * 60000 - morningNowMs()) / 60000;
+      var leftN = aftLandingKeys(name).filter(function (key) { return !aftOn(name, key); }).length;
+      html += '<div class="aft-kicker">Landing · ' + aftRoot().landMin + ' min</div><div class="aft-huge" id="aftBig-' + name + '">' + aftLeftLabel(landLeft) + '</div>';
+      html += '<div class="aft-line">Finish the landing list, then punch out</div>';
+      html += leftN
+        ? '<button type="button" class="checkin ' + name.toLowerCase() + '" disabled>' + leftN + ' landing task' + (leftN === 1 ? '' : 's') + ' left</button>'
+        : '<button type="button" class="checkin ' + name.toLowerCase() + '" data-act="aft-land" data-kid="' + name + '">Landed</button>';
+    } else if (phase === 'screens') {
+      var remain = aftScreenItems(name, p).filter(function (it) { return !aftOn(name, it.key); }).length;
+      html += '<div class="aft-kicker">Before screens</div><div class="aft-huge" id="aftBig-' + name + '">' + remain + '</div><div class="aft-line">' + remain + ' must-do' + (remain === 1 ? '' : 's') + ' left' + (rec.easy === 1 ? ' · easy day' : '') + '</div>';
+    } else {
+      html += '<div class="aft-kicker">Afternoon</div><div class="aft-huge" id="aftBig-' + name + '">' + ((aftKid(name).SC || []).length ? 'Screens' : 'Done') + '</div>';
+      html += '<div class="aft-line">' + ((aftKid(name).SC || []).length ? 'Screens unlocked' + (rec.screensAt ? ' · ' + fmtAt(rec.screensAt) : '') : 'Afternoon done') + (rec.easy === 2 ? ' · skipped' : '') + '</div>';
+    }
+    html += '</div>';
+    if (phase === 'wait') html += '<p class="m-muted">Punch in first, then the landing list opens.</p>';
+    else {
+      html += '<div class="m-lbl">Landing' + (rec.landAt ? ' · ' + fmtAt(rec.landAt) : '') + '</div>';
+      if (rec.landAt) html += '<p class="m-muted">Landed at ' + fmtAt(rec.landAt) + '.</p>';
+      else (aftKid(name).L || []).forEach(function (label, i) { html += aftCheckHtml(name, 'L' + i, label, false); });
+    }
+    if ((aftKid(name).SC || []).length) {
+      var items = aftScreenItems(name, p);
+      html += '<div class="m-lbl">Before screens' + (rec.easy === 1 ? ' · easy day, reading only' : rec.easy === 2 ? ' · skip today' : '') + '</div>';
+      if (rec.screensAt) html += '<div class="aft-unlock">Screens unlocked ' + fmtAt(rec.screensAt) + '</div>';
+      if (rec.easy === 2) html += '<p class="m-muted">Skipped today. That is OK.</p>';
+      else items.forEach(function (it) { html += aftCheckHtml(name, it.key, it.label, it.fri); });
+      if (!aftReadDone(name, p) && rec.easy !== 2 && aftNowMin(p) >= 18 * 60) {
+        html += '<div class="m-lbl">Evening</div>' + aftCheckHtml(name, 'EV', 'Evening reading before bed', false);
+      }
+    }
+    html += '<div class="aft-parent"><span>Parent</span>';
+    html += '<button type="button" class="' + (rec.easy === 1 ? 'on' : '') + '" data-act="aft-easy" data-kid="' + name + '" data-id="1">Easy day</button>';
+    if ((aftKid(name).SC || []).length) html += '<button type="button" class="' + (rec.easy === 2 ? 'on' : '') + '" data-act="aft-easy" data-kid="' + name + '" data-id="2">Skip today</button>';
+    if (rec.inAt) html += '<button type="button" data-act="aft-undo" data-kid="' + name + '">Undo</button>';
+    html += '</div></section>';
+    return html;
+  }
+  function afternoonBanner(p) {
+    var now = aftNowMin(p);
+    var soon = null;
+    var bits = [];
+    KIDS.forEach(function (name) {
+      var home = aftHomeStr(name, p);
+      var left = aftHomeMin(name, p) - now;
+      bits.push(name + ' ' + home);
+      if (left > 0 && (!soon || left < soon.left)) soon = { left: left, home: home };
+    });
+    if (soon) {
+      return { title: 'Home at ' + soon.home, big: soon.left >= 60 ? fmtLeft(soon.left * 60) : aftLeftLabel(soon.left), sub: bits.join(' · '), pct: 0, urg: soon.left < 10 ? 'yellow' : 'ok', mode: 'wait' };
+    }
+    return { title: 'Afternoon', big: 'Home', sub: 'Punch in when you get home · ' + bits.join(' · '), pct: 0, urg: 'ok', mode: 'wait' };
+  }
+  function renderAfternoon() {
+    var p = morningParts();
+    var model = afternoonBanner(p);
+    var weather = currentWeather(nowParts());
+    var html = '<div class="page morning-wall">';
+    html += '<section class="m-top urg-' + model.urg + '" id="countCard" data-wall="1" data-phase="afternoon">';
+    html += '<div class="m-clock"><div class="m-clock-time" id="mClock">' + esc(fmtClock(p)) + '</div><div class="m-clock-date" id="mDate">' + esc((p.weekday || '') + ' ' + p.d + ' ' + (MONTHS[p.mo - 1] || '')) + '</div></div>';
+    html += '<div class="m-mid"><div class="count-title" id="countTitle">' + esc(model.title) + '</div><div class="count-big" id="countBig">' + esc(model.big) + '</div><div class="count-sub" id="countSub">' + esc(model.sub) + '</div></div>';
+    html += '<div class="m-wx"><div class="m-wx-main" id="mWxMain">' + (weather ? weatherSvg(weather.kind) + '<span class="m-temp">' + weather.temp + '°</span>' : '<span class="m-temp">—</span>') + '</div>';
+    html += '<div class="m-wx-sub" id="mWxSub">' + esc(weather ? (weather.word + (weather.hint ? ' · ' + weather.hint : '')) : 'Weather for Bad Tölz') + '</div></div>';
+    html += '<div class="bar" id="bar"><i id="barFill" style="width:0"></i></div></section><div class="m-cols">';
+    KIDS.forEach(function (name) { html += aftColumn(name, p); });
+    html += '</div></div>';
+    return html;
+  }
   function renderMorning() {
     var mp = morningParts();
     var live = schoolMorning(mp);
@@ -1787,6 +2027,15 @@
     });
     html += '</div></div>';
     return html;
+  }
+  function renderKids() {
+    var mp = morningParts();
+    kidsShown = kidsMode(mp);
+    if (kidsShown === 'afternoon') {
+      morningLive = false;
+      return renderAfternoon();
+    }
+    return renderMorning();
   }
 
   function shiftAnchor(dir) {
@@ -2454,7 +2703,7 @@
   function renderView() {
     var html = '';
     if (page === 'home') html = renderHome();
-    else if (page === 'morning') html = renderMorning();
+    else if (page === 'kids') html = renderKids();
     else if (page === 'calendar') html = renderCalendar();
     else if (page === 'playroom') html = renderPlayroom();
     else if (page === 'meals') html = renderMeals();
@@ -2497,7 +2746,7 @@
     var card = document.getElementById('countCard');
     if (!card) return;
     var live = schoolMorning(p);
-    var model = live || page !== 'morning' ? countdownModel(p) : waitingMorningModel(p);
+    var model = page === 'kids' && kidsMode(p) === 'afternoon' ? afternoonBanner(p) : (live || page !== 'kids' ? countdownModel(p) : waitingMorningModel(p));
     var wall = card.getAttribute('data-wall') === '1';
     if (wall) card.className = 'm-top urg-' + model.urg;
     else card.className = 'card count-card urg-' + model.urg;
@@ -2518,6 +2767,21 @@
       var weather = currentWeather(nowParts());
       if (wxMain) wxMain.innerHTML = weather ? weatherSvg(weather.kind) + '<span class="m-temp">' + weather.temp + '°</span>' : '<span class="m-temp">—</span>';
       if (wxSub) wxSub.textContent = weather ? (weather.word + (weather.hint ? ' · ' + weather.hint : '')) : 'Weather for Bad Tölz';
+      if (card.getAttribute('data-phase') === 'afternoon') {
+        KIDS.forEach(function (name) {
+          var el = document.getElementById('aftBig-' + name);
+          if (!el) return;
+          var phase = aftPhase(name);
+          var rec = aftRec(name);
+          if (phase === 'wait') {
+            var left = aftHomeMin(name, mp) - aftNowMin(mp);
+            var school = !isWeekendYmd(mp.ymd) && !hardOff(mp.ymd);
+            el.textContent = left > 0 && school ? aftLeftLabel(left) : 'Home';
+          } else if (phase === 'land') {
+            el.textContent = aftLeftLabel((rec.inAt + aftRoot().landMin * 60000 - morningNowMs()) / 60000);
+          }
+        });
+      }
     }
     var fill = document.getElementById('barFill');
     if (fill) fill.style.width = model.pct + '%';
@@ -2712,12 +2976,13 @@
   function pageFromHash() {
     var h = (location.hash || '').replace(/^#/, '');
     if (h === 'sleep') return 'sleep';
+    if (h === 'morning' || h === 'kids') return 'kids';
     for (var i = 0; i < NAV.length; i++) if (NAV[i].id === h) return h;
     return 'home';
   }
 
   function toggleMorning(name, id) {
-    if (page === 'morning' && !schoolMorning(morningParts())) return;
+    if (page === 'kids' && !schoolMorning(morningParts())) return;
     if (!kidHasSchool(name, morningParts().ymd)) return;
     var k = kidState(name);
     if (!k.inAt) k.inAt = morningNowMs();
@@ -2731,7 +2996,7 @@
     syncMorningStar(name);
   }
   function checkIn(name) {
-    if (page === 'morning' && !schoolMorning(morningParts())) return;
+    if (page === 'kids' && !schoolMorning(morningParts())) return;
     if (!kidHasSchool(name, morningParts().ymd)) return;
     var k = kidState(name);
     if (!k.inAt) k.inAt = morningNowMs();
@@ -2741,7 +3006,7 @@
     syncMorningStar(name);
   }
   function resetKid(name) {
-    if (page === 'morning' && !schoolMorning(morningParts())) return;
+    if (page === 'kids' && !schoolMorning(morningParts())) return;
     var now = Date.now();
     if (!resetArm[name] || now - resetArm[name] > 5000) {
       resetArm[name] = now;
@@ -2896,7 +3161,12 @@
     var id = actEl.getAttribute('data-id') || '';
     var kid = actEl.getAttribute('data-kid') || '';
     markFocus(actEl);
-    if (act === 'nav') { closeOverlay(); go(id); return; }
+    if (act === 'nav') { closeOverlay(); go(id === 'morning' ? 'kids' : id); return; }
+    if (act === 'aft-in') { aftPunchIn(kid); render(); return; }
+    if (act === 'aft-land') { aftLand(kid); render(); return; }
+    if (act === 'aft-check') { aftToggle(kid, id); render(); return; }
+    if (act === 'aft-easy') { aftEasy(kid, +id); render(); return; }
+    if (act === 'aft-undo') { aftUndo(kid); render(); return; }
     if (act === 'wake') { go(lastPage || 'home'); return; }
     if (act === 'close') { closeOverlay(); return; }
     if (act === 'sound') {
@@ -3349,7 +3619,7 @@
     if (!TEST_MORNING && state.date !== p.ymd) {
       ensureToday(p.ymd);
       render();
-    } else if ((page === 'home' || page === 'morning') && schoolMorning(mp) !== morningLive && !overlay) {
+    } else if ((page === 'home' || page === 'kids') && !overlay && (schoolMorning(mp) !== morningLive || (page === 'kids' && kidsShown !== kidsMode(mp)))) {
       render();
     }
     setText('clockTime', fmtClock(p));
@@ -3372,7 +3642,7 @@
   ensureToday(currentYmd());
   calAnchor = currentYmd();
   page = pageFromHash();
-  if (!location.hash && Q.view === 'morning') page = 'morning';
+  if (!location.hash && (Q.view === 'morning' || Q.view === 'kids')) page = 'kids';
   render();
   loadToday();
   loadRecipeIndex();

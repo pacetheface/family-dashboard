@@ -576,6 +576,15 @@ h1, h2, h3, .serif { font-family: var(--serif); font-weight: 560; letter-spacing
 .m-muted { color: #8d8276; font-weight: 700; }
 .m-chip { display: inline-block; background: #f6e7c1; color: #5c4632; font-weight: 800; border-radius: 999px; padding: 6px 12px; margin: 0 8px 8px 0; }
 .m-reset { margin-top: 6px; background: none; border: 0; color: #8d8276; font-weight: 800; text-decoration: underline; padding: 4px 0; cursor: pointer; }
+.aft-card { background: #f6f1e8; border-radius: 14px; padding: 12px 14px; margin-top: 12px; }
+.aft-kicker { font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: #9a6b32; }
+.aft-huge { font-family: var(--serif); font-size: 52px; line-height: .95; font-variant-numeric: tabular-nums; }
+.aft-line { font-weight: 800; color: #6d645c; margin-top: 2px; }
+.aft-unlock { background: #e4f6ea; color: #1b6b3a; font-weight: 800; border-radius: 12px; padding: 10px 12px; margin: 6px 0; }
+.aft-parent { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin-top: 14px; padding-top: 10px; border-top: 1px dashed #e6dccf; color: #8d8276; font-size: 13px; font-weight: 800; }
+.aft-parent button { border: 1px solid #e6dccf; background: #fff; border-radius: 999px; padding: 6px 10px; font-weight: 800; cursor: pointer; }
+.aft-parent button.on { background: #ffe9a8; border-color: #e2b13c; }
+.chk.fri .lbl { background: #ffe08a; border-radius: 8px; padding: 1px 6px; }
 @media (max-width: 1180px) {
   .m-top { flex-wrap: wrap; }
   .m-clock, .m-wx { width: auto; }
