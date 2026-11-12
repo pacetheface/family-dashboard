@@ -3,20 +3,23 @@
 <head>
 <meta charset="utf-8">
 <title>Knapp recipe cards</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;800&display=swap" rel="stylesheet">
 <style>
   @page { size: A4; margin: 12mm; }
-  body { font-family: Georgia, "Iowan Old Style", serif; color: #2c261f; margin: 0; background: #f6f1e7; }
-  h1 { font-size: 22pt; margin: 0; }
-  header p { margin: 4px 0 0; color: #6d645c; }
+  body { font-family: Montserrat, "Segoe UI", sans-serif; font-weight: 500; color: #003253; margin: 0; background: #D6DBE7; }
+  h1 { font-size: 22pt; margin: 0; font-weight: 800; }
+  header p { margin: 4px 0 0; color: #3d5c78; }
   .card { background: #fffdfb; border-radius: 16px; padding: 18px 20px; margin: 0 0 16px; break-after: page; page-break-after: always; }
   .cols { display: flex; gap: 18px; }
   .cols > div { flex: 1; }
-  h2 { font-size: 13pt; margin: 12px 0 6px; }
-  h3 { font-size: 11pt; margin: 10px 0 4px; }
+  h2 { font-size: 13pt; margin: 12px 0 6px; font-weight: 800; }
+  h3 { font-size: 11pt; margin: 10px 0 4px; font-weight: 800; }
   ul, ol { margin: 0; padding-left: 18px; }
   li { margin: 4px 0; }
   img { width: 100%; max-height: 220px; object-fit: cover; border-radius: 12px; }
-  .notes, .src { font-size: 10pt; color: #6d645c; }
+  .notes, .src { font-size: 10pt; color: #3d5c78; }
   @media screen { body { padding: 24px; } .card { box-shadow: 0 8px 24px rgba(80,50,20,.06); } }
 </style>
 </head>

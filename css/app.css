@@ -1,18 +1,18 @@
 :root {
-  --bg: #f6f1e7;
-  --bg-2: #fbf7f1;
-  --sidebar: #f3ebdf;
-  --ink: #2c261f;
-  --muted: #8d8276;
-  --line: rgba(90, 62, 32, 0.08);
-  --card: #fffdfb;
-  --shadow: 0 10px 28px rgba(86, 58, 28, 0.06);
-  --coral: #e36b58;
-  --serif: "Fraunces", "Iowan Old Style", Palatino, Georgia, serif;
-  --sans: "Nunito", "Avenir Next", "Segoe UI", sans-serif;
-  --west: #d7efd4;
-  --jack: #e4d9f6;
-  --june: #fde4c4;
+  --bg: #d6e3ee;
+  --bg-2: #f7fafc;
+  --sidebar: #071622;
+  --ink: #003253;
+  --muted: #3d5c78;
+  --line: rgba(0, 50, 83, 0.12);
+  --card: rgba(247, 250, 253, 0.94);
+  --shadow: 0 8px 18px rgba(7, 22, 34, 0.12);
+  --coral: #1872A0;
+  --serif: "Montserrat", "Segoe UI", sans-serif;
+  --sans: "Montserrat", "Segoe UI", sans-serif;
+  --west: #c5e4f2;
+  --jack: #d9d4f0;
+  --june: #f6cfc4;
   --dad: #d7e7f8;
   --mom: #f8d5e3;
   --school: #f6d3bf;
@@ -29,10 +29,11 @@
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
 body {
-  background: var(--bg);
+  background: #071622 url("../assets/alps.jpg") center center / cover no-repeat;
   color: var(--ink);
   font-family: var(--sans);
   font-size: 17px;
+  font-weight: 500;
   line-height: 1.35;
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
@@ -40,12 +41,12 @@ body {
 button, input, select, textarea { font-family: inherit; color: inherit; }
 button { touch-action: manipulation; cursor: pointer; border: 0; background: transparent; }
 button:focus-visible, a:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
-  outline: 3px solid #e39b78;
+  outline: 3px solid #1872A0;
   outline-offset: 2px;
 }
 img { max-width: 100%; }
 .hidden { display: none !important; }
-h1, h2, h3, .serif { font-family: var(--serif); font-weight: 560; letter-spacing: -0.02em; }
+h1, h2, h3, .serif { font-family: var(--sans); font-weight: 800; letter-spacing: 0; }
 
 #shell {
   height: 100%;
@@ -601,4 +602,74 @@ h1, h2, h3, .serif { font-family: var(--serif); font-weight: 560; letter-spacing
   .m-top { flex-wrap: wrap; }
   .m-clock, .m-wx { width: auto; }
   .m-cols { flex-direction: column; }
+}
+
+a { color: #1872A0; }
+.kicker, .today-word, .m-lbl, .aft-kicker, .variation-head, .side-card h3 {
+  color: #3d5c78;
+  font-weight: 600;
+}
+.banner p, .task-next, .quote, .sleep-quote, .wxday .wr, .meta, .m-meta, .m-muted, .m-at,
+.aft-line, .legend, .linkish, .meal h3, .person small, .wxchip, .count-sub, .daymonth {
+  color: #3d5c78;
+}
+.nav { background: #071622; }
+.navbtn { color: #D6DBE7; font-weight: 600; }
+.navbtn.on { background: #1872A0; color: #fff; }
+.logo { background: #D6DBE7; color: #003253; }
+.brand h1, .clock, .dayname, .count-big, .m-clock-time, .m-top .count-big, .aft-huge, .m-time {
+  font-weight: 900;
+}
+h2, h3, .m-head h2, .side-card h3 { font-weight: 800; }
+button, .btn, .pill, .q-pill, .badge, .checkin { font-weight: 600; }
+.quick, .btn.dark, .btn.coral, .seg button.on, .dh-num.today, .q-pill.on, .pill.on {
+  background: #1872A0;
+  color: #fff;
+  border-color: #1872A0;
+}
+.quick { box-shadow: none; }
+.iconbtn { background: rgba(251, 254, 255, 0.94); color: #003253; }
+.card, .m-col, .banner, .side-card, .sheet, .meal, .wxday, .m-sw, .aft-card, .count-card {
+  background: rgba(247, 250, 253, 0.94);
+  color: #003253;
+  border-color: rgba(255, 255, 255, 0.72);
+}
+.m-top, .m-top.urg-ok, .m-top.urg-yellow, .m-top.urg-orange, .m-top.urg-red, .m-top.urg-gone, .m-top.urg-off {
+  background: rgba(247, 250, 253, 0.94);
+  color: #003253;
+}
+.m-top.urg-red .count-big { animation: none; color: #003253; }
+.m-top .count-title, .m-top .count-big, .m-top .count-sub, .m-clock-time, .m-clock-date, .m-temp, .m-wx-sub { color: #003253; }
+.m-top .sound { background: #1872A0; color: #fff; }
+.m-top .bar i { background: #1872A0; }
+.kid-name.west, .morning-wall .checkin.west { background: #1872A0; color: #fff; }
+.kid-name.jack, .morning-wall .checkin.jack { background: #1f7a62; color: #fff; }
+.kid-name.june, .morning-wall .checkin.june { background: #b85c74; color: #fff; }
+#sleep {
+  background: #071622 url("../assets/alps.jpg") center center / cover no-repeat;
+  color: #003253;
+}
+.sleep-copy, .sleep-time, .sleep-date { color: #003253; text-shadow: 0 1px 0 rgba(255,255,255,.65); }
+.sleep-time, .next-card .t { font-weight: 900; }
+.photo-credit {
+  position: fixed;
+  right: 8px;
+  bottom: 6px;
+  z-index: 6;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  color: #003253;
+  background: rgba(214, 219, 231, 0.9);
+  padding: 2px 6px;
+  border-radius: 6px;
+  text-decoration: none;
+}
+@supports ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))) {
+  .card, .m-col, .banner, .side-card, .sheet, .meal, .wxday, .m-sw, .aft-card, .count-card,
+  .m-top, .m-top.urg-ok, .m-top.urg-yellow, .m-top.urg-orange, .m-top.urg-red, .m-top.urg-gone, .m-top.urg-off {
+    background: rgba(214, 219, 231, 0.7);
+    -webkit-backdrop-filter: blur(8px);
+    backdrop-filter: blur(8px);
+  }
 }
