@@ -1669,10 +1669,124 @@
     html += '</div>';
     return html;
   }
+  function eventIcon(title) {
+    var t = String(title || '').toLowerCase();
+    if (t.indexOf('football') >= 0 || t.indexOf('soccer') >= 0 || t.indexOf('fussball') >= 0 || t.indexOf('fußball') >= 0) return '⚽';
+    if (t.indexOf('forest') >= 0 || t.indexOf('wald') >= 0) return '🌲';
+    if (t.indexOf('ogt') >= 0 || t.indexOf('pickup') >= 0 || t.indexOf('abhol') >= 0) return '🚗';
+    if (t.indexOf('gym') >= 0 || t.indexOf('sport') >= 0 || t.indexOf('turnen') >= 0) return '🤸';
+    if (t.indexOf('math') >= 0 || t.indexOf('test') >= 0 || t.indexOf('probe') >= 0) return '📘';
+    if (t.indexOf('swim') >= 0 || t.indexOf('schwimm') >= 0) return '🏊';
+    if (t.indexOf('music') >= 0 || t.indexOf('musik') >= 0) return '🎵';
+    if (t.indexOf('dentist') >= 0 || t.indexOf('arzt') >= 0 || t.indexOf('doctor') >= 0) return '🩺';
+    if (t.indexOf('ferien') >= 0 || t.indexOf('holiday') >= 0 || t.indexOf('schulfrei') >= 0) return '🏖';
+    return '•';
+  }
+  function stopwatchSvg() {
+    return '<svg class="m-ico" viewBox="0 0 64 64" width="40" height="40" aria-hidden="true">' +
+      '<circle cx="32" cy="36" r="16" fill="none" stroke="#8d8276" stroke-width="4"/>' +
+      '<path d="M32 36 V26" stroke="#8d8276" stroke-width="3" stroke-linecap="round"/>' +
+      '<path d="M32 16 v6 M27 14 h10" stroke="#8d8276" stroke-width="3" stroke-linecap="round"/>' +
+      '</svg>';
+  }
+  function wallTimerHtml(name, ymd, live) {
+    if (!kidHasSchool(name, ymd)) return '<div class="m-dayoff">No school today</div>';
+    var k = live ? kidState(name) : { checks: {} };
+    var started = !!k.inAt;
+    var done = !!(k.inAt && k.doneAt);
+    var onTime = done && finishOnTime(name, k.doneAt);
+    var elapsed = '--:--';
+    var star = '';
+    if (done) {
+      elapsed = fmtDur(Math.round((k.doneAt - k.inAt) / 1000));
+      if (onTime) star = ' <span class="m-star">★</span>';
+    } else if (started) elapsed = fmtDur(Math.round((morningNowMs() - k.inAt) / 1000));
+    var lines = [];
+    lines.push('Ready by ' + fmtHM(LEAVE[name] - EARLY));
+    if (done) lines.push(onTime ? 'Done · on time' : 'Done');
+    else if (started) lines.push('Checked in ' + fmtAt(k.inAt));
+    else lines.push('Starts at check-in');
+    if (!started) lines.push('Leaves ' + fmtHM(LEAVE[name]));
+    if (done) lines.push('Checked in ' + fmtAt(k.inAt));
+    var yday = yesterdaySecs(name, ymd);
+    var best = weekBest(name, ymd);
+    if (yday != null) lines.push('Yesterday ' + fmtDur(yday));
+    if (best != null) lines.push('Best ' + fmtDur(best));
+    var html = '<div class="m-sw' + (onTime ? ' good' : '') + '">' + stopwatchSvg() +
+      '<div class="m-time" id="elapsed-' + name + '"' + (started && !done && live ? ' data-run="1"' : '') + '>' + elapsed + star + '</div>' +
+      '<div class="m-meta">' + lines.map(function (line) { return '<div>' + esc(line) + '</div>'; }).join('') + '</div></div>';
+    if (!live) html += '<button type="button" class="checkin ' + name.toLowerCase() + '" disabled>Check in</button>';
+    else if (!started) html += '<button type="button" class="checkin ' + name.toLowerCase() + '" data-act="checkin" data-kid="' + name + '">Check in</button>';
+    return html;
+  }
+  function wallListHtml(name, live) {
+    var tasks = morningTasks(name);
+    var k = live ? kidState(name) : { checks: {} };
+    var html = '<div class="m-lbl">Checklist</div>';
+    tasks.forEach(function (t) {
+      var on = !!k.checks[t.id];
+      html += '<button type="button" class="chk' + (on ? ' done' : '') + (t.id === 'meds' ? ' meds' : '') + '" data-act="toggle" data-kid="' + name + '" data-id="' + esc(t.id) + '" aria-pressed="' + (on ? 'true' : 'false') + '"' + (live ? '' : ' disabled') + '>' +
+        '<span class="box"><span class="tick"></span></span><span class="lbl">' + esc(t.label) + '</span></button>';
+    });
+    if (live && k.inAt) html += '<button type="button" class="m-reset" id="reset-' + name + '" data-act="reset" data-kid="' + name + '">' + esc(resetLabel(name)) + '</button>';
+    return html;
+  }
+  function wallCalendarHtml(name, ymd) {
+    var head = '<div class="m-lbl">Today</div>';
+    if (calMode === 'loading' || calMode === 'opening') return head + '<div class="m-muted">Opening calendar…</div>';
+    if (calMode === 'nocrypto') return head + '<div class="m-muted">This browser cannot unlock the calendar. Checklists still work.</div>';
+    if (calMode === 'missing') return head + '<div class="m-muted">Calendar file not loaded.</div>';
+    if (calMode !== 'open' || !DATA) return head + '<div class="m-muted">Unlock the family password to see today.</div>';
+    var day = dayBucket(ymd);
+    var kid = (day && day[name]) || { events: [], bring: [], homework: [] };
+    var events = kid.events || [];
+    var html = head;
+    if (!events.length) html += '<div class="m-muted">Nothing on the calendar</div>';
+    events.forEach(function (ev) {
+      var line = esc(ev.title || '');
+      if (ev.time) line += ' <span class="m-at">· ' + esc(prettyTime(ev.time)) + '</span>';
+      html += '<div class="m-ev"><span class="m-eic">' + eventIcon(ev.title) + '</span><span>' + line + '</span></div>';
+    });
+    if (kid.bring && kid.bring.length) {
+      html += '<div class="m-lbl">Bring</div><div class="m-chips">';
+      kid.bring.forEach(function (item) { html += '<span class="m-chip">' + esc(item) + '</span>'; });
+      html += '</div>';
+    }
+    if (kid.homework && kid.homework.length) {
+      html += '<div class="m-lbl">Homework</div>';
+      kid.homework.forEach(function (item) { html += '<div class="m-hw">' + esc(item) + '</div>'; });
+    }
+    return html;
+  }
   function renderMorning() {
     var mp = morningParts();
-    morningLive = schoolMorning(mp);
-    return '<div class="page morning-page">' + morningBoardHtml(mp, morningLive) + '</div>';
+    var live = schoolMorning(mp);
+    morningLive = live;
+    var model = live ? countdownModel(mp) : waitingMorningModel(mp);
+    var day = live ? mp.ymd : model.ymd;
+    var weather = currentWeather(nowParts());
+    var html = '<div class="page morning-wall">';
+    html += '<section class="m-top urg-' + model.urg + '" id="countCard" data-wall="1">';
+    html += '<div class="m-clock"><div class="m-clock-time" id="mClock">' + esc(fmtClock(mp)) + '</div><div class="m-clock-date" id="mDate">' + esc((mp.weekday || '') + ' ' + mp.d + ' ' + (MONTHS[mp.mo - 1] || '')) + '</div></div>';
+    html += '<div class="m-mid"><div class="count-title" id="countTitle">' + esc(model.title) + '</div><div class="count-big' + (model.mode === 'count' || model.mode === 'wait' ? '' : ' small') + '" id="countBig">' + esc(model.big) + '</div><div class="count-sub" id="countSub">' + esc(model.sub) + '</div></div>';
+    html += '<div class="m-wx"><div class="m-wx-main" id="mWxMain">' + (weather ? weatherSvg(weather.kind) + '<span class="m-temp">' + weather.temp + '°</span>' : '<span class="m-temp">—</span>') + '</div>';
+    html += '<div class="m-wx-sub" id="mWxSub">' + esc(weather ? (weather.word + (weather.hint ? ' · ' + weather.hint : '')) : 'Weather for Bad Tölz') + '</div>';
+    html += '<button type="button" class="sound" id="soundBtn" data-act="sound" data-role="sound">Enable sound</button></div>';
+    html += '<div class="bar" id="bar"><i id="barFill" style="width:' + model.pct + '%"></i></div></section>';
+    html += '<div class="m-cols">';
+    KIDS.forEach(function (name) {
+      var stat = onTimeDays(name, day);
+      var badge = !stat.of ? 'Day off' : ('★ ' + stat.n + ' of ' + stat.of + ' this week');
+      var kidNow = live ? kidState(name) : null;
+      var good = kidNow && kidNow.doneAt && finishOnTime(name, kidNow.doneAt);
+      html += '<section class="m-col ' + name.toLowerCase() + '"><div class="m-head"><h2>' + esc(name) + '</h2><span class="badge' + (good ? ' good' : '') + '">' + esc(badge) + '</span></div>';
+      html += wallTimerHtml(name, day, live);
+      html += wallCalendarHtml(name, day);
+      if (kidHasSchool(name, day)) html += wallListHtml(name, live);
+      html += '</section>';
+    });
+    html += '</div></div>';
+    return html;
   }
 
   function shiftAnchor(dir) {
@@ -2384,11 +2498,27 @@
     if (!card) return;
     var live = schoolMorning(p);
     var model = live || page !== 'morning' ? countdownModel(p) : waitingMorningModel(p);
-    card.className = 'card count-card urg-' + model.urg;
+    var wall = card.getAttribute('data-wall') === '1';
+    if (wall) card.className = 'm-top urg-' + model.urg;
+    else card.className = 'card count-card urg-' + model.urg;
     setText('countTitle', model.title);
-    setText('countBig', model.big);
+    var big = document.getElementById('countBig');
+    if (big) {
+      big.textContent = model.big;
+      if (wall) big.className = 'count-big' + (model.mode === 'count' || model.mode === 'wait' ? '' : ' small');
+    }
     var cur = live ? currentWeather(nowParts()) : null;
-    setText('countSub', model.sub + (cur && cur.hint ? ' · ' + cur.hint : ''));
+    setText('countSub', wall ? model.sub : (model.sub + (cur && cur.hint ? ' · ' + cur.hint : '')));
+    if (wall) {
+      var mp = morningParts();
+      setText('mClock', fmtClock(mp));
+      setText('mDate', (mp.weekday || '') + ' ' + mp.d + ' ' + (MONTHS[mp.mo - 1] || ''));
+      var wxMain = document.getElementById('mWxMain');
+      var wxSub = document.getElementById('mWxSub');
+      var weather = currentWeather(nowParts());
+      if (wxMain) wxMain.innerHTML = weather ? weatherSvg(weather.kind) + '<span class="m-temp">' + weather.temp + '°</span>' : '<span class="m-temp">—</span>';
+      if (wxSub) wxSub.textContent = weather ? (weather.word + (weather.hint ? ' · ' + weather.hint : '')) : 'Weather for Bad Tölz';
+    }
     var fill = document.getElementById('barFill');
     if (fill) fill.style.width = model.pct + '%';
   }
