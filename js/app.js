@@ -1533,14 +1533,17 @@
     var k = live ? kidState(name) : { checks: {} };
     var started = !!k.inAt;
     var done = !!(k.inAt && k.doneAt);
+    var leftHouse = !!(k.inAt && k.outAt);
     var onTime = done && finishOnTime(name, k.doneAt);
     var elapsed = '--:--';
     if (done) elapsed = fmtDur(Math.round((k.doneAt - k.inAt) / 1000));
+    else if (leftHouse) elapsed = fmtDur(Math.round((k.outAt - k.inAt) / 1000));
     else if (started) elapsed = fmtDur(Math.round((morningNowMs() - k.inAt) / 1000));
     var stat = onTimeDays(name, ymd);
     var badge = !stat.of ? 'Day off' : (stat.n + ' of ' + stat.of + ' this week');
     var lines = [];
     lines.push('Ready by ' + fmtHM(LEAVE[name] - EARLY));
+    if (leftHouse) lines.push('Checked out ' + fmtAt(k.outAt));
     if (done) lines.push(onTime ? 'Done · on time' : 'Done');
     else if (started) lines.push('Checked in ' + fmtAt(k.inAt));
     else lines.push('Leaves ' + fmtHM(LEAVE[name]));
@@ -1549,7 +1552,7 @@
     if (!compact && yday != null) lines.push('Yesterday ' + fmtDur(yday));
     if (!compact && best != null) lines.push('Best ' + fmtDur(best));
     var html = '<div class="kid-head"><h3>' + esc(name) + '</h3><span class="badge' + (onTime ? ' good' : '') + '">★ ' + esc(badge) + '</span></div>';
-    html += '<div class="sw"><div class="elapsed' + (onTime ? ' good' : '') + '" id="elapsed-' + name + '"' + (started && !done ? ' data-run="1"' : '') + '>' + elapsed + (onTime ? ' ★' : '') + '</div>';
+    html += '<div class="sw"><div class="elapsed' + (onTime ? ' good' : '') + '" id="elapsed-' + name + '"' + (started && !done && !leftHouse ? ' data-run="1"' : '') + '>' + elapsed + (onTime ? ' ★' : '') + '</div>';
     html += '<div class="meta">' + lines.map(function (line) { return '<div>' + esc(line) + '</div>'; }).join('') + '</div></div>';
     if (!live) html += '<button type="button" class="checkin" disabled>Check in</button>';
     else if (!started) html += '<button type="button" class="checkin" data-act="checkin" data-kid="' + name + '">Check in</button>';
@@ -1559,10 +1562,11 @@
     if (!kidHasSchool(name, ymd)) return '';
     var tasks = morningTasks(name);
     var k = live ? kidState(name) : { checks: {} };
+    var open = live && !!k.inAt && !k.outAt;
     var html = '';
     tasks.forEach(function (t) {
       var on = !!k.checks[t.id];
-      html += '<button type="button" class="chk' + (on ? ' done' : '') + (t.id === 'meds' ? ' meds' : '') + '" data-act="toggle" data-kid="' + name + '" data-id="' + esc(t.id) + '" aria-pressed="' + (on ? 'true' : 'false') + '"' + (live ? '' : ' disabled') + '><span class="box"><span class="tick"></span></span><span class="lbl">' + esc(t.label) + '</span></button>';
+      html += '<button type="button" class="chk' + (on ? ' done' : '') + (open ? '' : ' locked') + (t.id === 'meds' ? ' meds' : '') + '" data-act="toggle" data-kid="' + name + '" data-id="' + esc(t.id) + '" aria-pressed="' + (on ? 'true' : 'false') + '"' + (open ? '' : ' disabled') + '><span class="box"><span class="tick"></span></span><span class="lbl">' + esc(t.label) + '</span></button>';
     });
     if (k.inAt) html += '<button type="button" class="btn ghost small" data-act="reset" data-kid="' + name + '">' + esc(resetLabel(name)) + '</button>';
     return html;
@@ -1644,6 +1648,7 @@
     morningLive = homeMorning;
     var html = '<div class="page home">';
     if (homeMorning) html += morningBoardHtml(mp, true);
+    html += parentMorningCard();
     html += parentAfternoonCard();
     if (!homeMorning && hardOff(ymd)) {
       html += '<div class="holo">No school today · ' + esc(dayOffReason(ymd) || 'Day off') + '</div>';
@@ -1724,41 +1729,42 @@
     var k = live ? kidState(name) : { checks: {} };
     var started = !!k.inAt;
     var done = !!(k.inAt && k.doneAt);
+    var leftHouse = !!(k.inAt && k.outAt);
     var onTime = done && finishOnTime(name, k.doneAt);
     var elapsed = '--:--';
     var star = '';
     if (done) {
       elapsed = fmtDur(Math.round((k.doneAt - k.inAt) / 1000));
       if (onTime) star = ' <span class="m-star">★</span>';
-    } else if (started) elapsed = fmtDur(Math.round((morningNowMs() - k.inAt) / 1000));
+    } else if (leftHouse) elapsed = fmtDur(Math.round((k.outAt - k.inAt) / 1000));
+    else if (started) elapsed = fmtDur(Math.round((morningNowMs() - k.inAt) / 1000));
     var lines = [];
     lines.push('Ready by ' + fmtHM(LEAVE[name] - EARLY));
+    if (leftHouse) lines.push('Checked out ' + fmtAt(k.outAt));
     if (done) lines.push(onTime ? 'Done · on time' : 'Done');
     else if (started) lines.push('Checked in ' + fmtAt(k.inAt));
     else lines.push('Starts at check-in');
     if (!started) lines.push('Leaves ' + fmtHM(LEAVE[name]));
-    if (done) lines.push('Checked in ' + fmtAt(k.inAt));
+    if (done && !leftHouse) lines.push('Checked in ' + fmtAt(k.inAt));
     var yday = yesterdaySecs(name, ymd);
     var best = weekBest(name, ymd);
     if (yday != null) lines.push('Yesterday ' + fmtDur(yday));
     if (best != null) lines.push('Best ' + fmtDur(best));
     var html = '<div class="m-sw' + (onTime ? ' good' : '') + '">' + stopwatchSvg() +
-      '<div class="m-time" id="elapsed-' + name + '"' + (started && !done && live ? ' data-run="1"' : '') + '>' + elapsed + star + '</div>' +
+      '<div class="m-time" id="elapsed-' + name + '"' + (started && !done && !leftHouse && live ? ' data-run="1"' : '') + '>' + elapsed + star + '</div>' +
       '<div class="m-meta">' + lines.map(function (line) { return '<div>' + esc(line) + '</div>'; }).join('') + '</div></div>';
-    if (!live) html += '<button type="button" class="checkin ' + name.toLowerCase() + '" disabled>Check in</button>';
-    else if (!started) html += '<button type="button" class="checkin ' + name.toLowerCase() + '" data-act="checkin" data-kid="' + name + '">Check in</button>';
     return html;
   }
-  function wallListHtml(name, live) {
+  function wallListHtml(name, open, saved) {
     var tasks = morningTasks(name);
-    var k = live ? kidState(name) : { checks: {} };
+    var k = (open || saved) ? kidState(name) : { checks: {} };
     var html = '<div class="m-lbl">Checklist</div>';
     tasks.forEach(function (t) {
       var on = !!k.checks[t.id];
-      html += '<button type="button" class="chk' + (on ? ' done' : '') + (t.id === 'meds' ? ' meds' : '') + '" data-act="toggle" data-kid="' + name + '" data-id="' + esc(t.id) + '" aria-pressed="' + (on ? 'true' : 'false') + '"' + (live ? '' : ' disabled') + '>' +
+      html += '<button type="button" class="chk' + (on ? ' done' : '') + (open ? '' : ' locked') + (t.id === 'meds' ? ' meds' : '') + '" data-act="toggle" data-kid="' + name + '" data-id="' + esc(t.id) + '" aria-pressed="' + (on ? 'true' : 'false') + '"' + (open ? '' : ' disabled') + '>' +
         '<span class="box"><span class="tick"></span></span><span class="lbl">' + esc(t.label) + '</span></button>';
     });
-    if (live && k.inAt) html += '<button type="button" class="m-reset" id="reset-' + name + '" data-act="reset" data-kid="' + name + '">' + esc(resetLabel(name)) + '</button>';
+    if (open) html += '<button type="button" class="m-reset" id="reset-' + name + '" data-act="reset" data-kid="' + name + '">' + esc(resetLabel(name)) + '</button>';
     return html;
   }
   function wallCalendarHtml(name, ymd) {
@@ -1989,6 +1995,7 @@
     var school = !isWeekendYmd(p.ymd) && !hardOff(p.ymd);
     var who = name === 'June' ? 'Leaving Kinderhaus' : (name === 'Jack' ? 'Leaving OGT' : 'Leaving school');
     var html = '<section class="m-col ' + name.toLowerCase() + '">';
+    var morn = morningStamp(name);
     if (!rec.inAt) {
       if (left > 0 && school && !aftCanIn(name, p)) {
         html += '<div class="m-head"><h2>' + esc(name) + '</h2></div>';
@@ -1998,10 +2005,12 @@
         html += '<button type="button" class="kid-name ' + name.toLowerCase() + '" data-act="aft-in" data-kid="' + name + '">' + esc(name) + '</button>';
         html += '<p class="m-muted">Tap your name when you get home.</p>';
       }
+      if (morn) html += '<p class="m-muted morn-stamp">' + esc(morn) + '</p>';
       html += '</section>';
       return html;
     }
     html += '<div class="m-head"><h2>' + esc(name) + '</h2><span class="badge">Home ' + fmtAt(rec.inAt) + '</span></div>';
+    if (morn) html += '<p class="m-muted morn-stamp">' + esc(morn) + '</p>';
     html += '<div class="m-lbl">Is your homework all done?</div><div class="q-pills">';
     [['yes', 'Yes'], ['notyet', 'Not yet'], ['none', 'No homework']].forEach(function (pair) {
       html += '<button type="button" class="q-pill' + (rec.homework === pair[0] ? ' on' : '') + '" data-act="aft-hw" data-kid="' + name + '" data-id="' + pair[0] + '">' + pair[1] + '</button>';
@@ -2025,12 +2034,38 @@
     html += '<button type="button" data-act="aft-undo" data-kid="' + name + '">Undo</button></div></section>';
     return html;
   }
+  function morningStamp(name) {
+    var k = kidState(name);
+    if (!k || !k.inAt) return '';
+    var line = 'Morning check-in ' + fmtAt(k.inAt);
+    if (k.outAt) line += ' · out ' + fmtAt(k.outAt);
+    return line;
+  }
+  function parentMorningCard() {
+    var p = morningParts();
+    if (kidsMode(p) === 'afternoon') return '';
+    var html = '<article class="card aft-summary"><div class="kicker"><span>THIS MORNING</span></div>';
+    KIDS.forEach(function (name) {
+      var school = kidHasSchool(name, p.ymd);
+      var k = school ? kidState(name) : { checks: {} };
+      html += '<div class="aft-sum"><div><b>' + esc(name) + '</b> ';
+      if (!school) html += '<span class="muted">No school</span>';
+      else if (!k.inAt) html += '<span class="muted">Not checked in</span>';
+      else html += '<span class="muted">In ' + fmtAt(k.inAt) + (k.outAt ? ' · Out ' + fmtAt(k.outAt) : ' · Not checked out') + '</span>';
+      html += '</div>';
+      if (k.inAt) html += '<button type="button" class="btn light small" data-act="morn-undo" data-kid="' + name + '">Undo</button>';
+      html += '</div>';
+    });
+    html += '</article>';
+    return html;
+  }
   function parentAfternoonCard() {
     var p = morningParts();
     if (kidsMode(p) !== 'afternoon') return '';
     var html = '<article class="card aft-summary"><div class="kicker"><span>AFTER SCHOOL</span></div>';
     KIDS.forEach(function (name) {
       var rec = aftRec(name);
+      var morn = morningStamp(name);
       html += '<div class="aft-sum' + (rec.seenAt ? ' seen' : '') + '"><div><b>' + esc(name) + '</b> ';
       if (!rec.inAt) html += '<span class="muted">Not home yet</span>';
       else {
@@ -2039,6 +2074,7 @@
         if (rec.message) html += '<div>“' + esc(rec.message) + '”</div>';
         if (rec.screensAt) html += '<div class="muted">Screens unlocked ' + fmtAt(rec.screensAt) + '</div>';
       }
+      if (morn) html += '<div class="muted">' + esc(morn) + '</div>';
       html += '</div>';
       if (rec.inAt && !rec.seenAt) html += '<button type="button" class="btn light small" data-act="aft-seen" data-kid="' + name + '">Seen</button>';
       else if (rec.seenAt) html += '<span class="muted">Seen</span>';
@@ -2096,12 +2132,27 @@
     KIDS.forEach(function (name) {
       var stat = onTimeDays(name, day);
       var badge = !stat.of ? 'Day off' : ('★ ' + stat.n + ' of ' + stat.of + ' this week');
-      var kidNow = live ? kidState(name) : null;
+      var kidNow = live ? kidState(name) : { checks: {} };
+      var started = !!(kidNow && kidNow.inAt);
+      var leftHouse = !!(started && kidNow.outAt);
       var good = kidNow && kidNow.doneAt && finishOnTime(name, kidNow.doneAt);
-      html += '<section class="m-col ' + name.toLowerCase() + '"><div class="m-head"><h2>' + esc(name) + '</h2><span class="badge' + (good ? ' good' : '') + '">' + esc(badge) + '</span></div>';
-      html += wallTimerHtml(name, day, live);
+      var school = kidHasSchool(name, day);
+      var open = live && started && !leftHouse && school;
+      html += '<section class="m-col ' + name.toLowerCase() + '">';
+      if (school && !started) {
+        html += '<button type="button" class="checkin ' + name.toLowerCase() + '"' + (live ? ' data-act="checkin" data-kid="' + name + '"' : ' disabled') + '>Check in</button>';
+      }
+      if (leftHouse) html += '<div class="m-status">Checked out ' + fmtAt(kidNow.outAt) + ' ✓<span class="sub">Checked in ' + fmtAt(kidNow.inAt) + '</span></div>';
+      html += '<div class="m-head"><h2>' + esc(name) + '</h2><span class="badge' + (good ? ' good' : '') + '">' + esc(badge) + '</span></div>';
+      if (!leftHouse) html += wallTimerHtml(name, day, live);
       html += wallCalendarHtml(name, day);
-      if (kidHasSchool(name, day)) html += wallListHtml(name, live);
+      if (school) html += wallListHtml(name, open, live && started);
+      if (open) {
+        html += '<div class="m-foot"><button type="button" class="checkout" data-act="checkout" data-kid="' + name + '">Check out</button>';
+        html += '<div class="aft-parent"><span>Parent</span><button type="button" data-act="morn-undo" data-kid="' + name + '">Undo</button></div></div>';
+      } else if (leftHouse) {
+        html += '<div class="aft-parent"><span>Parent</span><button type="button" data-act="morn-undo" data-kid="' + name + '">Undo</button></div>';
+      }
       html += '</section>';
     });
     html += '</div></div>';
@@ -2311,7 +2362,8 @@
       }
       choresOf(name, playGroup).forEach(function (t) {
         var on = isDone(name, playGroup, t.id, ymd);
-        var disabled = playGroup === 'morning' && !kidHasSchool(name, ymd);
+        var morningKid = kidState(name);
+        var disabled = playGroup === 'morning' && (!kidHasSchool(name, ymd) || !morningKid.inAt || !!morningKid.outAt);
         html += '<button type="button" class="chore' + (on ? ' done' : '') + '" data-act="chore" data-kid="' + name + '" data-id="' + esc(t.id) + '" data-group="' + playGroup + '"' + (disabled ? ' disabled' : '') + '><span class="box"><span class="tick"></span></span><span class="star">★</span> ' + esc(t.label) + '<span class="plus">+1★</span></button>';
       });
       html += '</div>';
@@ -2868,8 +2920,8 @@
     KIDS.forEach(function (name) {
       var el = document.getElementById('elapsed-' + name);
       if (!el || el.getAttribute('data-run') !== '1') return;
-      var k = state.kids[name];
-      if (!k || !k.inAt || k.doneAt) return;
+      var k = kidState(name);
+      if (!k || !k.inAt || k.doneAt || k.outAt) return;
       el.textContent = fmtDur(Math.round((morningNowMs() - k.inAt) / 1000));
     });
   }
@@ -3059,16 +3111,29 @@
     return 'home';
   }
 
-  function toggleMorning(name, id) {
-    if (page === 'kids' && !schoolMorning(morningParts())) return;
-    if (!kidHasSchool(name, morningParts().ymd)) return;
+  function morningOpen(name) {
+    if (!kidHasSchool(name, morningParts().ymd)) return false;
+    if (page === 'kids' && !schoolMorning(morningParts())) return false;
     var k = kidState(name);
-    if (!k.inAt) k.inAt = morningNowMs();
+    return !!(k.inAt && !k.outAt);
+  }
+  function uncheckedMorning(name) {
+    var k = kidState(name);
+    var n = 0;
+    morningTasks(name).forEach(function (t) { if (!k.checks[t.id]) n++; });
+    return n;
+  }
+  function persistMorning() {
+    if (!TEST_MORNING) saveState();
+  }
+  function toggleMorning(name, id) {
+    if (!morningOpen(name)) return;
+    var k = kidState(name);
     k.checks[id] = !k.checks[id];
     if (allChecked(name)) { if (!k.doneAt) k.doneAt = morningNowMs(); }
     else k.doneAt = null;
+    persistMorning();
     if (TEST_MORNING) return;
-    saveState();
     var task = morningTasks(name).filter(function (t) { return t.id === id; })[0];
     setChoreStar(name, id, !!k.checks[id], task ? task.label : 'Morning task');
     syncMorningStar(name);
@@ -3077,11 +3142,37 @@
     if (page === 'kids' && !schoolMorning(morningParts())) return;
     if (!kidHasSchool(name, morningParts().ymd)) return;
     var k = kidState(name);
-    if (!k.inAt) k.inAt = morningNowMs();
+    if (k.inAt || k.outAt) return;
+    k.inAt = morningNowMs();
     if (allChecked(name) && !k.doneAt) k.doneAt = morningNowMs();
-    if (TEST_MORNING) return;
-    saveState();
-    syncMorningStar(name);
+    persistMorning();
+    if (!TEST_MORNING) syncMorningStar(name);
+  }
+  function checkOut(name) {
+    if (!morningOpen(name)) return;
+    var left = uncheckedMorning(name);
+    var commit = function () {
+      var k = kidState(name);
+      if (!k.inAt || k.outAt) return;
+      k.outAt = morningNowMs();
+      persistMorning();
+    };
+    if (left) askConfirm(left + (left === 1 ? ' thing' : ' things') + ' not done - check out anyway?', commit);
+    else { commit(); render(); }
+  }
+  function undoMorning(name) {
+    var k = kidState(name);
+    if (!TEST_MORNING) {
+      morningTasks(name).forEach(function (t) {
+        if (k.checks[t.id]) setChoreStar(name, t.id, false, t.label);
+      });
+    }
+    if (TEST_MORNING) testKids[name] = { checks: {} };
+    else {
+      state.kids[name] = { checks: {} };
+      saveState();
+      syncMorningStar(name);
+    }
   }
   function resetKid(name) {
     if (page === 'kids' && !schoolMorning(morningParts())) return;
@@ -3269,6 +3360,8 @@
     if (act === 'filter-kid') { kidOn[id] = !kidOn[id]; render(); return; }
     if (act === 'event') { openOverlay({ type: 'event', key: actEl.getAttribute('data-key') }); return; }
     if (act === 'checkin') { checkIn(kid); render(); return; }
+    if (act === 'checkout') { checkOut(kid); return; }
+    if (act === 'morn-undo') { undoMorning(kid); render(); return; }
     if (act === 'toggle') { toggleMorning(kid, id); render(); return; }
     if (act === 'reset') { resetKid(kid); render(); return; }
     if (act === 'playkid') { playKid = id; render(); return; }
