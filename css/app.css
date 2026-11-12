@@ -502,9 +502,11 @@ h1, h2, h3, .serif { font-family: var(--sans); font-weight: 800; letter-spacing:
   .logo { width: 44px; height: 44px; font-size: 24px; margin: 0 4px 0 0; }
   .navbtn { width: auto; min-width: 64px; padding: 6px 8px; flex-direction: row; gap: 4px; }
   .nav .grow { display: none; }
-  .home-top, .home-mid, .lists, .columns-2, .columns-3, .meal-grid, .recipe-grid, .kid-cols, .morn-kids, .weekstat, .side {
+  .home-top, .home-mid, .home-banners, .kid-strip, .home-late, .lists, .columns-2, .columns-3, .meal-grid, .recipe-grid, .kid-cols, .morn-kids, .weekstat, .side {
     grid-template-columns: 1fr;
   }
+  .wx-hero { flex-wrap: wrap; }
+  .wx-hero-side, .wx-windows { text-align: left; justify-content: flex-start; }
   .tasks-col { grid-column: auto; }
   #sleep { grid-template-columns: 1fr; }
   .cal-range { font-size: 20px; }
@@ -685,6 +687,44 @@ button, .btn, .pill, .q-pill, .badge, .checkin { font-weight: 600; }
 .morning-wall .aft-line, .morning-wall .morn-stamp { font-size: 22px; }
 .morning-wall .badge { font-size: 16px; }
 .morning-wall .m-dayoff { font-size: 26px; }
+.wx-hero { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 16px 28px; }
+.wx-hero-main { display: flex; align-items: center; gap: 18px; min-width: 0; }
+.wx-hero .wx-ic { width: 92px; height: 92px; margin: 0; }
+.wx-temp { font-size: 92px; font-weight: 900; line-height: .9; font-variant-numeric: tabular-nums; }
+.wx-range { font-size: 26px; font-weight: 700; margin-top: 4px; }
+.wx-hero-side { text-align: right; }
+.wx-cond { font-size: 32px; font-weight: 800; }
+.wx-rain { font-size: 24px; font-weight: 700; }
+.wx-clothes { font-size: 32px; font-weight: 800; margin-top: 4px; }
+.wx-windows { display: flex; gap: 16px; justify-content: flex-end; margin-top: 8px; font-size: 22px; font-weight: 600; }
+.wx-windows b { font-weight: 800; }
+.home-banners { display: grid; grid-template-columns: 1.3fr 1fr auto; gap: 10px; align-items: stretch; }
+.home-banners .banner { min-height: 0; padding: 10px 16px; }
+.home-banners .banner h3 { font-size: 22px; margin: 0; }
+.home-banners .banner p { font-size: 18px; }
+.home-banners .sticky { margin: 0; align-self: center; font-size: 18px; padding: 10px 14px; }
+.kid-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.kid-tile { border-radius: 20px; padding: 14px 16px 12px; color: #003253; display: flex; flex-direction: column; gap: 6px; }
+.kid-tile.west { background: #c5e4f2; }
+.kid-tile.jack { background: #d9d4f0; }
+.kid-tile.june { background: #f6cfc4; }
+.kid-tile-main { display: block; width: 100%; text-align: left; background: transparent; color: inherit; padding: 0; border-radius: 12px; }
+.kid-tile h2 { margin: 0; font-size: 36px; font-weight: 800; }
+.kid-status { font-size: 26px; font-weight: 800; line-height: 1.15; margin-top: 4px; }
+.kid-detail { font-size: 20px; font-weight: 600; line-height: 1.3; }
+.kid-msg { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.home-cal .today-row { font-size: 22px; padding: 12px 16px; }
+.home-cal .t-who { margin-left: auto; font-weight: 700; }
+.home-late { display: grid; grid-template-columns: 0.72fr 1.28fr; gap: 12px; align-items: stretch; }
+.home-late .dinner-card { margin: 0; }
+.home-late .dinner-card h3 { font-size: 36px; }
+.home-late .wxstrip { margin: 0; }
+.home-late .wxday .wd { font-size: 18px; }
+.home-late .wxday .wt { font-size: 22px; }
+.home-late .wxday .wr { font-size: 16px; }
+.needs-card .kicker { font-size: 16px; }
+.needs-row { display: flex; gap: 14px; align-items: baseline; padding: 6px 0; font-size: 22px; font-weight: 600; }
+.needs-when { flex: 0 0 92px; font-weight: 800; }
 @supports ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))) {
   .card, .m-col, .banner, .side-card, .sheet, .meal, .wxday, .m-sw, .aft-card, .count-card,
   .m-top, .m-top.urg-ok, .m-top.urg-yellow, .m-top.urg-orange, .m-top.urg-red, .m-top.urg-gone, .m-top.urg-off {
