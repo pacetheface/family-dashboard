@@ -1661,13 +1661,12 @@
     var view = currentWeather(p);
     var map = forecastMap()[ymd];
     html += '<div class="home-mid">';
-    html += '<article class="card date-card"><div class="dayname">' + esc(wdLong(p.weekday)) + '</div><div class="daymonth">' + esc(MONTHS[p.mo - 1] + ' ' + p.d) + '</div>';
+    html += '<article class="card"><div class="dayname">' + esc(wdLong(p.weekday)) + '</div><div class="daymonth">' + esc(MONTHS[p.mo - 1] + ' ' + p.d) + '</div>';
     if (view) html += '<div class="wxline">' + weatherSvg(view.kind) + '<span>' + esc(view.word) + ' · ' + (map && map.high != null ? map.high : view.temp) + '°' + (map && map.low != null ? ' / ' + map.low + '°' : '') + '</span></div><div class="muted">' + esc(view.hint) + '</div>';
     else html += '<div class="muted">Weather for Bad Tölz will show when it loads.</div>';
     html += '<div>' + chips.map(function (c) { return '<span class="holo">' + esc(c) + '</span>'; }).join('') + '</div>';
     html += '<p class="quote">“' + esc(pick(QUOTES, ymd)) + '”</p>';
-    html += '<button type="button" class="sticky" data-act="note">' + (hub.note ? esc(hub.note.slice(0, 42)) : 'Sticky note') + '</button>';
-    html += '<img class="botanical" alt="" src="assets/botanical.svg"></article>';
+    html += '<button type="button" class="sticky" data-act="note">' + (hub.note ? esc(hub.note.slice(0, 42)) : 'Sticky note') + '</button></article>';
     html += '<article class="card"><div class="kicker"><span>TODAY</span><button type="button" class="linkish" data-act="nav" data-id="calendar">Calendar ›</button></div>' + todayRows(ymd) + bringBlock(ymd);
     if (calMode !== 'open') html += '<p class="muted">Unlock the family password in Settings to see Google Calendar. Holidays still show.</p>';
     var note = rangeNote();
@@ -2777,7 +2776,6 @@
     }
     html += '<p class="sleep-quote">“' + esc(pick(QUOTES, p.ymd)) + '”</p>';
     html += '<div class="wake-hint">Tap anywhere to wake · ' + esc(moon.name) + '</div></div>';
-    html += '<img class="sleep-art" alt="" src="assets/botanical.svg">';
     document.getElementById('sleep').innerHTML = html;
   }
   function renderView() {

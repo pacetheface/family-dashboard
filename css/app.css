@@ -167,11 +167,6 @@ h1, h2, h3, .serif { font-family: var(--sans); font-weight: 800; letter-spacing:
   margin-top: 16px; border: 0; background: #fff6d6; border-radius: 12px; padding: 8px 12px;
   font-weight: 800; display: inline-flex; align-items: center; gap: 6px;
 }
-.botanical {
-  position: absolute; right: -6px; bottom: -8px; width: 200px; pointer-events: none; opacity: 0.8;
-}
-.date-card { overflow: hidden; padding: 18px 20px 96px; }
-.date-card > *:not(.botanical) { position: relative; z-index: 1; }
 .wxchip .wx-ic { width: 28px; height: 28px; margin: 0; }
 .today-row {
   display: flex; align-items: center; gap: 14px; border-radius: 14px; padding: 12px 16px;
@@ -453,7 +448,7 @@ h1, h2, h3, .serif { font-family: var(--sans); font-weight: 800; letter-spacing:
 .tag { display: inline-block; background: #f6f1e8; border-radius: 999px; padding: 5px 10px; font-size: 12px; font-weight: 800; color: #6d645c; }
 
 #sleep {
-  position: fixed; inset: 0; z-index: 20; display: grid; grid-template-columns: 1.1fr .9fr;
+  position: fixed; inset: 0; z-index: 20; display: grid; grid-template-columns: 1fr;
   background-color: #f4efe6;
   background-image: repeating-linear-gradient(to bottom, rgba(255,255,255,.45) 0 1px, transparent 1px 52px);
 }
@@ -466,7 +461,6 @@ h1, h2, h3, .serif { font-family: var(--sans); font-weight: 800; letter-spacing:
 .next-card .t { font-family: var(--serif); font-size: 28px; font-weight: 560; }
 .sleep-quote { font-family: var(--serif); font-style: italic; font-size: 20px; max-width: 520px; color: #4e463f; }
 .wake-hint { margin-top: 18px; color: #8d8276; font-weight: 800; }
-.sleep-art { align-self: end; justify-self: end; width: min(46vw, 620px); pointer-events: none; }
 
 #overlay { position: fixed; inset: 0; z-index: 30; background: rgba(60, 44, 28, .28); display: grid; place-items: center; padding: 24px; }
 .sheet {
@@ -513,7 +507,6 @@ h1, h2, h3, .serif { font-family: var(--sans); font-weight: 800; letter-spacing:
   }
   .tasks-col { grid-column: auto; }
   #sleep { grid-template-columns: 1fr; }
-  .sleep-art { width: 70vw; }
   .cal-range { font-size: 20px; }
   .topbar { padding: 8px 12px; }
   #view { padding: 10px 12px 16px; }
