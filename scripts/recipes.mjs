@@ -19,6 +19,37 @@ function isNumOrNull(value) {
   return value === null || (typeof value === 'number' && Number.isFinite(value));
 }
 
+const SMALL_WORDS = new Set(['and', 'or', 'of', 'the', 'a', 'an', 'to', 'for', 'in', 'on', 'with']);
+
+function titleTag(tag) {
+  let wordIndex = 0;
+  return String(tag).trim().split(/(\s+|-)/).map((part) => {
+    if (!part || /^\s+$/.test(part) || part === '-') return part;
+    const lower = part.toLowerCase();
+    const cap = lower.charAt(0).toUpperCase() + lower.slice(1);
+    const out = wordIndex > 0 && SMALL_WORDS.has(lower) ? lower : cap;
+    wordIndex += 1;
+    return out;
+  }).join('');
+}
+
+function normalizeTags(tags) {
+  const seen = new Set();
+  const out = [];
+  tags.forEach((tag) => {
+    const label = titleTag(tag);
+    const key = label.toLowerCase();
+    if (seen.has(key)) return;
+    seen.add(key);
+    out.push(label);
+  });
+  return out;
+}
+
+function isStringList(value) {
+  return Array.isArray(value) && value.every((item) => typeof item === 'string' && item.trim());
+}
+
 const files = fs.readdirSync(root).filter((name) => name.endsWith('.json') && name !== 'index.json' && name !== '_template.json');
 const index = [];
 
@@ -61,13 +92,27 @@ files.forEach((name) => {
     fail(name, 'steps must be a non-empty array of strings');
   }
   if (data.notes != null && typeof data.notes !== 'string') fail(name, 'notes must be a string when present');
+  if (data.variations != null) {
+    if (!Array.isArray(data.variations)) fail(name, 'variations must be an array when present');
+    else data.variations.forEach((variation, i) => {
+      const where = 'variations[' + i + ']';
+      if (!variation || typeof variation !== 'object' || Array.isArray(variation)) {
+        fail(name, where + ' must be an object');
+        return;
+      }
+      if (typeof variation.name !== 'string' || !variation.name.trim()) fail(name, where + '.name must be a non-empty string');
+      if (variation.notes != null && typeof variation.notes !== 'string') fail(name, where + '.notes must be a string when present');
+      if (!isStringList(variation.changes)) fail(name, where + '.changes must be an array of non-empty strings');
+      if (!isStringList(variation.serve_with)) fail(name, where + '.serve_with must be an array of non-empty strings');
+    });
+  }
   if (data.photo !== slug + '.jpg') fail(name, 'photo must be ' + slug + '.jpg');
   else if (!fs.existsSync(path.join(root, 'photos', data.photo))) fail(name, 'missing photos/' + data.photo);
   if (process.exitCode) return;
   index.push({
     slug: data.slug,
     title: data.title,
-    tags: data.tags,
+    tags: normalizeTags(data.tags),
     time: { prep: data.time.prep, cook: data.time.cook, total: data.time.total },
     photo: data.photo,
     servings: data.servings

@@ -10,8 +10,9 @@ Each recipe is one file, `recipes/<slug>.json`, plus `recipes/photos/<slug>.jpg`
 2. Fill in the fields. Do not invent a quantity: if the card does not give a single number, set `qty` to `null` and keep the words in `item`.
 3. `section` is the Aldi aisle: Produce, Meat & Fish, Dairy & Eggs, Bakery, Pantry, Spices, Frozen, Drinks, or Other.
 4. `time.prep`, `time.cook`, and `time.total` are minutes, or `null` when the card does not say.
-5. Save a photo as `recipes/photos/<slug>.jpg`, about 1200 pixels wide and under 250 KB.
-6. Commit both files and push. The Recipe index action checks the JSON and refreshes `recipes/index.json` and `recipes/book.html`.
+5. `variations` is optional. Each item is `{ "name", "notes", "changes", "serve_with" }`. `changes` and `serve_with` are lists of strings. Leave the field out when there are none.
+6. Save a photo as `recipes/photos/<slug>.jpg`, about 1200 pixels wide and under 250 KB.
+7. Commit both files and push. The Recipe index action checks the JSON and refreshes `recipes/index.json` and `recipes/book.html`. Tag chips use Title Case, so `quick` and `Quick` are the same chip.
 
 You can do the same check on your computer:
 

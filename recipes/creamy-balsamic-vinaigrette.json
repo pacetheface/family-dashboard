@@ -12,7 +12,8 @@
     "dressing",
     "salad",
     "sauce",
-    "quick"
+    "quick",
+    "greek"
   ],
   "ingredients": [
     {
@@ -69,5 +70,52 @@
     "Season with salt and black pepper."
   ],
   "notes": "Makes 3/4 cup. Nutrition on the source page is 119 kcal, 0 g protein, 3 g carbs, and 12 g fat per serving. Author: Cathy.",
-  "photo": "creamy-balsamic-vinaigrette.jpg"
+  "photo": "creamy-balsamic-vinaigrette.jpg",
+  "variations": [
+    {
+      "name": "Ryan's Greek-style variation",
+      "notes": "Other amounts as in the base recipe.",
+      "changes": [
+        "Skip the water completely",
+        "Use Tuscan Herb olive oil",
+        "Use white balsamic vinegar",
+        "Use Duke's mayo",
+        "Use 2/3 tsp wild honey",
+        "Use 2/3 tsp homemade Greek seasoning"
+      ],
+      "serve_with": [
+        "romaine",
+        "Roma tomatoes",
+        "red onion",
+        "kalamata olives",
+        "feta",
+        "cucumber",
+        "rotisserie chicken"
+      ]
+    },
+    {
+      "name": "Greek yogurt version (base plus Ryan's variation)",
+      "notes": "Suggested amounts, not tested yet. Thin with water or lemon juice 1 tsp at a time if too thick. Keeps about 4-5 days in the fridge.",
+      "changes": [
+        "3 tbsp Tuscan Herb olive oil",
+        "3 tbsp white balsamic vinegar",
+        "2 tbsp Greek yogurt",
+        "1 tbsp Duke's mayo",
+        "2 cloves garlic",
+        "1 tsp Dijon mustard",
+        "2/3 tsp wild honey",
+        "2/3 tsp homemade Greek seasoning",
+        "Salt and pepper; blend until smooth"
+      ],
+      "serve_with": [
+        "romaine",
+        "Roma tomatoes",
+        "red onion",
+        "kalamata olives",
+        "feta",
+        "cucumber",
+        "rotisserie chicken"
+      ]
+    }
+  ]
 }
