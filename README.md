@@ -4,6 +4,8 @@ A wall display for the living room in Bad Tölz: clock, leave countdown, weather
 
 Open [https://pacetheface.github.io/family-dashboard/](https://pacetheface.github.io/family-dashboard/).
 
+The background photo is [Sea of clouds from Zugspitze](https://commons.wikimedia.org/wiki/File:Sea_of_clouds_from_Zugspitze.jpg) by Nawadee, cropped, [CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
+
 Ryan is Dad. Jessica is Mom. West (born 1 Apr 2016), Jack (born 19 Mar 2018), and June (born 22 Jan 2021) show ages from those dates. Avatars are initials, not photos.
 
 ## Pages
