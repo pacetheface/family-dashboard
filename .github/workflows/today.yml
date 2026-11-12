@@ -21,29 +21,51 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          # A re-run checks out the original commit, which is behind main.
+          # Full history lets the later rebase replay onto the latest main.
+          fetch-depth: 0
 
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '20'
 
-      - name: Build encrypted data/today.json (today plus Mon–Sun and the next few days)
+      - name: Rebuild data/today.json on latest main and push
         env:
           ICAL_WEST: ${{ secrets.ICAL_WEST }}
           ICAL_JACK: ${{ secrets.ICAL_JACK }}
           ICAL_JUNE: ${{ secrets.ICAL_JUNE }}
           ICAL_FAMILY: ${{ secrets.ICAL_FAMILY }}
           DASH_PASSWORD: ${{ secrets.DASH_PASSWORD }}
-        run: node scripts/build-today.mjs
-
-      - name: Commit data/today.json
         run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+          git checkout -B main origin/main
+          node scripts/build-today.mjs
           git add data/today.json
           if git diff --cached --quiet; then
             echo "No change to data/today.json"
             exit 0
           fi
           git commit -m "Update encrypted today.json"
-          git push
+          changed="$(git diff-tree --no-commit-id --name-only -r HEAD)"
+          if [ "$changed" != "data/today.json" ]; then
+            echo "Refusing to push a commit that changes more than data/today.json"
+            printf '%s\n' "$changed"
+            exit 1
+          fi
+          attempt=1
+          while [ "$attempt" -le 4 ]; do
+            git pull --rebase origin main
+            if git push origin HEAD:main; then
+              exit 0
+            fi
+            echo "git push rejected; retrying ($attempt)"
+            attempt=$((attempt + 1))
+            sleep 2
+          done
+          echo "git push was rejected after retries"
+          exit 1
