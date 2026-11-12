@@ -101,8 +101,8 @@ h1, h2, h3, .serif { font-family: var(--sans); font-weight: 800; letter-spacing:
   padding: 12px 22px 4px;
 }
 .brand { display: flex; align-items: center; gap: 14px; min-width: 0; flex-wrap: wrap; }
-.brand h1 { margin: 0; font-size: 34px; }
-.clock { font-family: var(--serif); font-size: 32px; font-variant-numeric: tabular-nums; }
+.brand h1 { margin: 0; font-size: 34px; color: #FFFFFF; text-shadow: 0 2px 8px rgba(0, 32, 64, .45); }
+.clock { font-family: var(--serif); font-size: 32px; font-variant-numeric: tabular-nums; color: #FFFFFF; text-shadow: 0 2px 8px rgba(0, 32, 64, .45); }
 .test-badge { background: #fff4d2; color: #6d5414; border-radius: 999px; padding: 4px 10px; font-size: 13px; font-weight: 800; }
 .wxchip { display: inline-flex; align-items: center; gap: 6px; color: #5c534b; font-weight: 800; font-size: 15px; }
 .wxchip b { font-size: 16px; }
