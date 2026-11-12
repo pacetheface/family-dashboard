@@ -92,6 +92,30 @@
         "cucumber",
         "rotisserie chicken"
       ]
+    },
+    {
+      "name": "Greek yogurt version (base plus Ryan's variation)",
+      "notes": "Suggested amounts, not tested yet. Thin with water or lemon juice 1 tsp at a time if too thick. Keeps about 4-5 days in the fridge.",
+      "changes": [
+        "3 tbsp Tuscan Herb olive oil",
+        "3 tbsp white balsamic vinegar",
+        "2 tbsp Greek yogurt",
+        "1 tbsp Duke's mayo",
+        "2 cloves garlic",
+        "1 tsp Dijon mustard",
+        "2/3 tsp wild honey",
+        "2/3 tsp homemade Greek seasoning",
+        "Salt and pepper; blend until smooth"
+      ],
+      "serve_with": [
+        "romaine",
+        "Roma tomatoes",
+        "red onion",
+        "kalamata olives",
+        "feta",
+        "cucumber",
+        "rotisserie chicken"
+      ]
     }
   ]
 }
