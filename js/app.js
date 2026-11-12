@@ -197,6 +197,8 @@
   var playKid = 'all';
   var playTab = 'today';
   var playGroup = '';
+  var listEditKid = 'West';
+  var listImportText = '';
   var parentOn = false;
   var pinBuf = '';
   var pinFlow = null;
@@ -713,6 +715,43 @@
       if (sectionRename[item.section]) { item.section = sectionRename[item.section]; renamed = true; }
     });
     if (renamed) saveHub();
+    migrateLists();
+  }
+  function defaultArrival(kid) {
+    var items = [
+      { id: 'coat', label: 'Coat on hook', emoji: '' },
+      { id: 'shoes', label: 'Shoes away', emoji: '' },
+      { id: 'bag', label: 'Backpack unpacked', emoji: '' },
+      { id: 'box', label: 'Lunchbox to the kitchen', emoji: '' }
+    ];
+    (kid && kid.L || []).forEach(function (label, i) {
+      items.push({ id: 'L' + i, label: label, emoji: '' });
+    });
+    return items;
+  }
+  function defaultScreens(kid) {
+    return ((kid && kid.SC) || []).map(function (label, i) {
+      return { id: 'S' + i, label: label, emoji: '' };
+    });
+  }
+  function defaultEvening() {
+    return [{ id: 'EV', label: 'Evening reading before bed', emoji: '', stars: 0 }];
+  }
+  function migrateLists() {
+    if (!hub.afternoon || !hub.afternoon.kids) return;
+    var dirty = false;
+    KIDS.forEach(function (name) {
+      var kid = hub.afternoon.kids[name];
+      if (!kid) return;
+      if (!kid.arrival) { kid.arrival = defaultArrival(kid); dirty = true; }
+      if (!kid.screens) { kid.screens = defaultScreens(kid); dirty = true; }
+      if (!kid.evening) { kid.evening = defaultEvening(); dirty = true; }
+      (hub.chores[name].morning || []).forEach(function (t) {
+        if (t.emoji == null) { t.emoji = ''; dirty = true; }
+        if (t.stars == null) { t.stars = 1; dirty = true; }
+      });
+    });
+    if (dirty) saveHub();
   }
   function loadHub() {
     try {
@@ -731,6 +770,16 @@
   function morningTasks(name) {
     var list = hub.chores && hub.chores[name] && hub.chores[name].morning;
     return list || [];
+  }
+  function taskText(t) {
+    if (!t) return '';
+    return (t.emoji ? String(t.emoji) + ' ' : '') + (t.label || '');
+  }
+  function starCount(t, fallback) {
+    if (!t || t.stars == null) return fallback;
+    var n = Math.round(+t.stars);
+    if (isNaN(n)) return fallback;
+    return Math.max(0, Math.min(5, n));
   }
   function choresOf(name, group) {
     var list = hub.chores && hub.chores[name] && hub.chores[name][group];
@@ -774,20 +823,25 @@
     (hub.starLog || []).forEach(function (row) { if (row.kid === kid && row.n > 0) n += row.n; });
     return n;
   }
-  function setChoreStar(kid, id, on, reason) {
+  function setChoreStar(kid, id, on, reason, n) {
     if (TEST_MORNING) return;
+    if (n == null) n = 1;
+    n = Math.max(0, Math.min(5, Math.round(+n) || 0));
     var ymd = currentYmd();
     if (!hub.awarded[ymd]) hub.awarded[ymd] = {};
     if (!hub.awarded[ymd][kid]) hub.awarded[ymd][kid] = {};
     var bag = hub.awarded[ymd][kid];
-    if (on && !bag[id]) {
-      bag[id] = true;
+    var prev = bag[id] === true ? 1 : (typeof bag[id] === 'number' ? bag[id] : 0);
+    if (on) {
+      if (prev === n) return;
+      if (prev) addStars(kid, -prev, reason);
+      if (n) { bag[id] = n; addStars(kid, n, reason); }
+      else delete bag[id];
       saveHub();
-      if (addStars(kid, 1, reason)) toast(kid + ' earned a star');
-    } else if (!on && bag[id]) {
+    } else if (prev) {
       delete bag[id];
       saveHub();
-      addStars(kid, -1, reason);
+      addStars(kid, -prev, reason);
     }
   }
   function syncMorningStar(name) {
@@ -1593,7 +1647,7 @@
     var html = '';
     tasks.forEach(function (t) {
       var on = !!k.checks[t.id];
-      html += '<button type="button" class="chk' + (on ? ' done' : '') + (open ? '' : ' locked') + (t.id === 'meds' ? ' meds' : '') + '" data-act="toggle" data-kid="' + name + '" data-id="' + esc(t.id) + '" aria-pressed="' + (on ? 'true' : 'false') + '"' + (open ? '' : ' disabled') + '><span class="box"><span class="tick"></span></span><span class="lbl">' + esc(t.label) + '</span></button>';
+      html += '<button type="button" class="chk' + (on ? ' done' : '') + (open ? '' : ' locked') + (t.id === 'meds' ? ' meds' : '') + '" data-act="toggle" data-kid="' + name + '" data-id="' + esc(t.id) + '" aria-pressed="' + (on ? 'true' : 'false') + '"' + (open ? '' : ' disabled') + '><span class="box"><span class="tick"></span></span><span class="lbl">' + esc(taskText(t)) + '</span></button>';
     });
     if (k.inAt) html += '<button type="button" class="btn ghost small" data-act="reset" data-kid="' + name + '">' + esc(resetLabel(name)) + '</button>';
     return html;
@@ -1910,7 +1964,7 @@
     tasks.forEach(function (t) {
       var on = !!k.checks[t.id];
       html += '<button type="button" class="chk' + (on ? ' done' : '') + (open ? '' : ' locked') + (t.id === 'meds' ? ' meds' : '') + '" data-act="toggle" data-kid="' + name + '" data-id="' + esc(t.id) + '" aria-pressed="' + (on ? 'true' : 'false') + '"' + (open ? '' : ' disabled') + '>' +
-        '<span class="box"><span class="tick"></span></span><span class="lbl">' + esc(t.label) + '</span></button>';
+        '<span class="box"><span class="tick"></span></span><span class="lbl">' + esc(taskText(t)) + '</span></button>';
     });
     if (open) html += '<button type="button" class="m-reset" id="reset-' + name + '" data-act="reset" data-kid="' + name + '">' + esc(resetLabel(name)) + '</button>';
     return html;
@@ -1983,12 +2037,12 @@
   }
   function aftOn(name, key) { return !!aftRec(name).checks[key]; }
   function aftLandingKeys(name) {
-    return (aftKid(name).L || []).map(function (_, i) { return 'L' + i; });
+    return (aftKid(name).arrival || []).filter(function (it) { return /^L\d+$/.test(it.id); }).map(function (it) { return it.id; });
   }
   function aftScreenItems(name, p) {
-    var sc = aftKid(name).SC || [];
-    var items = sc.map(function (label, i) { return { key: 'S' + i, label: label, read: /reading/i.test(label), fri: false }; });
-    if (aftFri(p) && name !== 'June' && sc.length) items.unshift({ key: 'WH', label: aftRoot().whw || 'Weekend homework', read: false, fri: true });
+    var sc = aftKid(name).screens || [];
+    var items = sc.map(function (it) { return { key: it.id, label: taskText(it), read: /reading/i.test(it.label), fri: false, stars: starCount(it, 0) }; });
+    if (aftFri(p) && name !== 'June' && sc.length) items.unshift({ key: 'WH', label: aftRoot().whw || 'Weekend homework', read: false, fri: true, stars: 0 });
     var easy = aftRec(name).easy || 0;
     if (easy === 2) return [];
     if (easy === 1) {
@@ -2004,7 +2058,7 @@
   }
   function aftPhase(name) {
     var rec = aftRec(name);
-    var sc = aftKid(name).SC || [];
+    var sc = aftKid(name).screens || [];
     if (!rec.inAt) return 'wait';
     if (!rec.landAt) return 'land';
     if (sc.length && !rec.screensAt) return 'screens';
@@ -2031,12 +2085,9 @@
       seen[norm] = true;
       items.push({ key: key, label: label, fri: !!fri });
     }
-    ARRIVAL.forEach(function (item) { add(item.key, item.label, false); });
+    (aftKid(name).arrival || []).forEach(function (it) { add(it.id, taskText(it), false); });
     var easy = aftRec(name).easy || 0;
-    if (easy !== 2) {
-      (aftKid(name).L || []).forEach(function (label, i) { add('L' + i, label, false); });
-      aftScreenItems(name, p).forEach(function (it) { add(it.key, it.label, it.fri); });
-    }
+    if (easy !== 2) aftScreenItems(name, p).forEach(function (it) { add(it.key, it.label, it.fri); });
     return items;
   }
   function aftMaybeScreens(name) {
@@ -2112,12 +2163,22 @@
     aftMaybeScreens(name);
     aftSave();
   }
+  function aftFindItem(name, key) {
+    var kid = aftKid(name);
+    var lists = [kid.arrival || [], kid.screens || [], kid.evening || []];
+    for (var i = 0; i < lists.length; i++) {
+      for (var j = 0; j < lists[i].length; j++) if (lists[i][j].id === key) return lists[i][j];
+    }
+    return null;
+  }
   function aftToggle(name, key) {
     var rec = aftRec(name);
     rec.checks[key] = !rec.checks[key];
     if (!rec.checks[key]) rec.screensAt = null;
     aftMaybeScreens(name);
     aftSave();
+    var item = aftFindItem(name, key);
+    if (item && item.stars && !TEST_MODE) setChoreStar(name, key, !!rec.checks[key], item.label, starCount(item, 0));
   }
   function aftEasy(name, value) {
     var rec = aftRec(name);
@@ -2170,15 +2231,23 @@
     });
     html += '</div><input class="field aft-field" data-act="aft-note" data-kid="' + name + '" maxlength="80" placeholder="A short note" value="' + esc(rec.needNote || '') + '" inputmode="text" enterkeyhint="done">';
     html += '<div class="m-lbl">Want to tell us something?</div><textarea class="field aft-field" data-act="aft-msg" data-kid="' + name + '" maxlength="160" rows="2" placeholder="A message for Mom or Dad">' + esc(rec.message || '') + '</textarea>';
-    html += '<div class="m-lbl">Before screens</div>';
-    aftChoreItems(name, p).forEach(function (it) { html += aftCheckHtml(name, it.key, it.label, it.fri); });
-    if (!aftReadDone(name, p) && rec.easy !== 2 && aftNowMin(p) >= 18 * 60) {
-      html += '<div class="m-lbl">Evening</div>' + aftCheckHtml(name, 'EV', 'Evening reading before bed', false);
+    html += '<div class="m-lbl">Arrival</div>';
+    (aftKid(name).arrival || []).forEach(function (it) { html += aftCheckHtml(name, it.id, taskText(it), false); });
+    if (rec.easy !== 2) {
+      html += '<div class="m-lbl">Before screens</div>';
+      aftScreenItems(name, p).forEach(function (it) { html += aftCheckHtml(name, it.key, it.label, it.fri); });
+    }
+    if (rec.easy !== 2 && aftNowMin(p) >= 18 * 60) {
+      var evening = aftKid(name).evening || [];
+      if (evening.length) {
+        html += '<div class="m-lbl">Evening</div>';
+        evening.forEach(function (it) { html += aftCheckHtml(name, it.id, taskText(it), false); });
+      }
     }
     if (rec.screensAt) html += '<div class="aft-unlock">Screens unlocked ' + fmtAt(rec.screensAt) + '</div>';
     html += '<div class="aft-parent"><span>Parent</span>';
     html += '<button type="button" class="' + (rec.easy === 1 ? 'on' : '') + '" data-act="aft-easy" data-kid="' + name + '" data-id="1">Easy day</button>';
-    if ((aftKid(name).SC || []).length) html += '<button type="button" class="' + (rec.easy === 2 ? 'on' : '') + '" data-act="aft-easy" data-kid="' + name + '" data-id="2">Skip today</button>';
+    if ((aftKid(name).screens || []).length) html += '<button type="button" class="' + (rec.easy === 2 ? 'on' : '') + '" data-act="aft-easy" data-kid="' + name + '" data-id="2">Skip today</button>';
     html += '<button type="button" data-act="aft-undo" data-kid="' + name + '">Undo</button></div></section>';
     return html;
   }
@@ -2306,14 +2375,120 @@
     html += '</div></div>';
     return html;
   }
+  function listSections() {
+    return [
+      { id: 'morning', title: 'Morning', stars: true, fresh: 1 },
+      { id: 'arrival', title: 'After school / Arrival chores', stars: false },
+      { id: 'screens', title: 'Must-do before screens', stars: false },
+      { id: 'evening', title: 'Evening', stars: true, fresh: 0 }
+    ];
+  }
+  function listOf(name, section) {
+    if (section === 'morning') return hub.chores[name].morning;
+    var kid = hub.afternoon.kids[name];
+    if (!kid[section]) kid[section] = [];
+    return kid[section];
+  }
+  function resetKidLists(name) {
+    var seed = seedChores()[name];
+    hub.chores[name].morning = seed.morning.map(function (t) {
+      return { id: t.id, label: t.label, emoji: '', stars: 1 };
+    });
+    var def = afternoonDefaults().kids[name];
+    var kid = hub.afternoon.kids[name];
+    kid.arrival = defaultArrival(def);
+    kid.screens = defaultScreens(def);
+    kid.evening = defaultEvening();
+    saveHub();
+  }
+  function checklistPayload() {
+    var chores = {};
+    var afternoon = {};
+    KIDS.forEach(function (name) {
+      chores[name] = { morning: listOf(name, 'morning') };
+      var kid = hub.afternoon.kids[name];
+      afternoon[name] = { arrival: kid.arrival, screens: kid.screens, evening: kid.evening };
+    });
+    return { kind: 'knapp-checklists', version: 1, chores: chores, afternoon: afternoon };
+  }
+  function normalizeList(list, withStars, fresh) {
+    if (!list || !list.length) return [];
+    return list.map(function (it) {
+      var item = { id: String(it.id || uid('c')), label: String(it.label || '').slice(0, 80), emoji: String(it.emoji || '').slice(0, 8) };
+      if (withStars) item.stars = starCount(it, fresh);
+      return item;
+    }).filter(function (it) { return it.label; });
+  }
+  function importChecklistText(text) {
+    var data = JSON.parse(String(text || ''));
+    if (!data || data.kind !== 'knapp-checklists' || !data.chores || !data.afternoon) throw new Error('shape');
+    KIDS.forEach(function (name) {
+      var src = data.chores[name];
+      if (src && src.morning) hub.chores[name].morning = normalizeList(src.morning, true, 1);
+      var aft = data.afternoon[name];
+      if (!aft) return;
+      var kid = hub.afternoon.kids[name];
+      if (aft.arrival) kid.arrival = normalizeList(aft.arrival, false, 0);
+      if (aft.screens) kid.screens = normalizeList(aft.screens, false, 0);
+      if (aft.evening) kid.evening = normalizeList(aft.evening, true, 0);
+    });
+    saveHub();
+  }
+  function updateListField(el) {
+    var name = el.getAttribute('data-kid');
+    var section = el.getAttribute('data-section');
+    var id = el.getAttribute('data-item');
+    var list = listOf(name, section);
+    for (var i = 0; i < list.length; i++) {
+      if (list[i].id !== id) continue;
+      if (el.getAttribute('data-act') === 'list-emoji') list[i].emoji = String(el.value || '').slice(0, 8);
+      else list[i].label = String(el.value || '').slice(0, 80);
+      saveHub();
+      return;
+    }
+  }
+  function listsHtml() {
+    var name = listEditKid;
+    var code = JSON.stringify(checklistPayload());
+    var html = '<h2>Edit checklists</h2><p class="muted">Saved on this device. Today’s ticks stay with each item’s id, so reordering or renaming does not reset the day.</p>';
+    html += '<div class="kid-picks">';
+    KIDS.forEach(function (kid) {
+      html += '<button type="button" class="' + (kid === name ? 'on' : '') + '" data-act="list-kid" data-id="' + kid + '">' + kid + '</button>';
+    });
+    html += '</div>';
+    listSections().forEach(function (sec) {
+      var list = listOf(name, sec.id);
+      html += '<section class="list-section"><h3>' + esc(sec.title) + '</h3>';
+      list.forEach(function (it, index) {
+        html += '<div class="list-row">';
+        html += '<input class="field emoji" data-act="list-emoji" data-kid="' + name + '" data-section="' + sec.id + '" data-item="' + esc(it.id) + '" value="' + esc(it.emoji || '') + '" maxlength="8" placeholder="😀" inputmode="text" enterkeyhint="done" aria-label="Emoji">';
+        html += '<input class="field list-label" data-act="list-label" data-kid="' + name + '" data-section="' + sec.id + '" data-item="' + esc(it.id) + '" value="' + esc(it.label) + '" maxlength="80" inputmode="text" enterkeyhint="done" aria-label="Item">';
+        if (sec.stars) {
+          html += '<div class="star-step"><button type="button" data-act="list-star" data-kid="' + name + '" data-section="' + sec.id + '" data-item="' + esc(it.id) + '" data-id="-1">−</button><span>★ ' + starCount(it, sec.fresh) + '</span><button type="button" data-act="list-star" data-kid="' + name + '" data-section="' + sec.id + '" data-item="' + esc(it.id) + '" data-id="1">+</button></div>';
+        }
+        html += '<button type="button" class="btn light" data-act="list-move" data-kid="' + name + '" data-section="' + sec.id + '" data-item="' + esc(it.id) + '" data-id="up"' + (index === 0 ? ' disabled' : '') + '>Up</button>';
+        html += '<button type="button" class="btn light" data-act="list-move" data-kid="' + name + '" data-section="' + sec.id + '" data-item="' + esc(it.id) + '" data-id="down"' + (index === list.length - 1 ? ' disabled' : '') + '>Down</button>';
+        html += '<button type="button" class="btn ghost" data-act="list-del" data-kid="' + name + '" data-section="' + sec.id + '" data-item="' + esc(it.id) + '">Delete</button>';
+        html += '</div>';
+      });
+      html += '<div class="list-row">';
+      html += '<input class="field emoji" id="addEmoji-' + sec.id + '" maxlength="8" placeholder="😀" inputmode="text" enterkeyhint="done" aria-label="New emoji">';
+      html += '<input class="field list-label" id="addLabel-' + sec.id + '" maxlength="80" placeholder="New item" inputmode="text" enterkeyhint="done" aria-label="New item">';
+      html += '<button type="button" class="btn dark" data-act="list-add" data-kid="' + name + '" data-section="' + sec.id + '">Add</button></div></section>';
+    });
+    html += '<div class="row-actions"><button type="button" class="btn light" data-act="list-reset" data-kid="' + name + '">Reset ' + name + ' to defaults</button></div>';
+    html += '<h3>Move these lists to another screen</h3><p class="muted">Copy the code, or download the file. On the other device, paste the code or choose the file, then Import. Today’s ticks are not in the file.</p>';
+    html += '<textarea class="field list-code" id="listCode" readonly rows="4">' + esc(code) + '</textarea>';
+    html += '<div class="row-actions"><button type="button" class="btn dark" data-act="list-copy">Copy code</button><button type="button" class="btn light" data-act="list-download">Download file</button></div>';
+    html += '<textarea class="field list-code" data-act="list-import" rows="3" placeholder="Paste a checklist code here">' + esc(listImportText) + '</textarea>';
+    html += '<div class="row-actions"><button type="button" class="btn dark" data-act="list-apply">Import code</button><label class="btn light">Import file<input id="listImportFile" type="file" accept="application/json" style="display:none"></label></div>';
+    return html;
+  }
   function renderKids() {
     var mp = morningParts();
     kidsShown = kidsMode(mp);
-    if (kidsShown === 'afternoon') {
-      morningLive = false;
-      return renderAfternoon();
-    }
-    return renderMorning();
+    var html = kidsShown === 'afternoon' ? (morningLive = false, renderAfternoon()) : renderMorning();
+    return html.replace('<div class="page morning-wall">', '<div class="page morning-wall"><div class="list-edit-bar"><button type="button" class="btn dark" data-act="edit-lists">Edit checklists</button></div>');
   }
 
   function shiftAnchor(dir) {
@@ -2512,7 +2687,7 @@
         var on = isDone(name, playGroup, t.id, ymd);
         var morningKid = kidState(name);
         var disabled = playGroup === 'morning' && (!kidHasSchool(name, ymd) || !morningKid.inAt || !!morningKid.outAt);
-        html += '<button type="button" class="chore' + (on ? ' done' : '') + '" data-act="chore" data-kid="' + name + '" data-id="' + esc(t.id) + '" data-group="' + playGroup + '"' + (disabled ? ' disabled' : '') + '><span class="box"><span class="tick"></span></span><span class="star">★</span> ' + esc(t.label) + '<span class="plus">+1★</span></button>';
+        html += '<button type="button" class="chore' + (on ? ' done' : '') + '" data-act="chore" data-kid="' + name + '" data-id="' + esc(t.id) + '" data-group="' + playGroup + '"' + (disabled ? ' disabled' : '') + '><span class="box"><span class="tick"></span></span><span class="star">★</span> ' + esc(taskText(t)) + '<span class="plus">+' + (playGroup === 'morning' ? starCount(t, 1) : 1) + '★</span></button>';
       });
       html += '</div>';
     });
@@ -3090,6 +3265,8 @@
     else if (overlay.type === 'bell') body = bellHtml();
     else if (overlay.type === 'note') body = '<h2>Sticky note</h2><textarea class="field" id="noteText" rows="5">' + esc(hub.note || '') + '</textarea><div class="row-actions"><button type="button" class="btn dark" data-act="note-save">Save</button></div>';
     else if (overlay.type === 'confirm') body = '<h2>' + esc(overlay.message) + '</h2><div class="row-actions"><button type="button" class="btn dark" data-act="confirm-yes">Yes</button><button type="button" class="btn light" data-act="close">Cancel</button></div>';
+    else if (overlay.type === 'pin') body = pinPadHtml(hub.pin ? 'Parent PIN' : ((pinFlow && pinFlow.mode === 'confirm') ? 'Type the PIN again' : 'Choose a parent PIN'), 'The parent PIN opens the checklist editor.');
+    else if (overlay.type === 'lists') body = listsHtml();
     else if (overlay.type === 'meal') body = mealEditHtml(overlay.day);
     else if (overlay.type === 'thanks' || overlay.type === 'swap') body = noteFormHtml(overlay.type);
     else if (overlay.type === 'reward') body = '<h2>New reward</h2>' + field('rwTitle', 'Name', '') + field('rwCost', 'Star price', '10', 'number') + field('rwEmoji', 'Emoji', '⭐') + '<div class="row-actions"><button type="button" class="btn dark" data-act="reward-save">Save</button></div>';
@@ -3097,7 +3274,7 @@
     else if (overlay.type === 'sport') body = '<h2>Activity</h2>' + field('spTitle', 'Name', '') + '<label>Child</label><select class="field" id="spKid">' + KIDS.map(function (n) { return '<option>' + n + '</option>'; }).join('') + '</select>' + field('spDay', 'Day', 'Tue') + field('spTime', 'Time', '16:00') + field('spPlace', 'Place', '') + field('spBring', 'Bring', '') + '<div class="row-actions"><button type="button" class="btn dark" data-act="sport-save">Save</button></div>';
     else if (overlay.type === 'recipe') body = '<h2>Recipe</h2>' + field('rcTitle', 'Title', '') + field('rcIng', 'Ingredients', '') + '<label>Steps</label><textarea class="field" id="rcSteps" rows="4"></textarea><div class="row-actions"><button type="button" class="btn dark" data-act="recipe-save">Save</button></div>';
     else if (overlay.type === 'dateidea') body = '<h2>Date idea</h2>' + field('dtTitle', 'Title', '') + field('dtDetail', 'Detail', '') + '<div class="row-actions"><button type="button" class="btn dark" data-act="date-save">Save</button></div>';
-    return '<div class="sheet" role="dialog"><button type="button" class="btn ghost close" data-act="close" aria-label="Close">Close</button>' + body + '</div>';
+    return '<div class="sheet' + (overlay.type === 'lists' ? ' wide' : '') + '" role="dialog"><button type="button" class="btn ghost close" data-act="close" aria-label="Close">Close</button>' + body + '</div>';
   }
   function settingsHtml() {
     var when = DATA && DATA.generatedAt ? DATA.generatedAt.replace('T', ' ').slice(0, 16) + ' UTC' : 'not open';
@@ -3107,7 +3284,8 @@
     html += '<h3>Calendar password</h3>';
     if (calMode === 'open') html += '<p class="muted">Calendar is open' + (DATA && DATA.date ? ' · file date ' + esc(DATA.date) : '') + ' · built ' + esc(when) + '.</p><button type="button" class="btn light" data-act="lock-cal">Lock calendar on this device</button>';
     else html += '<form data-act="unlock" class="add-row"><input class="field" id="pw" type="password" autocomplete="current-password" placeholder="Family password" aria-label="Family password"><button class="btn dark" type="submit">Unlock</button></form><p class="muted">Without the password the hub still runs. Google events stay hidden.</p>';
-    html += '<h3>Parent PIN</h3><p class="muted">A 4-digit soft lock for chores, the Star Store, stars, backup, and restoring the starter lists. It is not the calendar password.</p>';
+    html += '<h3>Parent PIN</h3><p class="muted">A 4-digit soft lock for chores, the Star Store, stars, checklists, backup, and restoring the starter lists. It is not the calendar password.</p>';
+    html += '<p><button type="button" class="btn dark" data-act="edit-lists">Edit checklists</button></p>';
     if (!parentOn) html += '<button type="button" class="btn light" data-act="open-pin">Enter parent PIN</button>';
     else html += '<button type="button" class="btn light" data-act="parent-lock">Lock parent mode</button> <button type="button" class="btn light" data-act="change-pin">Change PIN</button>';
     html += '<h3>This device only</h3><p class="muted">Meals, lists, chores, stars, rewards, House, Sports, Spice, Date, and Quick add live in this browser. They do not sync. Export a JSON file and import it on the other screen. The file includes the parent PIN and does not include Google Calendar events. Keep it private.</p>';
@@ -3185,6 +3363,17 @@
     var file = document.getElementById('importFile');
     if (file) file.addEventListener('change', function () {
       if (file.files && file.files[0]) importFile(file.files[0]);
+    });
+    var listFile = document.getElementById('listImportFile');
+    if (listFile) listFile.addEventListener('change', function () {
+      var picked = listFile.files && listFile.files[0];
+      if (!picked) return;
+      var reader = new FileReader();
+      reader.onload = function () {
+        try { importChecklistText(String(reader.result || '')); listImportText = ''; toast('Checklists imported'); overlay = { type: 'lists' }; render(); }
+        catch (e) { toast('That is not a checklist code'); }
+      };
+      reader.readAsText(picked);
     });
   }
   function closeOverlay() { overlay = null; pendingConfirm = null; renderOverlay(); }
@@ -3283,7 +3472,7 @@
     persistMorning();
     if (TEST_MORNING) return;
     var task = morningTasks(name).filter(function (t) { return t.id === id; })[0];
-    setChoreStar(name, id, !!k.checks[id], task ? task.label : 'Morning task');
+    setChoreStar(name, id, !!k.checks[id], task ? task.label : 'Morning task', starCount(task, 1));
     syncMorningStar(name);
   }
   function checkIn(name) {
@@ -3377,7 +3566,14 @@
       if (pinBuf === hub.pin) {
         pinFails = 0;
         if (mode === 'change-old') { pinFlow = { mode: 'create' }; pinBuf = ''; toast('Choose a new PIN'); }
-        else { parentOn = true; pinFlow = null; pinBuf = ''; toast('Parent mode is on'); }
+        else {
+          parentOn = true;
+          var thenList = pinFlow && pinFlow.then === 'lists';
+          pinFlow = null;
+          pinBuf = '';
+          toast('Parent mode is on');
+          if (thenList) overlay = { type: 'lists' };
+        }
       } else {
         pinFails++;
         pinBuf = '';
@@ -3385,16 +3581,18 @@
         toast('That PIN did not match');
       }
     } else if (mode === 'create') {
-      pinFlow = { mode: 'confirm', first: pinBuf };
+      pinFlow = { mode: 'confirm', first: pinBuf, then: pinFlow && pinFlow.then };
       pinBuf = '';
     } else if (mode === 'confirm') {
       if (pinBuf === pinFlow.first) {
         hub.pin = pinBuf;
         saveHub();
         parentOn = true;
+        var thenList = pinFlow && pinFlow.then === 'lists';
         pinFlow = null;
         pinBuf = '';
         toast('Parent PIN saved');
+        if (thenList) overlay = { type: 'lists' };
       } else {
         pinFlow = { mode: 'create' };
         pinBuf = '';
@@ -3507,6 +3705,94 @@
     if (act === 'openday') { calAnchor = id; calView = 'day'; render(); return; }
     if (act === 'filter-kid') { kidOn[id] = !kidOn[id]; render(); return; }
     if (act === 'event') { openOverlay({ type: 'event', key: actEl.getAttribute('data-key') }); return; }
+    if (act === 'edit-lists') {
+      if (!parentOn) {
+        pinFlow = { mode: hub.pin ? 'unlock' : 'create', then: 'lists' };
+        pinBuf = '';
+        openOverlay({ type: 'pin' });
+      } else openOverlay({ type: 'lists' });
+      return;
+    }
+    if (act === 'list-kid') { listEditKid = id; render(); return; }
+    if (act === 'list-label' || act === 'list-emoji' || act === 'list-import') return;
+    if (act === 'list-add') {
+      var sectionId = actEl.getAttribute('data-section');
+      var added = val('addLabel-' + sectionId).replace(/^\s+|\s+$/g, '');
+      if (!added) { toast('Type an item first'); return; }
+      var sec = listSections().filter(function (s) { return s.id === sectionId; })[0];
+      var item = { id: uid('c'), label: added.slice(0, 80), emoji: val('addEmoji-' + sectionId).slice(0, 8) };
+      if (sec && sec.stars) item.stars = sec.fresh;
+      listOf(kid, sectionId).push(item);
+      saveHub();
+      render();
+      return;
+    }
+    if (act === 'list-del') {
+      var bucket = listOf(kid, actEl.getAttribute('data-section'));
+      var itemId = actEl.getAttribute('data-item');
+      for (var li = bucket.length - 1; li >= 0; li--) if (bucket[li].id === itemId) bucket.splice(li, 1);
+      saveHub();
+      render();
+      return;
+    }
+    if (act === 'list-move') {
+      var moving = listOf(kid, actEl.getAttribute('data-section'));
+      var mid = actEl.getAttribute('data-item');
+      var from = -1;
+      for (var mi = 0; mi < moving.length; mi++) if (moving[mi].id === mid) from = mi;
+      var to = from + (id === 'up' ? -1 : 1);
+      if (from < 0 || to < 0 || to >= moving.length) return;
+      var swap = moving[from];
+      moving[from] = moving[to];
+      moving[to] = swap;
+      saveHub();
+      render();
+      return;
+    }
+    if (act === 'list-star') {
+      var starring = listOf(kid, actEl.getAttribute('data-section'));
+      var sid = actEl.getAttribute('data-item');
+      starring.forEach(function (it) {
+        if (it.id === sid) it.stars = Math.max(0, Math.min(5, starCount(it, 0) + (+id || 0)));
+      });
+      saveHub();
+      render();
+      return;
+    }
+    if (act === 'list-reset') {
+      askConfirm('Reset ' + kid + '’s lists to the starter ones?', function () {
+        resetKidLists(kid);
+        overlay = { type: 'lists' };
+        toast(kid + ' is back to the starter lists');
+      });
+      return;
+    }
+    if (act === 'list-copy') {
+      var box = document.getElementById('listCode');
+      var text = box ? box.value : JSON.stringify(checklistPayload());
+      if (box) { box.focus(); box.select(); }
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(function () { toast('Checklist code copied'); }, function () { toast('The code is selected. Copy it from the box.'); });
+      } else toast('The code is selected. Copy it from the box.');
+      return;
+    }
+    if (act === 'list-download') {
+      var blob = new Blob([JSON.stringify(checklistPayload(), null, 2)], { type: 'application/json' });
+      var link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = 'knapp-checklists.json';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      toast('Checklist file downloaded');
+      return;
+    }
+    if (act === 'list-apply') {
+      try { importChecklistText(listImportText || val('listCode')); listImportText = ''; toast('Checklists imported'); }
+      catch (err) { toast('That is not a checklist code'); return; }
+      render();
+      return;
+    }
     if (act === 'checkin') { checkIn(kid); render(); return; }
     if (act === 'checkout') { checkOut(kid); return; }
     if (act === 'morn-undo') { undoMorning(kid); render(); return; }
@@ -3992,6 +4278,8 @@
       aftText(t.getAttribute('data-kid'), act === 'aft-msg' ? 'message' : 'needNote', t.value);
       return;
     }
+    if (act === 'list-label' || act === 'list-emoji') { updateListField(t); return; }
+    if (act === 'list-import') { listImportText = t.value; return; }
     if (t.id !== 'recipeSearch') return;
     recipeQuery = t.value;
     var grid = document.getElementById('recipeGrid');
