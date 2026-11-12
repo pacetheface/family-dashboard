@@ -305,6 +305,41 @@
   function nowMs() { return FROZEN ? FROZEN_MS : Date.now() + CLOCK_OFFSET; }
   function nowParts() { return berlinParts(new Date(nowMs())); }
   function currentYmd() { return nowParts().ymd; }
+
+  // ?test=morning starts a private clock at 06:45 on the next school day and
+  // lets it run at real speed. The wall clock, calendar, and saved progress stay put.
+  var TEST_MORNING = Q.test === 'morning';
+  var testBootMs = Date.now();
+  var testOriginMs = 0;
+  var testKids = {};
+  var testChimed = {};
+  function isSchoolDay(ymd) {
+    if (hardOff(ymd)) return false;
+    if (!DATA) return true;
+    var who = leaveWho(ymd);
+    return !!(who.boys.length || who.june);
+  }
+  function nextSchoolYmd(real) {
+    var mins = real.h * 60 + real.mi;
+    var start = (isSchoolDay(real.ymd) && mins < 6 * 60 + 45) ? real.ymd : addDays(real.ymd, 1);
+    var ymd = start;
+    for (var i = 0; i < 21; i++) {
+      ymd = addDays(start, i);
+      if (isSchoolDay(ymd)) return ymd;
+    }
+    return ymd;
+  }
+  if (TEST_MORNING) {
+    testOriginMs = berlinLocalToEpoch(nextSchoolYmd(berlinParts(new Date(testBootMs))) + 'T06:45:00');
+  }
+  function morningNowMs() {
+    if (!TEST_MORNING || !testOriginMs) return nowMs();
+    return testOriginMs + (Date.now() - testBootMs);
+  }
+  function morningParts() {
+    if (!TEST_MORNING || !testOriginMs) return nowParts();
+    return berlinParts(new Date(morningNowMs()));
+  }
   function doy(ymd) { return daysBetween(ymd.slice(0, 4) + '-01-01', ymd); }
   function pick(list, ymd) { return list[((doy(ymd) % list.length) + list.length) % list.length]; }
   function prettyTime(t) {
@@ -423,6 +458,11 @@
     saveState();
   }
   function kidState(name) {
+    if (TEST_MORNING) {
+      if (!testKids[name]) testKids[name] = { checks: {} };
+      if (!testKids[name].checks) testKids[name].checks = {};
+      return testKids[name];
+    }
     if (!state.kids[name]) state.kids[name] = { checks: {} };
     if (!state.kids[name].checks) state.kids[name].checks = {};
     return state.kids[name];
@@ -685,6 +725,7 @@
     return choreDone(name, id, ymd);
   }
   function addStars(kid, delta, reason) {
+    if (TEST_MORNING) return false;
     if (hub.stars[kid] == null) hub.stars[kid] = 0;
     var next = hub.stars[kid] + delta;
     if (next < 0) delta = -hub.stars[kid];
@@ -701,6 +742,7 @@
     return n;
   }
   function setChoreStar(kid, id, on, reason) {
+    if (TEST_MORNING) return;
     var ymd = currentYmd();
     if (!hub.awarded[ymd]) hub.awarded[ymd] = {};
     if (!hub.awarded[ymd][kid]) hub.awarded[ymd][kid] = {};
@@ -1191,9 +1233,10 @@
         var mark = marks[m];
         if (left <= mark && left > mark - 0.35) {
           var key = groups[g].id + '-' + mark;
-          if (state.chimed[key]) continue;
-          state.chimed[key] = true;
-          saveState();
+          var bag = TEST_MORNING ? testChimed : state.chimed;
+          if (bag[key]) continue;
+          bag[key] = true;
+          if (!TEST_MORNING) saveState();
           var verb = groups[g].who.indexOf(' and ') >= 0 ? ' leave' : ' leaves';
           remind(mark + ' minutes until ' + groups[g].who + verb);
         }
@@ -1428,13 +1471,13 @@
   }
   function timerBlock(name, ymd, compact) {
     if (!kidHasSchool(name, ymd)) return '<div class="dayoff">No school today</div>';
-    var k = state.kids[name] || { checks: {} };
+    var k = kidState(name);
     var started = !!k.inAt;
     var done = !!(k.inAt && k.doneAt);
     var onTime = done && finishOnTime(name, k.doneAt);
     var elapsed = '--:--';
     if (done) elapsed = fmtDur(Math.round((k.doneAt - k.inAt) / 1000));
-    else if (started) elapsed = fmtDur(Math.round((nowMs() - k.inAt) / 1000));
+    else if (started) elapsed = fmtDur(Math.round((morningNowMs() - k.inAt) / 1000));
     var stat = onTimeDays(name, ymd);
     var badge = !stat.of ? 'Day off' : (stat.n + ' of ' + stat.of + ' this week');
     var lines = [];
@@ -1506,7 +1549,7 @@
   }
   function noticeCount(p) {
     var n = 0;
-    if (schoolMorning(p) && !soundOn) n++;
+    if (schoolMorning(morningParts()) && !soundOn) n++;
     if ((hub.house || []).some(function (task) { return houseDue(task, p.ymd); })) n++;
     (hub.redemptions || []).forEach(function (r) { if (r.status === 'pending') n++; });
     return n;
@@ -1516,7 +1559,7 @@
     var n = noticeCount(p);
     var voice = canVoice();
     document.getElementById('topbar').innerHTML =
-      '<div class="brand"><h1>The Knapps</h1><div class="clock" id="clockTime">' + esc(fmtClock(p)) + '</div><div class="wxchip" id="wxTop">' + wxTopHtml(p) + '</div></div>' +
+      '<div class="brand"><h1>The Knapps</h1><div class="clock" id="clockTime">' + esc(fmtClock(p)) + '</div>' + (TEST_MORNING ? '<span class="test-badge">Test mode</span>' : '') + '<div class="wxchip" id="wxTop">' + wxTopHtml(p) + '</div></div>' +
       '<div class="top-actions"><button type="button" class="iconbtn" data-act="bell" aria-label="Notifications">' + icon('bell') + (n ? '<span class="dot"></span>' : '') + '</button>' +
       '<button type="button" class="iconbtn" data-act="settings" aria-label="Settings">' + icon('gear') + '</button>' +
       '<button type="button" class="quick" data-act="quick">' + icon(voice ? 'mic' : 'plus') + ' Quick add</button></div>';
@@ -1535,17 +1578,18 @@
 
   function renderHome() {
     var p = nowParts();
+    var mp = morningParts();
     var ymd = p.ymd;
-    homeMorning = schoolMorning(p);
+    homeMorning = schoolMorning(mp);
     var html = '<div class="page home">';
     if (homeMorning) {
-      var model = countdownModel(p);
+      var model = countdownModel(mp);
       var cur = currentWeather(p);
       html += '<section class="card count-card urg-' + model.urg + '" id="countCard"><div class="mid"><div class="count-title" id="countTitle">' + esc(model.title) + '</div><div class="count-big" id="countBig">' + esc(model.big) + '</div><div class="count-sub" id="countSub">' + esc(model.sub) + (cur ? ' · ' + esc(cur.hint) : '') + '</div></div>';
       html += '<button type="button" class="sound" id="soundBtn" data-act="sound" data-role="sound">Enable sound</button><div class="bar"><i id="barFill" style="width:' + model.pct + '%"></i></div></section>';
       html += '<div class="morn-kids">';
       KIDS.forEach(function (name) {
-        html += '<section class="card kid-card ' + name.toLowerCase() + '">' + timerBlock(name, ymd, true) + checklistBlock(name, ymd) + '</section>';
+        html += '<section class="card kid-card ' + name.toLowerCase() + '">' + timerBlock(name, mp.ymd, true) + checklistBlock(name, mp.ymd) + '</section>';
       });
       html += '</div>';
     } else if (hardOff(ymd)) {
@@ -2312,7 +2356,7 @@
       if (!el || el.getAttribute('data-run') !== '1') return;
       var k = state.kids[name];
       if (!k || !k.inAt || k.doneAt) return;
-      el.textContent = fmtDur(Math.round((nowMs() - k.inAt) / 1000));
+      el.textContent = fmtDur(Math.round((morningNowMs() - k.inAt) / 1000));
     });
   }
   function paintSleep(p) {
@@ -2393,8 +2437,8 @@
   function bellHtml() {
     var p = nowParts();
     var html = '<h2>Notifications</h2>';
-    if (schoolMorning(p)) html += '<div class="notice"><b>School morning</b><div>Boys leave 7:10 · June leaves 7:30.</div></div>';
-    if (schoolMorning(p) && !soundOn) html += '<div class="notice"><b>Sound is off</b><div>Tap Enable sound so the 15, 10, and 5 minute reminders can play.</div></div>';
+    if (schoolMorning(morningParts())) html += '<div class="notice"><b>School morning</b><div>Boys leave 7:10 · June leaves 7:30.</div></div>';
+    if (schoolMorning(morningParts()) && !soundOn) html += '<div class="notice"><b>Sound is off</b><div>Tap Enable sound so the 15, 10, and 5 minute reminders can play.</div></div>';
     var any = false;
     (hub.house || []).forEach(function (task) {
       if (!houseDue(task, p.ymd)) return;
@@ -2407,7 +2451,7 @@
       html += '<div class="notice"><b>Reward request</b><div>' + esc(r.kid) + ' asked for ' + esc(r.title) + '.</div></div>';
     });
     html += '<div class="notice"><b>Kindness jar</b><div>' + (hub.kindness || 0) + ' of 20.</div></div>';
-    if (!schoolMorning(p) && !any) html += '<p class="muted">All quiet.</p>';
+    if (!schoolMorning(morningParts()) && !any) html += '<p class="muted">All quiet.</p>';
     return html;
   }
   function mealEditHtml(day) {
@@ -2501,22 +2545,24 @@
   }
 
   function toggleMorning(name, id) {
-    if (!kidHasSchool(name, currentYmd())) return;
+    if (!kidHasSchool(name, morningParts().ymd)) return;
     var k = kidState(name);
-    if (!k.inAt) k.inAt = nowMs();
+    if (!k.inAt) k.inAt = morningNowMs();
     k.checks[id] = !k.checks[id];
-    if (allChecked(name)) { if (!k.doneAt) k.doneAt = nowMs(); }
+    if (allChecked(name)) { if (!k.doneAt) k.doneAt = morningNowMs(); }
     else k.doneAt = null;
+    if (TEST_MORNING) return;
     saveState();
     var task = morningTasks(name).filter(function (t) { return t.id === id; })[0];
     setChoreStar(name, id, !!k.checks[id], task ? task.label : 'Morning task');
     syncMorningStar(name);
   }
   function checkIn(name) {
-    if (!kidHasSchool(name, currentYmd())) return;
+    if (!kidHasSchool(name, morningParts().ymd)) return;
     var k = kidState(name);
-    if (!k.inAt) k.inAt = nowMs();
-    if (allChecked(name) && !k.doneAt) k.doneAt = nowMs();
+    if (!k.inAt) k.inAt = morningNowMs();
+    if (allChecked(name) && !k.doneAt) k.doneAt = morningNowMs();
+    if (TEST_MORNING) return;
     saveState();
     syncMorningStar(name);
   }
@@ -2528,6 +2574,10 @@
       return;
     }
     delete resetArm[name];
+    if (TEST_MORNING) {
+      testKids[name] = { checks: {} };
+      return;
+    }
     state.kids[name] = { checks: {} };
     saveState();
   }
@@ -3120,18 +3170,19 @@
 
   function tick() {
     var p = nowParts();
-    if (state.date !== p.ymd) {
+    var mp = morningParts();
+    if (!TEST_MORNING && state.date !== p.ymd) {
       ensureToday(p.ymd);
       render();
-    } else if (page === 'home' && schoolMorning(p) !== homeMorning && !overlay) {
+    } else if (page === 'home' && schoolMorning(mp) !== homeMorning && !overlay) {
       render();
     }
     setText('clockTime', fmtClock(p));
-    paintCountdown(p);
+    paintCountdown(mp);
     paintElapsed();
     paintKitchen();
     if (page === 'sleep') paintSleep(p);
-    maybeChime(p);
+    maybeChime(mp);
     maybeReload(p);
   }
 
