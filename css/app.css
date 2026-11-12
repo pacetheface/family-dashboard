@@ -725,6 +725,21 @@ button, .btn, .pill, .q-pill, .badge, .checkin { font-weight: 600; }
 .needs-card .kicker { font-size: 16px; }
 .needs-row { display: flex; gap: 14px; align-items: baseline; padding: 6px 0; font-size: 22px; font-weight: 600; }
 .needs-when { flex: 0 0 92px; font-weight: 800; }
+.list-edit-bar { display: flex; justify-content: flex-end; }
+.list-edit-bar .btn { font-size: 22px; padding: 14px 20px; min-height: 56px; }
+.sheet.wide { width: min(1280px, 96vw); }
+.kid-picks { display: flex; gap: 8px; margin: 8px 0 4px; }
+.kid-picks button { border: 0; border-radius: 999px; padding: 12px 20px; font-size: 22px; font-weight: 800; background: rgba(255,255,255,.9); color: #003253; }
+.kid-picks button.on { background: #1872A0; color: #fff; }
+.list-section { margin: 18px 0; }
+.list-section h3 { margin: 0 0 8px; font-size: 26px; }
+.list-row { display: flex; gap: 8px; align-items: center; margin: 8px 0; }
+.list-row .emoji { width: 88px; flex: 0 0 88px; font-size: 28px; text-align: center; min-height: 60px; }
+.list-row .list-label, .list-code { font-size: 22px; min-height: 60px; }
+.list-row .btn { min-height: 60px; font-size: 18px; padding: 10px 14px; }
+.star-step { display: flex; align-items: center; gap: 6px; font-size: 20px; font-weight: 800; white-space: nowrap; }
+.star-step button { min-width: 48px; min-height: 60px; border-radius: 12px; background: #fff; font-size: 28px; font-weight: 800; color: #003253; }
+.list-code { width: 100%; margin-top: 8px; font-family: inherit; }
 @supports ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))) {
   .card, .m-col, .banner, .side-card, .sheet, .meal, .wxday, .m-sw, .aft-card, .count-card,
   .m-top, .m-top.urg-ok, .m-top.urg-yellow, .m-top.urg-orange, .m-top.urg-red, .m-top.urg-gone, .m-top.urg-off {
