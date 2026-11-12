@@ -1600,7 +1600,8 @@
   }
 
   function renderNav() {
-    var html = '<div class="logo" aria-hidden="true">K</div>';
+    var html = '<svg class="ridge" viewBox="0 0 108 84" preserveAspectRatio="none" aria-hidden="true"><path fill="#8aa4b0" d="M0 46 L20 30 L36 40 L54 18 L74 34 L90 24 L108 36 L108 84 L0 84 Z"/><path fill="#3e6b62" d="M0 56 L24 40 L44 52 L64 34 L86 48 L108 38 L108 84 L0 84 Z"/><path fill="#16302c" d="M0 66 L28 52 L50 62 L72 48 L108 58 L108 84 L0 84 Z"/></svg>';
+    html += '<div class="logo" aria-hidden="true">K</div>';
     NAV.forEach(function (item) {
       html += '<button type="button" class="navbtn' + (page === item.id ? ' on' : '') + '" data-act="nav" data-id="' + item.id + '" aria-current="' + (page === item.id ? 'page' : 'false') + '">' + icon(item.icon) + '<span>' + item.label + '</span></button>';
     });
@@ -3005,6 +3006,7 @@
   function render() {
     try {
       var sleeping = page === 'sleep';
+      document.body.classList.toggle('sky-home', page === 'home');
       document.getElementById('shell').classList.toggle('hidden', sleeping);
       var sleepEl = document.getElementById('sleep');
       sleepEl.classList.toggle('hidden', !sleeping);
