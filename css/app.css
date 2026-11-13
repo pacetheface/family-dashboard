@@ -24,7 +24,7 @@
   --appt: #f6c9d8;
   --meal: #cfe3f7;
   --family: #e5efd4;
-  --navw: 132px;
+  --navw: 4.125rem;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
@@ -483,35 +483,24 @@ h1, h2, h3, .serif { font-family: var(--sans); font-weight: 800; letter-spacing:
 .checks { display: flex; gap: 8px; flex-wrap: wrap; }
 .checks label { display: flex; align-items: center; gap: 8px; font-weight: 800; background: #f6f1e8; border-radius: 999px; padding: 8px 14px; margin: 0; }
 
-@media (max-width: 1180px) {
-  :root { --navw: 92px; }
-  .brand h1, .clock { font-size: 28px; }
-  .home-mid { grid-template-columns: 1fr 1fr; }
-  .tasks-col { grid-column: 1 / -1; }
-  .play { grid-template-columns: 1fr; }
-  .side { display: grid; grid-template-columns: 1fr 1fr; }
-  .meal-grid, .recipe-grid { grid-template-columns: 1fr 1fr; }
-  .recipe-detail { grid-template-columns: 1fr; }
-  .kid-cols, .morn-kids, .weekstat, .columns-3 { grid-template-columns: 1fr 1fr; }
-  .count-big { font-size: 56px; }
-  .dayname { font-size: 36px; }
-}
-@media (max-width: 820px) {
+@media (max-width: 900px) {
   #shell { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
-  .nav { flex-direction: row; overflow: auto; width: 100%; padding: 8px; gap: 4px; }
-  .logo { width: 44px; height: 44px; font-size: 24px; margin: 0 4px 0 0; }
-  .navbtn { width: auto; min-width: 64px; padding: 6px 8px; flex-direction: row; gap: 4px; }
+  .nav { flex-direction: row; overflow: auto; width: 100%; padding: 0.35rem; gap: 0.2rem; }
+  .navbtn { width: auto; min-width: 4.2rem; padding: 0.35rem 0.5rem; flex-direction: row; gap: 0.25rem; }
   .nav .grow { display: none; }
-  .home-top, .home-mid, .home-banners, .kid-strip, .home-late, .lists, .columns-2, .columns-3, .meal-grid, .recipe-grid, .kid-cols, .morn-kids, .weekstat, .side {
+  .logo { margin: 0 0.25rem 0 0; }
+  .home-top, .home-mid, .home-banners, .kid-strip, .home-late, .lists, .columns-2, .columns-3,
+  .meal-grid, .recipe-grid, .kid-cols, .morn-kids, .weekstat, .side, .three-days, .wxstrip, .play {
     grid-template-columns: 1fr;
   }
-  .wx-hero { flex-wrap: wrap; }
-  .wx-hero-side, .wx-windows { text-align: left; justify-content: flex-start; }
+  .pills { grid-template-columns: 1fr 1fr; }
+  .month-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wx-hero, .m-top { flex-wrap: wrap; }
+  .wx-hero-side, .wx-windows, .m-wx { text-align: left; justify-content: flex-start; }
+  .m-clock, .m-wx { width: auto; max-width: 100%; }
+  .m-cols { flex-direction: column; }
   .tasks-col { grid-column: auto; }
   #sleep { grid-template-columns: 1fr; }
-  .cal-range { font-size: 20px; }
-  .topbar { padding: 8px 12px; }
-  #view { padding: 10px 12px 16px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .count-card.urg-red .count-big { animation: none; }
@@ -593,11 +582,6 @@ h1, h2, h3, .serif { font-family: var(--sans); font-weight: 800; letter-spacing:
 .aft-sum:first-of-type { border-top: 0; }
 .aft-sum.seen { opacity: 0.55; }
 .chk.fri .lbl { background: #ffe08a; border-radius: 8px; padding: 1px 6px; }
-@media (max-width: 1180px) {
-  .m-top { flex-wrap: wrap; }
-  .m-clock, .m-wx { width: auto; }
-  .m-cols { flex-direction: column; }
-}
 
 a { color: #1872A0; }
 .kicker, .today-word, .m-lbl, .aft-kicker, .variation-head, .side-card h3 {
@@ -740,7 +724,7 @@ button, .btn, .pill, .q-pill, .badge, .checkin { font-weight: 600; }
 .star-step { display: flex; align-items: center; gap: 6px; font-size: 20px; font-weight: 800; white-space: nowrap; }
 .star-step button { min-width: 48px; min-height: 60px; border-radius: 12px; background: #fff; font-size: 28px; font-weight: 800; color: #003253; }
 .list-code { width: 100%; margin-top: 8px; font-family: inherit; }
-html { font-size: clamp(20px, 1.67vw, 32px); }
+html { font-size: 32px; font-size: clamp(18px, min(1.667vw, 2.963vh), 80px); }
 body, button, input, select, textarea { font-size: 1rem; }
 .brand h1, .clock { font-size: 2.2rem; }
 .navbtn { width: 100%; font-size: 0.62rem; line-height: 1.1; padding: 0.35rem 0.2rem; white-space: normal; text-align: center; }
@@ -765,7 +749,16 @@ h3, .banner h3, .side-card h3, .meal h3, .kid-head h3 { font-size: 1.45rem; }
 .wx-ic { width: 2.6rem; height: 2.6rem; }
 .wx-block { display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
 .wx-more { align-self: flex-start; }
-.three-days { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.three-days { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.4rem; align-items: start; }
+#view { padding: 0.4rem 0.65rem 0.5rem; }
+.page, .home, .morning-wall { gap: 0.4rem; }
+.topbar { padding: 0.35rem 0.7rem 0.15rem; gap: 0.5rem; }
+.card { padding: 0.55rem 0.65rem; border-radius: 0.75rem; }
+.m-clock { width: 6.875rem; }
+.m-wx { width: 8.75rem; max-width: 100%; }
+.m-cols, .kid-strip, .home-banners, .home-late { gap: 0.4rem; }
+.sheet.wide { width: min(96vw, 50rem); }
+.play { grid-template-columns: minmax(0, 1fr) minmax(0, 13.125rem); }
 .day-col-list { min-width: 0; }
 .day-col-list h2 { margin: 0 0 0.4rem; font-size: 1.6rem; }
 .pills, .meal-grid, .recipe-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
@@ -774,7 +767,7 @@ h3, .banner h3, .side-card h3, .meal h3, .kid-head h3 { font-size: 1.45rem; }
 .month-grid { gap: 0.4rem; }
 .mcell { min-height: 0; }
 .week-head, .allday-row, .week-body { min-width: 0; }
-.sheet.wide { width: min(96vw, 1600px); }
+.sheet.wide { width: min(96vw, 50rem); }
 .list-edit-bar .btn, .star-step, .star-step button, .kid-picks button { font-size: 1.05rem; }
 .card, .m-col, .sheet, .banner, .kid-tile, .today-row span, .chk .lbl { overflow-wrap: anywhere; }
 .m-top, .wx-hero { overflow: visible; }
@@ -790,11 +783,12 @@ h3, .banner h3, .side-card h3, .meal h3, .kid-head h3 { font-size: 1.45rem; }
 }
 .m-col { overflow: visible; }
 .m-cols { min-height: 0; }
-.play { grid-template-columns: minmax(0, 1fr) minmax(0, 420px); }
+.play { grid-template-columns: minmax(0, 1fr) minmax(0, 13.125rem); }
 .side, .side-card, .jar-row { min-width: 0; max-width: 100%; }
 .note-actions { flex-wrap: wrap; }
 .note-actions .btn, .jar-row .btn { max-width: 100%; }
 .pin-keys button { font-size: 1.4rem; min-height: 3.4rem; }
+.photo-credit { font-size: 0.7rem; right: 0.4rem; bottom: 0.3rem; padding: 0.1rem 0.35rem; }
 @supports ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))) {
   .card, .m-col, .banner, .side-card, .sheet, .meal, .wxday, .m-sw, .aft-card, .count-card,
   .m-top, .m-top.urg-ok, .m-top.urg-yellow, .m-top.urg-orange, .m-top.urg-red, .m-top.urg-gone, .m-top.urg-off {
@@ -802,4 +796,26 @@ h3, .banner h3, .side-card h3, .meal h3, .kid-head h3 { font-size: 1.45rem; }
     -webkit-backdrop-filter: blur(8px);
     backdrop-filter: blur(8px);
   }
+}
+@media (max-width: 900px) {
+  #shell { grid-template-columns: 1fr; grid-template-rows: auto 1fr; }
+  .nav { flex-direction: row; flex-wrap: wrap; overflow: visible; width: 100%; padding: 0.35rem; gap: 0.2rem; }
+  .navbtn { width: auto; min-width: 0; padding: 0.35rem 0.5rem; flex-direction: row; }
+  .nav .grow { display: none; }
+  .logo { margin: 0 0.25rem 0 0; }
+  .home-top, .home-mid, .home-banners, .kid-strip, .home-late, .lists, .columns-2, .columns-3,
+  .meal-grid, .recipe-grid, .kid-cols, .morn-kids, .weekstat, .side, .three-days, .wxstrip, .play, .pills {
+    grid-template-columns: 1fr;
+  }
+  .pills { grid-template-columns: 1fr 1fr; }
+  .month-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .wx-hero, .m-top { flex-wrap: wrap; }
+  .wx-hero-side, .wx-windows, .m-wx { text-align: left; justify-content: flex-start; }
+  .m-clock, .m-wx { width: auto; max-width: 100%; }
+  .m-cols { flex-direction: column; }
+  .topbar { flex-direction: column; align-items: stretch; }
+  .top-actions { justify-content: flex-end; }
+  .wx-windows { flex-wrap: wrap; }
+  .wx-windows span { white-space: nowrap; }
+  .photo-credit { position: static; display: inline-block; margin: 0.4rem 0.6rem 0.6rem auto; }
 }
