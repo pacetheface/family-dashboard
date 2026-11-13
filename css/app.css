@@ -24,7 +24,7 @@
   --appt: #f6c9d8;
   --meal: #cfe3f7;
   --family: #e5efd4;
-  --navw: 108px;
+  --navw: 132px;
 }
 * { box-sizing: border-box; }
 html, body { height: 100%; margin: 0; }
@@ -740,6 +740,61 @@ button, .btn, .pill, .q-pill, .badge, .checkin { font-weight: 600; }
 .star-step { display: flex; align-items: center; gap: 6px; font-size: 20px; font-weight: 800; white-space: nowrap; }
 .star-step button { min-width: 48px; min-height: 60px; border-radius: 12px; background: #fff; font-size: 28px; font-weight: 800; color: #003253; }
 .list-code { width: 100%; margin-top: 8px; font-family: inherit; }
+html { font-size: clamp(20px, 1.67vw, 32px); }
+body, button, input, select, textarea { font-size: 1rem; }
+.brand h1, .clock { font-size: 2.2rem; }
+.navbtn { width: 100%; font-size: 0.62rem; line-height: 1.1; padding: 0.35rem 0.2rem; white-space: normal; text-align: center; }
+.navbtn span { display: block; max-width: 100%; }
+.logo { width: 3rem; height: 3rem; font-size: 1.4rem; }
+.iconbtn { width: 3.1rem; height: 3.1rem; }
+.quick, .btn, .pill, .q-pill, .seg button, .checkin, .checkout, .kid-name { font-size: 1.05rem; min-height: 3rem; padding: 0.7rem 1rem; }
+.kicker, .m-lbl, .aft-kicker, .today-word, .section-label, .variation-head, .linkish, .legend, .cal-foot, .badge, .test-badge, .sample { font-size: 0.9rem; }
+h2, .page-head h2, .m-head h2, .kid-tile h2, .dayname, .sheet h2, .list-section h3 { font-size: 1.8rem; }
+h3, .banner h3, .side-card h3, .meal h3, .kid-head h3 { font-size: 1.45rem; }
+.wx-temp { font-size: 4rem; }
+.wx-range, .wx-cond, .wx-clothes { font-size: 1.35rem; }
+.wx-rain, .wx-windows, .kid-detail, .kid-status { font-size: 1.15rem; }
+.kid-tile h2 { font-size: 2rem; }
+.morning-wall .m-top .count-big, .count-big { font-size: 4.2rem; }
+.morning-wall .m-clock-time { font-size: 3rem; }
+.morning-wall .m-temp, .m-time, .aft-huge, .kitchen { font-size: 2.4rem; }
+.morning-wall .chk, .chk, .chore, .today-row, .home-cal .today-row { font-size: 1.1rem; min-height: 3.2rem; white-space: normal; }
+.field, .list-row .list-label, .list-code, .list-row .emoji { font-size: 1.15rem; min-height: 3.1rem; }
+.wxstrip { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 0.6rem; }
+.wxday .wd, .wxday .wt, .wxday .wr { font-size: 1.05rem; }
+.wx-ic { width: 2.6rem; height: 2.6rem; }
+.wx-block { display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
+.wx-more { align-self: flex-start; }
+.three-days { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.day-col-list { min-width: 0; }
+.day-col-list h2 { margin: 0 0 0.4rem; font-size: 1.6rem; }
+.pills, .meal-grid, .recipe-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.mini, .mpill, .ev-block, .ev-block span { font-size: 1rem; white-space: normal; overflow: visible; text-overflow: clip; }
+.mhead, .hour, .dh-wx, .person small, .person b, .plus, .tag, .cal-range { font-size: 1rem; }
+.month-grid { gap: 0.4rem; }
+.mcell { min-height: 0; }
+.week-head, .allday-row, .week-body { min-width: 0; }
+.sheet.wide { width: min(96vw, 1600px); }
+.list-edit-bar .btn, .star-step, .star-step button, .kid-picks button { font-size: 1.05rem; }
+.card, .m-col, .sheet, .banner, .kid-tile, .today-row span, .chk .lbl { overflow-wrap: anywhere; }
+.m-top, .wx-hero { overflow: visible; }
+.home-banners .banner h3, .home-banners .banner p, .home-banners .sticky { font-size: 1.05rem; }
+.banner { flex-wrap: wrap; }
+.banner .btn, .quick, .wx-more { white-space: nowrap; flex: 0 0 auto; }
+.wxchip, .wxchip b, .today-word { color: #fff; text-shadow: 0 2px 8px rgba(0, 32, 64, .45); }
+.page > .muted, .cal-foot, .legend {
+  background: rgba(247, 250, 253, 0.94);
+  color: #003253;
+  border-radius: 16px;
+  padding: 0.55rem 0.9rem;
+}
+.m-col { overflow: visible; }
+.m-cols { min-height: 0; }
+.play { grid-template-columns: minmax(0, 1fr) minmax(0, 420px); }
+.side, .side-card, .jar-row { min-width: 0; max-width: 100%; }
+.note-actions { flex-wrap: wrap; }
+.note-actions .btn, .jar-row .btn { max-width: 100%; }
+.pin-keys button { font-size: 1.4rem; min-height: 3.4rem; }
 @supports ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))) {
   .card, .m-col, .banner, .side-card, .sheet, .meal, .wxday, .m-sw, .aft-card, .count-card,
   .m-top, .m-top.urg-ok, .m-top.urg-yellow, .m-top.urg-orange, .m-top.urg-red, .m-top.urg-gone, .m-top.urg-off {

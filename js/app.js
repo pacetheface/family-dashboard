@@ -199,6 +199,7 @@
   var playGroup = '';
   var listEditKid = 'West';
   var listImportText = '';
+  var wxPage = 0;
   var parentOn = false;
   var pinBuf = '';
   var pinFlow = null;
@@ -1658,12 +1659,15 @@
   }
   function wxStrip(p) {
     var map = forecastMap();
+    var start = wxPage * 3;
     var html = '<div class="wxstrip">';
-    for (var i = 0; i < 7; i++) {
-      var ymd = addDays(p.ymd, i);
+    for (var i = 0; i < 3; i++) {
+      var idx = start + i;
+      if (idx > 6) break;
+      var ymd = addDays(p.ymd, idx);
       var day = map[ymd];
-      var label = i === 0 ? 'Today' : WD_SHORT[weekdayIndex(ymd)];
-      html += '<div class="wxday' + (i === 0 ? ' today' : '') + '"><div class="wd">' + label + '</div>';
+      var label = idx === 0 ? 'Today' : WD_SHORT[weekdayIndex(ymd)] + ' ' + (+ymd.slice(8));
+      html += '<div class="wxday' + (idx === 0 ? ' today' : '') + '"><div class="wd">' + label + '</div>';
       if (day) {
         html += weatherSvg(weatherKind(day.code));
         html += '<div class="wt">' + (day.high == null ? '–' : day.high + '°') + ' ' + (day.low == null ? '' : day.low + '°') + '</div>';
@@ -1671,8 +1675,8 @@
       } else html += '<div class="wr">—</div>';
       html += '</div>';
     }
-    html += '</div>';
-    return html;
+    html += '</div><button type="button" class="btn light wx-more" data-act="wx-more">' + (wxPage >= 2 ? 'Back to today' : 'More days') + '</button>';
+    return '<div class="wx-block">' + html + '</div>';
   }
   function wxTopHtml(p) {
     var map = forecastMap()[p.ymd];
@@ -2499,7 +2503,7 @@
       var dt = new Date(Date.UTC(y, m, 1));
       calAnchor = dt.getUTCFullYear() + '-' + pad2(dt.getUTCMonth() + 1) + '-01';
     } else if (calView === 'day') calAnchor = addDays(calAnchor, dir);
-    else calAnchor = addDays(calAnchor, dir * 7);
+    else calAnchor = addDays(calAnchor, dir * 3);
   }
   function layoutTimed(events) {
     var items = [];
@@ -2530,7 +2534,7 @@
     var label = '';
     if (calView === 'day') label = prettyDate(calAnchor);
     else if (calView === 'month') label = MONTHS[+calAnchor.slice(5, 7) - 1] + ' ' + calAnchor.slice(0, 4);
-    else label = prettyDate(mondayOf(calAnchor)) + ' – ' + prettyDate(addDays(mondayOf(calAnchor), 6));
+    else label = prettyDate(calAnchor) + ' – ' + prettyDate(addDays(calAnchor, 2));
     html += '<div class="cal-toolbar"><div class="seg">';
     ['day', 'week', 'month'].forEach(function (v) {
       html += '<button type="button" data-act="calview" data-id="' + v + '" class="' + (calView === v ? 'on' : '') + '">' + v.charAt(0).toUpperCase() + v.slice(1) + '</button>';
@@ -2545,52 +2549,24 @@
     if (note && calMode === 'open') html += '<p class="muted">' + esc(note) + '</p>';
     if (calView === 'day') html += renderDayView(calAnchor);
     else if (calView === 'month') html += renderMonthView(calAnchor);
-    else html += renderWeekView(mondayOf(calAnchor));
+    else html += renderWeekView(calAnchor);
     html += '<p class="cal-foot">Tap an event for details. Google Calendar is read-only. Quick add stays on this device. Weeks start Monday, times are Europe/Berlin.</p></div>';
     return html;
   }
-  function renderWeekView(monday) {
-    var map = forecastMap();
-    var html = '<div class="card week-card"><div class="week-scroll"><div class="week-head"><div></div>';
-    for (var i = 0; i < 7; i++) {
-      var ymd = addDays(monday, i);
-      var fx = map[ymd];
+  function renderWeekView(start) {
+    var html = '<div class="three-days">';
+    for (var i = 0; i < 3; i++) {
+      var ymd = addDays(start, i);
+      var events = dayEvents(ymd, true);
       var today = ymd === currentYmd();
-      html += '<div class="dh"><div class="dh-name">' + WD_SHORT[weekdayIndex(ymd)] + '</div><div class="dh-num' + (today ? ' today' : '') + '">' + (+ymd.slice(8)) + '</div>';
-      if (fx && fx.high != null) html += '<span class="dh-wx">' + fx.high + '°</span>';
-      html += '</div>';
-    }
-    html += '</div><div class="allday-row"><div></div>';
-    for (var c = 0; c < 7; c++) {
-      var day = addDays(monday, c);
-      var all = dayEvents(day, true).filter(function (ev) { return !ev.time; });
-      html += '<div class="allday-col">';
-      all.slice(0, 3).forEach(function (ev) {
-        html += '<button type="button" class="mini ' + kindOf(ev) + '" data-act="event" data-key="' + esc(evKey(day, ev)) + '">' + esc(ev.title) + '</button>';
+      html += '<section class="card day-col-list"><h2>' + esc(WD_SHORT[weekdayIndex(ymd)] + ' ' + (+ymd.slice(8))) + (today ? ' · Today' : '') + '</h2>';
+      if (!events.length) html += '<p class="muted">Nothing on this day.</p>';
+      events.forEach(function (ev) {
+        html += '<button type="button" class="today-row ' + kindOf(ev) + '" data-act="event" data-key="' + esc(evKey(ymd, ev)) + '"><span class="t-time">' + esc(ev.time ? fmtRange(ev.time, ev.end) : 'All day') + '</span><span>' + esc(ev.title) + '</span></button>';
       });
-      if (all.length > 3) html += '<div class="muted">+' + (all.length - 3) + '</div>';
-      html += '</div>';
+      html += '</section>';
     }
-    html += '</div><div class="week-body"><div class="hours">';
-    for (var h = 7; h <= 20; h++) html += '<div class="hour">' + h + '</div>';
     html += '</div>';
-    for (var d = 0; d < 7; d++) {
-      var y = addDays(monday, d);
-      var timed = layoutTimed(dayEvents(y, true).filter(function (ev) { return !!ev.time; }));
-      html += '<div class="day-col">';
-      for (var line = 0; line < 14; line++) html += '<div class="hline"></div>';
-      timed.forEach(function (it) {
-        var top = ((Math.max(it.start, 7 * 60) - 7 * 60) / (14 * 60)) * 100;
-        var end = Math.min(it.end, 21 * 60);
-        var start = Math.max(it.start, 7 * 60);
-        var height = Math.max(3.2, ((end - start) / (14 * 60)) * 100);
-        var width = 100 / it.total;
-        var left = it.col * width;
-        html += '<button type="button" class="ev-block ' + kindOf(it.ev) + '" style="top:' + top + '%;height:' + height + '%;left:' + left + '%;width:' + (width - 1.5) + '%" data-act="event" data-key="' + esc(evKey(y, it.ev)) + '"><b>' + esc(it.ev.title) + '</b><span>' + esc(fmtRange(it.ev.time, it.ev.end)) + '</span></button>';
-      });
-      html += '</div>';
-    }
-    html += '</div></div></div>';
     return html;
   }
   function renderDayView(ymd) {
@@ -3701,6 +3677,7 @@
     if (act === 'note-save') { hub.note = val('noteText'); saveHub(); closeOverlay(); render(); return; }
     if (act === 'calview') { calView = id; render(); return; }
     if (act === 'calshift') { shiftAnchor(+id); render(); return; }
+    if (act === 'wx-more') { wxPage = wxPage >= 2 ? 0 : wxPage + 1; render(); return; }
     if (act === 'caltoday') { calAnchor = currentYmd(); render(); return; }
     if (act === 'openday') { calAnchor = id; calView = 'day'; render(); return; }
     if (act === 'filter-kid') { kidOn[id] = !kidOn[id]; render(); return; }
