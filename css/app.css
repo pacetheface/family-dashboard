@@ -724,7 +724,7 @@ button, .btn, .pill, .q-pill, .badge, .checkin { font-weight: 600; }
 .star-step { display: flex; align-items: center; gap: 6px; font-size: 20px; font-weight: 800; white-space: nowrap; }
 .star-step button { min-width: 48px; min-height: 60px; border-radius: 12px; background: #fff; font-size: 28px; font-weight: 800; color: #003253; }
 .list-code { width: 100%; margin-top: 8px; font-family: inherit; }
-html { font-size: 32px; font-size: clamp(18px, min(1.667vw, 2.963vh), 80px); }
+html { --type: 1; font-size: 32px; font-size: calc(clamp(18px, min(1.667vw, 2.963vh), 80px) * var(--type)); }
 body, button, input, select, textarea { font-size: 1rem; }
 .brand h1, .clock { font-size: 2.2rem; }
 .navbtn { width: 100%; font-size: 0.62rem; line-height: 1.1; padding: 0.35rem 0.2rem; white-space: normal; text-align: center; }
@@ -788,7 +788,7 @@ h3, .banner h3, .side-card h3, .meal h3, .kid-head h3 { font-size: 1.45rem; }
 .note-actions { flex-wrap: wrap; }
 .note-actions .btn, .jar-row .btn { max-width: 100%; }
 .pin-keys button { font-size: 1.4rem; min-height: 3.4rem; }
-.photo-credit { font-size: 0.7rem; right: 0.4rem; bottom: 0.3rem; padding: 0.1rem 0.35rem; }
+.photo-credit { font-size: 11px; right: 8px; bottom: 6px; padding: 2px 6px; }
 @supports ((backdrop-filter: blur(8px)) or (-webkit-backdrop-filter: blur(8px))) {
   .card, .m-col, .banner, .side-card, .sheet, .meal, .wxday, .m-sw, .aft-card, .count-card,
   .m-top, .m-top.urg-ok, .m-top.urg-yellow, .m-top.urg-orange, .m-top.urg-red, .m-top.urg-gone, .m-top.urg-off {
@@ -819,3 +819,20 @@ h3, .banner h3, .side-card h3, .meal h3, .kid-head h3 { font-size: 1.45rem; }
   .wx-windows span { white-space: nowrap; }
   .photo-credit { position: static; display: inline-block; margin: 0.4rem 0.6rem 0.6rem auto; }
 }
+.type-picks { display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; }
+.type-picks button { min-height: 3.4rem; font-size: 1.2rem; background: #fff; color: #003253; border-radius: 16px; }
+.type-picks button.on { background: #1872A0; color: #fff; }
+html[data-size="xl"] .kid-strip,
+html[data-size="xl"] .three-days,
+html[data-size="xl"] .wxstrip,
+html[data-size="xl"] .meal-grid,
+html[data-size="xl"] .recipe-grid,
+html[data-size="xl"] .pills,
+html[data-size="xl"] .home-banners {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+html[data-size="xl"] .home-late,
+html[data-size="xl"] .play { grid-template-columns: 1fr; }
+html[data-size="xl"] .m-cols { flex-wrap: wrap; }
+html[data-size="xl"] .m-col { flex: 1 1 46%; }
+html[data-size="xl"] .topbar { flex-wrap: wrap; }
