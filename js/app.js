@@ -9,6 +9,8 @@
   var HUB_KEY = 'knappHub1';
   var KEY_CACHE = 'knappDashKey';
   var SOUND_KEY = 'knappSound';
+  var TYPE_KEY = 'knappType';
+  var TYPE_SCALE = { s: 0.85, m: 1, l: 1.25, xl: 1.5 };
   var WX_KEY = 'knappWx';
   var WAKE = 6 * 60 + 30;
   var LEAVE = { West: 7 * 60 + 10, Jack: 7 * 60 + 10, June: 7 * 60 + 30 };
@@ -154,6 +156,15 @@
     { id: 'date', label: 'Date', icon: 'heart' }
   ];
 
+  var typeSize = 'm';
+  function applyType(size, save) {
+    if (!TYPE_SCALE[size]) size = 'm';
+    typeSize = size;
+    var root = document.documentElement;
+    root.style.setProperty('--type', String(TYPE_SCALE[size]));
+    root.setAttribute('data-size', size);
+    if (save) { try { localStorage.setItem(TYPE_KEY, size); } catch (e) {} }
+  }
   var Q = {};
   (function () {
     var s = location.search.charAt(0) === '?' ? location.search.slice(1) : location.search;
@@ -3255,6 +3266,11 @@
   function settingsHtml() {
     var when = DATA && DATA.generatedAt ? DATA.generatedAt.replace('T', ' ').slice(0, 16) + ' UTC' : 'not open';
     var html = '<h2>Settings</h2>';
+    html += '<h3>Text size</h3><p class="muted">Saved on this screen only, so the TV and a monitor can differ. Normal matches the room size.</p><div class="type-picks">';
+    [['s', 'Small'], ['m', 'Normal'], ['l', 'Large'], ['xl', 'Extra large']].forEach(function (pair) {
+      html += '<button type="button" class="' + (typeSize === pair[0] ? 'on' : '') + '" data-act="type-size" data-id="' + pair[0] + '">' + pair[1] + '</button>';
+    });
+    html += '</div>';
     html += '<p><button type="button" class="btn dark" data-act="sound" data-role="sound">Enable sound</button></p>';
     html += '<p class="muted">Sound plays a chime and, if the browser can talk, speaks at 15, 10, and 5 minutes before the boys leave at 7:10 and June at 7:30. Browsers stay quiet until this is tapped. The screen stay-awake request runs after a tap too. The page reloads itself once around 3:00 so the new day shows up.</p>';
     html += '<h3>Calendar password</h3>';
@@ -3670,6 +3686,7 @@
       return;
     }
     if (act === 'settings') { openOverlay({ type: 'settings' }); return; }
+    if (act === 'type-size') { applyType(id, true); render(); return; }
     if (act === 'bell') { openOverlay({ type: 'bell' }); return; }
     if (act === 'quick') { openOverlay({ type: 'quick' }); return; }
     if (act === 'voice') { startVoice(); return; }
@@ -4225,6 +4242,12 @@
 
   try { localStorage.removeItem('knappUnlocked'); } catch (e) {}
   try { soundOn = localStorage.getItem(SOUND_KEY) === '1'; } catch (e2) {}
+  (function () {
+    var saved = '';
+    try { saved = localStorage.getItem(TYPE_KEY) || ''; } catch (e) {}
+    if (Q.size && TYPE_SCALE[Q.size]) applyType(Q.size, true);
+    else applyType(TYPE_SCALE[saved] ? saved : 'm', false);
+  })();
   try {
     var savedWx = localStorage.getItem(WX_KEY);
     if (savedWx) WX = JSON.parse(savedWx);
