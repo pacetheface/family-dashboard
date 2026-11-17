@@ -11,6 +11,9 @@
   var SOUND_KEY = 'knappSound';
   var TYPE_KEY = 'knappType';
   var TYPE_SCALE = { s: 0.85, m: 1, l: 1.25, xl: 1.5 };
+  var KIDS_TV_KEY = 'knappKidsTv';
+  var KIDS_SIZE_KEY = 'knappKidsSize';
+  var KIDS_STEPS = [0.85, 1, 1.2, 1.45];
   var WX_KEY = 'knappWx';
   var WAKE = 6 * 60 + 30;
   var LEAVE = { West: 7 * 60 + 10, Jack: 7 * 60 + 10, June: 7 * 60 + 30 };
@@ -159,6 +162,25 @@
   ];
 
   var typeSize = 'm';
+  var kidsStepIndex = 1;
+  function kidsTvOn() {
+    if (Q.tv === '0') return false;
+    if (Q.tv === '1') return true;
+    try {
+      var saved = localStorage.getItem(KIDS_TV_KEY);
+      if (saved === '0') return false;
+      if (saved === '1') return true;
+    } catch (e) {}
+    return /Tizen|SMART-TV|SmartTV|Smart-TV/i.test(navigator.userAgent || '');
+  }
+  function applyKidsStep(index, save) {
+    if (isNaN(index)) index = 1;
+    if (index < 0) index = 0;
+    if (index >= KIDS_STEPS.length) index = KIDS_STEPS.length - 1;
+    kidsStepIndex = index;
+    document.documentElement.style.setProperty('--kids-step', String(KIDS_STEPS[index]));
+    if (save) { try { localStorage.setItem(KIDS_SIZE_KEY, String(index)); } catch (e) {} }
+  }
   function applyType(size, save) {
     if (!TYPE_SCALE[size]) size = 'm';
     typeSize = size;
@@ -2618,7 +2640,8 @@
     var mp = morningParts();
     kidsShown = kidsMode(mp);
     var html = kidsShown === 'afternoon' ? (morningLive = false, renderAfternoon()) : renderMorning();
-    return html.replace('<div class="page morning-wall">', '<div class="page morning-wall kids-board"><div class="list-edit-bar"><button type="button" class="btn dark" data-act="edit-lists">Edit checklists</button></div>');
+    var bar = '<div class="list-edit-bar"><div class="kids-size" role="group" aria-label="Text size"><button type="button" data-act="kids-size" data-id="-1" aria-label="Smaller text">A−</button><button type="button" data-act="kids-size" data-id="1" aria-label="Larger text">A+</button></div><button type="button" class="btn dark" data-act="edit-lists">Edit checklists</button></div>';
+    return html.replace('<div class="page morning-wall">', '<div class="page morning-wall kids-board' + (kidsTvOn() ? ' tv' : '') + '">' + bar);
   }
 
   function shiftAnchor(dir) {
@@ -3909,6 +3932,7 @@
       render();
       return;
     }
+    if (act === 'kids-size') { applyKidsStep(kidsStepIndex + (id === '-1' ? -1 : 1), true); return; }
     if (act === 'checkin') { checkIn(kid); render(); return; }
     if (act === 'checkout') { checkOut(kid); return; }
     if (act === 'morn-undo') { undoMorning(kid); render(); return; }
@@ -4369,6 +4393,13 @@
     try { saved = localStorage.getItem(TYPE_KEY) || ''; } catch (e) {}
     if (Q.size && TYPE_SCALE[Q.size]) applyType(Q.size, true);
     else applyType(TYPE_SCALE[saved] ? saved : 'm', false);
+    if (Q.tv === '1' || Q.tv === '0') { try { localStorage.setItem(KIDS_TV_KEY, Q.tv); } catch (eTv) {} }
+    var step = 1;
+    try {
+      var stored = parseInt(localStorage.getItem(KIDS_SIZE_KEY), 10);
+      if (!isNaN(stored)) step = stored;
+    } catch (eStep) {}
+    applyKidsStep(step, false);
   })();
   try {
     var savedWx = localStorage.getItem(WX_KEY);
