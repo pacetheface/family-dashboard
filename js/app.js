@@ -163,6 +163,9 @@
 
   var typeSize = 'm';
   var kidsStepIndex = 1;
+  function applySiteTv() {
+    document.documentElement.classList.toggle('tv', kidsTvOn());
+  }
   function kidsTvOn() {
     if (Q.tv === '0') return false;
     if (Q.tv === '1') return true;
@@ -1838,7 +1841,7 @@
     var voice = canVoice();
     document.getElementById('topbar').innerHTML =
       '<div class="brand"><h1>The Knapps</h1><div class="clock" id="clockTime">' + esc(fmtClock(p)) + '</div>' + (TEST_MODE ? '<span class="test-badge">Test mode</span>' : '') + '<div class="wxchip" id="wxTop">' + wxTopHtml(p) + '</div></div>' +
-      '<div class="top-actions"><button type="button" class="iconbtn" data-act="bell" aria-label="Notifications">' + icon('bell') + (n ? '<span class="dot"></span>' : '') + '</button>' +
+      '<div class="top-actions"><div class="site-size" role="group" aria-label="Text size"><button type="button" data-act="site-size" data-id="-1" aria-label="Smaller text">A−</button><button type="button" data-act="site-size" data-id="1" aria-label="Larger text">A+</button></div><button type="button" class="iconbtn" data-act="bell" aria-label="Notifications">' + icon('bell') + (n ? '<span class="dot"></span>' : '') + '</button>' +
       '<button type="button" class="iconbtn" data-act="settings" aria-label="Settings">' + icon('gear') + '</button>' +
       '<button type="button" class="quick" data-act="quick">' + icon(voice ? 'mic' : 'plus') + ' Quick add</button></div>';
   }
@@ -2640,8 +2643,8 @@
     var mp = morningParts();
     kidsShown = kidsMode(mp);
     var html = kidsShown === 'afternoon' ? (morningLive = false, renderAfternoon()) : renderMorning();
-    var bar = '<div class="list-edit-bar"><div class="kids-size" role="group" aria-label="Text size"><button type="button" data-act="kids-size" data-id="-1" aria-label="Smaller text">A−</button><button type="button" data-act="kids-size" data-id="1" aria-label="Larger text">A+</button></div><button type="button" class="btn dark" data-act="edit-lists">Edit checklists</button></div>';
-    return html.replace('<div class="page morning-wall">', '<div class="page morning-wall kids-board' + (kidsTvOn() ? ' tv' : '') + '">' + bar);
+    var bar = '<div class="list-edit-bar"><button type="button" class="btn dark" data-act="edit-lists">Edit checklists</button></div>';
+    return html.replace('<div class="page morning-wall">', '<div class="page morning-wall kids-board">' + bar);
   }
 
   function shiftAnchor(dir) {
@@ -3932,7 +3935,7 @@
       render();
       return;
     }
-    if (act === 'kids-size') { applyKidsStep(kidsStepIndex + (id === '-1' ? -1 : 1), true); return; }
+    if (act === 'site-size' || act === 'kids-size') { applyKidsStep(kidsStepIndex + (id === '-1' ? -1 : 1), true); return; }
     if (act === 'checkin') { checkIn(kid); render(); return; }
     if (act === 'checkout') { checkOut(kid); return; }
     if (act === 'morn-undo') { undoMorning(kid); render(); return; }
@@ -4394,6 +4397,7 @@
     if (Q.size && TYPE_SCALE[Q.size]) applyType(Q.size, true);
     else applyType(TYPE_SCALE[saved] ? saved : 'm', false);
     if (Q.tv === '1' || Q.tv === '0') { try { localStorage.setItem(KIDS_TV_KEY, Q.tv); } catch (eTv) {} }
+    applySiteTv();
     var step = 1;
     try {
       var stored = parseInt(localStorage.getItem(KIDS_SIZE_KEY), 10);

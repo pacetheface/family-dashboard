@@ -53,6 +53,7 @@ h1, h2, h3, .serif { font-family: var(--sans); font-weight: 800; letter-spacing:
   display: grid;
   grid-template-columns: var(--navw) minmax(0, 1fr);
   min-height: 0;
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px) env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
 }
 .nav {
   background: var(--sidebar);
@@ -724,14 +725,21 @@ button, .btn, .pill, .q-pill, .badge, .checkin { font-weight: 600; }
 .star-step { display: flex; align-items: center; gap: 6px; font-size: 20px; font-weight: 800; white-space: nowrap; }
 .star-step button { min-width: 48px; min-height: 60px; border-radius: 12px; background: #fff; font-size: 28px; font-weight: 800; color: #003253; }
 .list-code { width: 100%; margin-top: 8px; font-family: inherit; }
-html { --type: 1; font-size: 32px; font-size: calc(clamp(18px, min(1.667vw, 2.963vh), 80px) * var(--type)); }
+html {
+  --base: clamp(14px, min(1.1vw, 2vh), 22px);
+  --type: 1;
+  --kids-step: 1;
+  font-size: calc(var(--base) * var(--type) * var(--kids-step));
+}
+html.tv { --base: clamp(28px, min(1.85vw, 3.3vh), 42px); }
 body, button, input, select, textarea { font-size: 1rem; }
 .brand h1, .clock { font-size: 2.2rem; }
 .navbtn { width: 100%; font-size: 0.62rem; line-height: 1.1; padding: 0.35rem 0.2rem; white-space: normal; text-align: center; }
 .navbtn span { display: block; max-width: 100%; }
 .logo { width: 3rem; height: 3rem; font-size: 1.4rem; }
-.iconbtn { width: 3.1rem; height: 3.1rem; }
-.quick, .btn, .pill, .q-pill, .seg button, .checkin, .checkout, .kid-name { font-size: 1.05rem; min-height: 3rem; padding: 0.7rem 1rem; }
+.quick, .btn, .pill, .q-pill, .seg button, .checkin, .checkout, .kid-name { font-size: 1.05rem; min-height: max(44px, 2.75rem); padding: 0.7rem 1rem; }
+.iconbtn { width: max(44px, 3.1rem); height: max(44px, 3.1rem); }
+.navbtn, .chk, .today-row, .person, .pin-keys button { min-height: 44px; }
 .kicker, .m-lbl, .aft-kicker, .today-word, .section-label, .variation-head, .linkish, .legend, .cal-foot, .badge, .test-badge, .sample { font-size: 0.9rem; }
 h2, .page-head h2, .m-head h2, .kid-tile h2, .dayname, .sheet h2, .list-section h3 { font-size: 1.8rem; }
 h3, .banner h3, .side-card h3, .meal h3, .kid-head h3 { font-size: 1.45rem; }
@@ -837,13 +845,7 @@ html[data-size="xl"] .m-cols { flex-wrap: wrap; }
 html[data-size="xl"] .m-col { flex: 1 1 46%; }
 html[data-size="xl"] .topbar { flex-wrap: wrap; }
 
-.kids-board {
-  --kid: clamp(14px, min(1.1vw, 2vh), 22px);
-  font-size: calc(var(--kid) * var(--kids-step, 1));
-  padding-bottom: env(safe-area-inset-bottom, 0px);
-  max-width: 100%;
-}
-.kids-board.tv { --kid: clamp(28px, min(1.85vw, 3.3vh), 42px); }
+.kids-board { max-width: 100%; }
 .kids-board .m-cols { min-width: 0; }
 .kids-board .m-col { min-width: 0; padding: 0.55em 0.6em 0.7em; }
 .kids-board .m-top,
@@ -956,20 +958,17 @@ html[data-size="xl"] .topbar { flex-wrap: wrap; }
 .kids-board .aft-huge { font-size: 1.8em; }
 .kids-board .q-pill { font-size: 0.82em; min-height: 44px; padding: 0.35em 0.55em; }
 .kids-board .list-edit-bar { align-items: center; gap: 0.4em; flex-wrap: wrap; }
-.kids-board .kids-size { display: flex; gap: 0.3em; }
-.kids-board .kids-size button,
-.kids-board .list-edit-bar .btn {
-  font-size: 0.9em;
+.kids-board .list-edit-bar .btn { font-size: 0.9em; min-width: 44px; min-height: 44px; padding: 0.35em 0.7em; }
+.site-size { display: flex; gap: 0.35rem; align-items: center; }
+.site-size button {
   min-width: 44px;
   min-height: 44px;
-  padding: 0.35em 0.7em;
-}
-.kids-board .kids-size button {
-  border: 1px solid #8AA7C4;
-  border-radius: 0.5em;
-  background: #fff;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(251, 254, 255, 0.94);
   color: #003253;
   font-weight: 800;
+  font-size: 1rem;
   cursor: pointer;
 }
 @media (max-width: 1024px) {
