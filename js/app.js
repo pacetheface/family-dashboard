@@ -855,7 +855,7 @@
       if (t.id === 'meds') return name === 'Jack' && school;
       return true;
     });
-    var notes = school ? bagNotes(name, ymd) : [];
+    var notes = school && name !== 'June' ? bagNotes(name, ymd) : [];
     if (notes.length) list = list.concat([{ id: 'bag', label: 'Bag: ' + notes.join(', '), emoji: '🎒', stars: 1 }]);
     return list;
   }
@@ -2101,7 +2101,7 @@
       if (ev.time) line += ' <span class="m-at">· ' + esc(prettyTime(ev.time)) + '</span>';
       html += '<div class="m-ev"><span class="m-eic">' + eventIcon(ev.title) + '</span><span>' + line + '</span></div>';
     });
-    if (kid.bring && kid.bring.length) {
+    if (name !== 'June' && kid.bring && kid.bring.length) {
       html += '<div class="m-lbl">Bring</div><div class="m-chips">';
       kid.bring.forEach(function (item) { html += '<span class="m-chip">' + esc(item) + '</span>'; });
       html += '</div>';
