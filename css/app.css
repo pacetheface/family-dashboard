@@ -836,3 +836,85 @@ html[data-size="xl"] .play { grid-template-columns: 1fr; }
 html[data-size="xl"] .m-cols { flex-wrap: wrap; }
 html[data-size="xl"] .m-col { flex: 1 1 46%; }
 html[data-size="xl"] .topbar { flex-wrap: wrap; }
+
+.kids-board .m-top,
+.kids-board .m-top.urg-ok,
+.kids-board .m-top.urg-yellow,
+.kids-board .m-top.urg-orange,
+.kids-board .m-top.urg-red,
+.kids-board .m-top.urg-gone,
+.kids-board .m-top.urg-off {
+  position: sticky;
+  top: -12px;
+  z-index: 8;
+  flex-wrap: wrap;
+  gap: 0.4rem 1rem;
+  margin: 0 -20px;
+  padding: 0.85rem calc(0.9rem + 20px) 0.7rem;
+  background: #f4f7fb;
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  border-radius: 0;
+  box-shadow: 0 8px 16px rgba(7, 22, 34, 0.12);
+}
+.kids-board .m-clock { width: auto; }
+.kids-board .m-clock-time { font-size: 1.8rem; }
+.kids-board .m-clock-date { font-size: 0.95rem; margin-top: 0; }
+.kids-board .m-top .count-title { font-size: 1rem; }
+.kids-board .m-top .count-big,
+.kids-board .m-top .count-big.small { font-size: 2rem; line-height: 1; }
+.kids-board .m-top .count-sub { font-size: 0.95rem; min-height: 0; }
+.kids-board .m-wx { display: none; }
+.kids-board .kids-gear {
+  flex: 1 0 100%;
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: #003253;
+  line-height: 1.2;
+}
+.kids-board .m-head h2 { font-size: 2.6rem; }
+.kids-board .m-lbl,
+.kids-board .kid-progress-label { font-size: 1.25rem; font-weight: 800; }
+.kids-board .chk.task-card {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  width: 100%;
+  margin: 0.45rem 0;
+  padding: 0.75rem 0.85rem;
+  border: 2px solid #8AA7C4;
+  border-radius: 16px;
+  background: #fff;
+  box-shadow: 0 8px 18px rgba(7, 22, 34, 0.14);
+  font-size: 1.7rem;
+  font-weight: 800;
+  min-height: 4.4rem;
+  text-align: left;
+  color: #071622;
+}
+.kids-board .task-no {
+  flex: 0 0 auto;
+  width: 2.1rem;
+  height: 2.1rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: #1872A0;
+  color: #fff;
+  font-size: 1.15rem;
+}
+.kids-board .task-emoji { flex: 0 0 auto; font-size: 2rem; line-height: 1; }
+.kids-board .chk.task-card .lbl { font-size: 1.7rem; overflow-wrap: normal; word-break: normal; }
+.kids-board .chk.meds .lbl { color: #071622; }
+.kids-board .chk.locked { opacity: 0.72; }
+.kids-board .kid-progress { margin: 0.4rem 0 0.2rem; }
+.kids-board .kid-progress-track {
+  height: 0.7rem;
+  border-radius: 999px;
+  background: #d6dbe7;
+  overflow: hidden;
+}
+.kids-board .kid-progress-track i { display: block; height: 100%; background: #1872A0; }
+.kids-board .checkout { font-size: 1.6rem; }
+.kids-board .m-dayoff,
+.kids-board .m-status { font-size: 1.8rem; }
