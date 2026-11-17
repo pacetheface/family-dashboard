@@ -47,7 +47,7 @@
     '2026-08-15': 'Mariä Himmelfahrt',
     '2026-10-03': 'Tag der Deutschen Einheit',
     '2026-11-01': 'Allerheiligen',
-    '2026-11-18': 'Buß- und Bettag',
+    '2026-11-18': { name: 'Buß- und Bettag', schoolOnly: true },
     '2026-12-25': '1. Weihnachtstag',
     '2026-12-26': '2. Weihnachtstag',
     '2027-01-01': 'Neujahr',
@@ -61,7 +61,7 @@
     '2027-08-15': 'Mariä Himmelfahrt',
     '2027-10-03': 'Tag der Deutschen Einheit',
     '2027-11-01': 'Allerheiligen',
-    '2027-11-17': 'Buß- und Bettag',
+    '2027-11-17': { name: 'Buß- und Bettag', schoolOnly: true },
     '2027-12-25': '1. Weihnachtstag',
     '2027-12-26': '2. Weihnachtstag'
   };
@@ -417,7 +417,27 @@
     }
     return best;
   }
-  function hardOff(ymd) { return isWeekendYmd(ymd) || !!HOLIDAYS[ymd] || !!ferienName(ymd); }
+  function holidayRecord(ymd) {
+    var v = HOLIDAYS[ymd];
+    if (!v) return null;
+    if (typeof v === 'string') return { name: v, schoolOnly: false };
+    return { name: v.name, schoolOnly: !!v.schoolOnly };
+  }
+  function holidayName(ymd) {
+    var h = holidayRecord(ymd);
+    return h ? h.name : '';
+  }
+  function holidayOffFor(kid, ymd) {
+    var h = holidayRecord(ymd);
+    if (!h) return false;
+    if (h.schoolOnly && kid === 'June') return false;
+    return true;
+  }
+  function hardOff(ymd) {
+    if (isWeekendYmd(ymd) || ferienName(ymd)) return true;
+    var h = holidayRecord(ymd);
+    return !!(h && !h.schoolOnly);
+  }
   function minutesOf(t) {
     if (!t) return null;
     var p = String(t).split(':');
@@ -502,8 +522,7 @@
     var of = 0;
     for (var i = 0; i < 5; i++) {
       var d = addDays(monday, i);
-      if (hardOff(d)) continue;
-      if (d === ymd && calendarOff(name, ymd)) continue;
+      if (!kidHasSchool(name, d)) continue;
       of += 1;
       var rec = recordOn(name, d, ymd);
       if (rec && rec.onTime) n += 1;
@@ -903,7 +922,8 @@
     return !!(day && day[kid] && day[kid].noSchool);
   }
   function kidHasSchool(kid, ymd) {
-    if (hardOff(ymd)) return false;
+    if (isWeekendYmd(ymd) || ferienName(ymd)) return false;
+    if (holidayOffFor(kid, ymd)) return false;
     if (calendarOff(kid, ymd)) return false;
     return true;
   }
@@ -937,7 +957,7 @@
     var who = leaveWho(p.ymd);
     var nowMin = p.h * 60 + p.mi + p.s / 60;
     if (!who.boys.length && !who.june) {
-      var reason = HOLIDAYS[p.ymd] || ferienName(p.ymd) || (isWeekendYmd(p.ymd) ? (weekdayIndex(p.ymd) === 0 ? 'Sunday' : 'Saturday') : 'Marked on the calendar');
+      var reason = holidayName(p.ymd) || ferienName(p.ymd) || (isWeekendYmd(p.ymd) ? (weekdayIndex(p.ymd) === 0 ? 'Sunday' : 'Saturday') : 'Marked on the calendar');
       return { mode: 'off', title: 'No school today', big: 'Day off', sub: reason, pct: 0, urg: 'off' };
     }
     if (who.boys.length && nowMin < LEAVE.West) {
@@ -978,7 +998,7 @@
     return { mode: 'wait', title: 'Next school morning', big: fmtLeft(leftSec), sub: when + ' · ' + bits.join(' · '), pct: 0, urg: 'off', ymd: next.ymd };
   }
   function dayOffReason(ymd) {
-    return HOLIDAYS[ymd] || ferienName(ymd) || (weekdayIndex(ymd) === 0 ? 'Sunday' : weekdayIndex(ymd) === 6 ? 'Saturday' : '');
+    return holidayName(ymd) || ferienName(ymd) || (weekdayIndex(ymd) === 0 ? 'Sunday' : weekdayIndex(ymd) === 6 ? 'Saturday' : '');
   }
 
   function dayBucket(ymd) {
@@ -1047,7 +1067,10 @@
     else if (day) list = mergeAll(day);
     list.forEach(add);
     (hub.localEvents || []).forEach(function (ev) { if (ev.ymd === ymd) add(ev); });
-    if (HOLIDAYS[ymd]) add({ title: HOLIDAYS[ymd], allDay: true, time: '', end: '', who: KIDS.slice(), kind: 'holiday', synthetic: true });
+    if (HOLIDAYS[ymd]) {
+      var hol = holidayRecord(ymd);
+      add({ title: hol.name, allDay: true, time: '', end: '', who: hol.schoolOnly ? ['West', 'Jack'] : KIDS.slice(), kind: 'holiday', synthetic: true });
+    }
     var fer = ferienName(ymd);
     if (fer) add({ title: fer, allDay: true, time: '', end: '', who: KIDS.slice(), kind: 'holiday', synthetic: true });
     if (useFilter) out = out.filter(eventVisible);
@@ -1496,7 +1519,7 @@
   function kidsInView() { return playKid === 'all' ? KIDS.slice() : [playKid]; }
   function chipProgress(name, ymd) {
     var group = 'morning';
-    if (hardOff(ymd)) group = 'weekend';
+    if (!kidHasSchool(name, ymd)) group = 'weekend';
     else if (nowParts().h >= 17) group = 'bedtime';
     var tasks = choresOf(name, group);
     var done = 0;
@@ -1539,7 +1562,7 @@
   }
   function holidayChips(ymd) {
     var chips = [];
-    if (HOLIDAYS[ymd]) chips.push(HOLIDAYS[ymd]);
+    if (holidayName(ymd)) chips.push(holidayName(ymd) + (holidayRecord(ymd).schoolOnly ? ' · school' : ''));
     var f = ferienName(ymd);
     if (f) chips.push(f);
     else {
@@ -1553,7 +1576,7 @@
     Object.keys(HOLIDAYS).forEach(function (day) { if (day > ymd && (!best || day < best)) best = day; });
     if (best) {
       var dd = daysBetween(ymd, best);
-      if (dd > 0 && dd <= 45) chips.push(HOLIDAYS[best] + ' in ' + dd + ' days');
+      if (dd > 0 && dd <= 45) chips.push(holidayName(best) + ' in ' + dd + ' days');
     }
     KIDS.forEach(function (name) {
       var md = BIRTH[name].slice(5);
@@ -1574,7 +1597,7 @@
     [[sat, 'Sat'], [sun, 'Sun']].forEach(function (pair) {
       var day = pair[0];
       var label = pair[1];
-      if (HOLIDAYS[day]) bits.push(label + ' · ' + HOLIDAYS[day]);
+      if (holidayName(day)) bits.push(label + ' · ' + holidayName(day));
       var fer = ferienName(day);
       if (fer) bits.push(label + ' · ' + fer);
       dayEvents(day, false).forEach(function (ev) {
@@ -1616,7 +1639,7 @@
     return html;
   }
   function nextTaskLabel(name, ymd) {
-    var group = hardOff(ymd) ? 'weekend' : (nowParts().h >= 17 ? 'bedtime' : 'morning');
+    var group = kidHasSchool(name, ymd) ? (nowParts().h >= 17 ? 'bedtime' : 'morning') : 'weekend';
     var tasks = choresOf(name, group);
     for (var i = 0; i < tasks.length; i++) {
       if (!isDone(name, group, tasks[i].id, ymd)) return tasks[i].label;
@@ -1745,6 +1768,8 @@
     return root.days[ymd][name] || null;
   }
   function kidStatusBits(name) {
+    var p = morningParts();
+    if (kidsMode(p) !== 'afternoon' && !kidHasSchool(name, p.ymd)) return { status: 'No school', sub: '' };
     var aft = aftPeek(name);
     var k = kidState(name);
     if (aft && aft.screensAt) return { status: 'Screens unlocked', sub: fmtAt(aft.screensAt) };
@@ -2155,7 +2180,7 @@
     return 'Not answered';
   }
   function aftCanIn(name, p) {
-    if (isWeekendYmd(p.ymd) || hardOff(p.ymd)) return true;
+    if (!kidHasSchool(name, p.ymd)) return true;
     return aftNowMin(p) >= aftHomeMin(name, p);
   }
   function aftLeftLabel(minsFloat) {
@@ -2218,7 +2243,7 @@
     var rec = aftRec(name);
     var home = aftHomeStr(name, p);
     var left = aftHomeMin(name, p) - aftNowMin(p);
-    var school = !isWeekendYmd(p.ymd) && !hardOff(p.ymd);
+    var school = kidHasSchool(name, p.ymd);
     var who = name === 'June' ? 'Leaving Kinderhaus' : (name === 'Jack' ? 'Leaving OGT' : 'Leaving school');
     var html = '<section class="m-col ' + name.toLowerCase() + '">';
     var morn = morningStamp(name);
@@ -3217,7 +3242,7 @@
           var rec = aftRec(name);
           if (phase === 'wait') {
             var left = aftHomeMin(name, mp) - aftNowMin(mp);
-            var school = !isWeekendYmd(mp.ymd) && !hardOff(mp.ymd);
+            var school = kidHasSchool(name, mp.ymd);
             el.textContent = left > 0 && school ? aftLeftLabel(left) : 'Home';
           } else if (phase === 'land') {
             el.textContent = aftLeftLabel((rec.inAt + aftRoot().landMin * 60000 - morningNowMs()) / 60000);
