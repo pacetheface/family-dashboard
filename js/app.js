@@ -546,25 +546,26 @@
   function seedMorning() {
     return {
       West: [
-        { id: 'dress', label: 'Get dressed' },
-        { id: 'teeth', label: 'Brush teeth' },
-        { id: 'hw', label: 'Homework done' },
-        { id: 'box', label: 'Brotbox in bag' },
-        { id: 'weather', label: 'Check the weather' }
+        { id: 'dress', label: 'Get dressed', emoji: '👕' },
+        { id: 'teeth', label: 'Brush teeth', emoji: '🦷' },
+        { id: 'hw', label: 'Homework done', emoji: '📘' },
+        { id: 'box', label: 'Brotbox in bag', emoji: '🥪' },
+        { id: 'weather', label: 'Check the weather', emoji: '🌤️' }
       ],
       Jack: [
-        { id: 'meds', label: 'Meds taken' },
-        { id: 'dress', label: 'Get dressed' },
-        { id: 'teeth', label: 'Brush teeth' },
-        { id: 'hw', label: 'Homework done' },
-        { id: 'box', label: 'Brotbox in bag' },
-        { id: 'weather', label: 'Check the weather' }
+        { id: 'meds', label: 'Take your medicine', emoji: '💊' },
+        { id: 'dress', label: 'Get dressed', emoji: '👕' },
+        { id: 'teeth', label: 'Brush teeth', emoji: '🦷' },
+        { id: 'hw', label: 'Homework done', emoji: '📘' },
+        { id: 'box', label: 'Brotbox in bag', emoji: '🥪' },
+        { id: 'weather', label: 'Check the weather', emoji: '🌤️' }
       ],
       June: [
-        { id: 'dress', label: 'Get dressed' },
-        { id: 'teeth', label: 'Brush teeth' },
-        { id: 'snack', label: 'Snack packed' },
-        { id: 'clothes', label: 'Weather clothes on' }
+        { id: 'dress', label: 'Get dressed', emoji: '👕' },
+        { id: 'teeth', label: 'Brush teeth', emoji: '🦷' },
+        { id: 'snack', label: 'Snack packed', emoji: '🍎' },
+        { id: 'clothes', label: 'Weather clothes on', emoji: '🧥' },
+        { id: 'pack', label: 'Pack snack, slippers, and weather gear', emoji: '🎒' }
       ]
     };
   }
@@ -782,7 +783,16 @@
       (hub.chores[name].morning || []).forEach(function (t) {
         if (t.emoji == null) { t.emoji = ''; dirty = true; }
         if (t.stars == null) { t.stars = 1; dirty = true; }
+        if (name === 'Jack' && t.id === 'meds' && t.label === 'Meds taken') {
+          t.label = 'Take your medicine';
+          t.emoji = '💊';
+          dirty = true;
+        }
       });
+      if (name === 'June' && hub.chores.June && hub.chores.June.morning && !hub.chores.June.morning.some(function (t) { return t.id === 'pack'; })) {
+        hub.chores.June.morning.push({ id: 'pack', label: 'Pack snack, slippers, and weather gear', emoji: '🎒', stars: 1 });
+        dirty = true;
+      }
     });
     if (dirty) saveHub();
   }
@@ -804,6 +814,67 @@
     var list = hub.chores && hub.chores[name] && hub.chores[name].morning;
     return list || [];
   }
+  var TASK_EMOJI = { dress: '👕', teeth: '🦷', hw: '📘', box: '🥪', weather: '🌤️', meds: '💊', snack: '🍎', clothes: '🧥', pack: '🎒', bag: '🎒', coat: '🧥', shoes: '👟' };
+  function taskEmoji(t) {
+    if (!t) return '✅';
+    if (t.emoji) return String(t.emoji);
+    return TASK_EMOJI[t.id] || '✅';
+  }
+  function bagNotes(name, ymd) {
+    if (calMode !== 'open' || !DATA) return [];
+    var day = dayBucket(ymd);
+    var kid = day && day[name];
+    if (!kid) return [];
+    var notes = [];
+    function push(text) {
+      text = String(text || '').replace(/\s+/g, ' ').replace(/^\s+|\s+$/g, '');
+      if (text.length > 80) text = text.slice(0, 80);
+      if (!text) return;
+      var low = text.toLowerCase();
+      for (var i = 0; i < notes.length; i++) if (notes[i].toLowerCase() === low) return;
+      notes.push(text);
+    }
+    (kid.bring || []).forEach(push);
+    (kid.events || []).forEach(function (ev) {
+      if (ev.bring && ev.bring.length) ev.bring.forEach(push);
+      var title = String(ev.title || '').replace(/^\s+|\s+$/g, '');
+      if (!title) return;
+      var allDay = ev.allDay || !ev.time;
+      if (allDay) {
+        if (/^(due|fällig|faellig|reminder|erinnerung|to[\s-]?do|deadline)\b/i.test(title)) push(title);
+        return;
+      }
+      push(title);
+    });
+    return notes.slice(0, 3);
+  }
+  function kidsDayTasks(name, ymd) {
+    var school = kidHasSchool(name, ymd);
+    var list = morningTasks(name).filter(function (t) {
+      if (t.id === 'pack') return name === 'June' && school;
+      if (t.id === 'meds') return name === 'Jack' && school;
+      return true;
+    });
+    var notes = school ? bagNotes(name, ymd) : [];
+    if (notes.length) list = list.concat([{ id: 'bag', label: 'Bag: ' + notes.join(', '), emoji: '🎒', stars: 1 }]);
+    return list;
+  }
+  function progressHtml(done, total) {
+    if (!total) return '';
+    var pct = Math.round(100 * done / total);
+    return '<div class="kid-progress"><div class="kid-progress-track"><i style="width:' + pct + '%"></i></div><div class="kid-progress-label">' + done + ' of ' + total + ' done</div></div>';
+  }
+  function kidsGearLine(p) {
+    var w = currentWeather(p);
+    if (!w) return 'Bad Tölz · weather in Celsius';
+    var wet = w.kind === 'rain' || w.kind === 'storm' || (w.rain != null && w.rain >= 40);
+    var gear = 'no extra gear';
+    if (w.kind === 'snow' || w.temp <= 8) gear = 'hat';
+    else if (wet && w.temp >= 18) gear = 'umbrella';
+    else if (wet) gear = 'rain jacket';
+    else if (w.temp >= 24) gear = 'hat';
+    return 'Bad Tölz · ' + w.temp + '°C · ' + gear;
+  }
   function taskText(t) {
     if (!t) return '';
     return (t.emoji ? String(t.emoji) + ' ' : '') + (t.label || '');
@@ -819,7 +890,7 @@
     return list || [];
   }
   function allChecked(name) {
-    var tasks = morningTasks(name);
+    var tasks = kidsDayTasks(name, morningParts().ymd);
     if (!tasks.length) return false;
     var k = kidState(name);
     for (var i = 0; i < tasks.length; i++) if (!k.checks[tasks[i].id]) return false;
@@ -1999,15 +2070,18 @@
       '<div class="m-meta">' + lines.map(function (line) { return '<div>' + esc(line) + '</div>'; }).join('') + '</div></div>';
     return html;
   }
-  function wallListHtml(name, open, saved) {
-    var tasks = morningTasks(name);
+  function wallListHtml(name, open, saved, ymd) {
+    var tasks = kidsDayTasks(name, ymd);
     var k = (open || saved) ? kidState(name) : { checks: {} };
+    var done = 0;
     var html = '<div class="m-lbl">Checklist</div>';
-    tasks.forEach(function (t) {
+    tasks.forEach(function (t, i) {
       var on = !!k.checks[t.id];
-      html += '<button type="button" class="chk' + (on ? ' done' : '') + (open ? '' : ' locked') + (t.id === 'meds' ? ' meds' : '') + '" data-act="toggle" data-kid="' + name + '" data-id="' + esc(t.id) + '" aria-pressed="' + (on ? 'true' : 'false') + '"' + (open ? '' : ' disabled') + '>' +
-        '<span class="box"><span class="tick"></span></span><span class="lbl">' + esc(taskText(t)) + '</span></button>';
+      if (on) done += 1;
+      html += '<button type="button" class="chk task-card' + (on ? ' done' : '') + (open ? '' : ' locked') + (t.id === 'meds' ? ' meds' : '') + '" data-act="toggle" data-kid="' + name + '" data-id="' + esc(t.id) + '" aria-pressed="' + (on ? 'true' : 'false') + '"' + (open ? '' : ' disabled') + '>' +
+        '<span class="task-no">' + (i + 1) + '</span><span class="task-emoji">' + esc(taskEmoji(t)) + '</span><span class="box"><span class="tick"></span></span><span class="lbl">' + esc(t.label) + '</span></button>';
     });
+    html += progressHtml(done, tasks.length);
     if (open) html += '<button type="button" class="m-reset" id="reset-' + name + '" data-act="reset" data-kid="' + name + '">' + esc(resetLabel(name)) + '</button>';
     return html;
   }
@@ -2083,8 +2157,8 @@
   }
   function aftScreenItems(name, p) {
     var sc = aftKid(name).screens || [];
-    var items = sc.map(function (it) { return { key: it.id, label: taskText(it), read: /reading/i.test(it.label), fri: false, stars: starCount(it, 0) }; });
-    if (aftFri(p) && name !== 'June' && sc.length) items.unshift({ key: 'WH', label: aftRoot().whw || 'Weekend homework', read: false, fri: true, stars: 0 });
+    var items = sc.map(function (it) { return { key: it.id, label: it.label, emoji: it.emoji, read: /reading/i.test(it.label), fri: false, stars: starCount(it, 0) }; });
+    if (aftFri(p) && name !== 'June' && sc.length) items.unshift({ key: 'WH', label: aftRoot().whw || 'Weekend homework', emoji: '📘', read: false, fri: true, stars: 0 });
     var easy = aftRec(name).easy || 0;
     if (easy === 2) return [];
     if (easy === 1) {
@@ -2235,9 +2309,10 @@
     if (root.days && root.days[ymd]) delete root.days[ymd][name];
     aftSave();
   }
-  function aftCheckHtml(name, key, label, fri) {
-    var on = aftOn(name, key);
-    return '<button type="button" class="chk' + (on ? ' done' : '') + (fri ? ' fri' : '') + '" data-act="aft-check" data-kid="' + name + '" data-id="' + esc(key) + '" aria-pressed="' + (on ? 'true' : 'false') + '"><span class="box"><span class="tick"></span></span><span class="lbl">' + esc(label) + '</span></button>';
+  function aftCheckHtml(name, item, fri, index) {
+    var id = item.id || item.key;
+    var on = aftOn(name, id);
+    return '<button type="button" class="chk task-card' + (on ? ' done' : '') + (fri ? ' fri' : '') + '" data-act="aft-check" data-kid="' + name + '" data-id="' + esc(id) + '" aria-pressed="' + (on ? 'true' : 'false') + '"><span class="task-no">' + (index + 1) + '</span><span class="task-emoji">' + esc(taskEmoji({ id: id, emoji: item.emoji })) + '</span><span class="box"><span class="tick"></span></span><span class="lbl">' + esc(item.label) + '</span></button>';
   }
   function aftColumn(name, p) {
     var rec = aftRec(name);
@@ -2273,19 +2348,30 @@
     });
     html += '</div><input class="field aft-field" data-act="aft-note" data-kid="' + name + '" maxlength="80" placeholder="A short note" value="' + esc(rec.needNote || '') + '" inputmode="text" enterkeyhint="done">';
     html += '<div class="m-lbl">Want to tell us something?</div><textarea class="field aft-field" data-act="aft-msg" data-kid="' + name + '" maxlength="160" rows="2" placeholder="A message for Mom or Dad">' + esc(rec.message || '') + '</textarea>';
+    var cardN = 0;
+    var cardDone = 0;
+    function addCard(it, fri) {
+      var id = it.id || it.key;
+      if (aftOn(name, id)) cardDone += 1;
+      html += aftCheckHtml(name, it, !!fri, cardN);
+      cardN += 1;
+    }
     html += '<div class="m-lbl">Arrival</div>';
-    (aftKid(name).arrival || []).forEach(function (it) { html += aftCheckHtml(name, it.id, taskText(it), false); });
+    (aftKid(name).arrival || []).forEach(function (it) { addCard(it, false); });
     if (rec.easy !== 2) {
       html += '<div class="m-lbl">Before screens</div>';
-      aftScreenItems(name, p).forEach(function (it) { html += aftCheckHtml(name, it.key, it.label, it.fri); });
+      aftScreenItems(name, p).forEach(function (it) { addCard(it, it.fri); });
     }
     if (rec.easy !== 2 && aftNowMin(p) >= 18 * 60) {
       var evening = aftKid(name).evening || [];
       if (evening.length) {
         html += '<div class="m-lbl">Evening</div>';
-        evening.forEach(function (it) { html += aftCheckHtml(name, it.id, taskText(it), false); });
+        evening.forEach(function (it) { addCard(it, false); });
       }
     }
+    html += progressHtml(cardDone, cardN);
+    if (rec.finishedAt) html += '<div class="m-status">Finished ' + fmtAt(rec.finishedAt) + ' ✓</div>';
+    else html += '<button type="button" class="checkout" data-act="aft-finish" data-kid="' + name + '">Finished</button>';
     if (rec.screensAt) html += '<div class="aft-unlock">Screens unlocked ' + fmtAt(rec.screensAt) + '</div>';
     html += '<div class="aft-parent"><span>Parent</span>';
     html += '<button type="button" class="' + (rec.easy === 1 ? 'on' : '') + '" data-act="aft-easy" data-kid="' + name + '" data-id="1">Easy day</button>';
@@ -2367,6 +2453,7 @@
     html += '<div class="m-mid"><div class="count-title" id="countTitle">' + esc(model.title) + '</div><div class="count-big" id="countBig">' + esc(model.big) + '</div><div class="count-sub" id="countSub">' + esc(model.sub) + '</div></div>';
     html += '<div class="m-wx"><div class="m-wx-main" id="mWxMain">' + (weather ? weatherSvg(weather.kind) + '<span class="m-temp">' + weather.temp + '°</span>' : '<span class="m-temp">—</span>') + '</div>';
     html += '<div class="m-wx-sub" id="mWxSub">' + esc(weather ? (weather.word + (weather.hint ? ' · ' + weather.hint : '')) : 'Weather for Bad Tölz') + '</div></div>';
+    html += '<div class="kids-gear" id="kidsGear">' + esc(kidsGearLine(p)) + '</div>';
     html += '<div class="bar" id="bar"><i id="barFill" style="width:0"></i></div></section><div class="m-cols">';
     KIDS.forEach(function (name) { html += aftColumn(name, p); });
     html += '</div></div>';
@@ -2386,6 +2473,7 @@
     html += '<div class="m-wx"><div class="m-wx-main" id="mWxMain">' + (weather ? weatherSvg(weather.kind) + '<span class="m-temp">' + weather.temp + '°</span>' : '<span class="m-temp">—</span>') + '</div>';
     html += '<div class="m-wx-sub" id="mWxSub">' + esc(weather ? (weather.word + (weather.hint ? ' · ' + weather.hint : '')) : 'Weather for Bad Tölz') + '</div>';
     html += '<button type="button" class="sound" id="soundBtn" data-act="sound" data-role="sound">Enable sound</button></div>';
+    html += '<div class="kids-gear" id="kidsGear">' + esc(kidsGearLine(mp)) + '</div>';
     html += '<div class="bar" id="bar"><i id="barFill" style="width:' + model.pct + '%"></i></div></section>';
     html += '<div class="m-cols">';
     KIDS.forEach(function (name) {
@@ -2401,13 +2489,13 @@
       if (school && !started) {
         html += '<button type="button" class="checkin ' + name.toLowerCase() + '"' + (live ? ' data-act="checkin" data-kid="' + name + '"' : ' disabled') + '>Check in</button>';
       }
-      if (leftHouse) html += '<div class="m-status">Checked out ' + fmtAt(kidNow.outAt) + ' ✓<span class="sub">Checked in ' + fmtAt(kidNow.inAt) + '</span></div>';
+      if (leftHouse) html += '<div class="m-status">Finished ' + fmtAt(kidNow.outAt) + ' ✓<span class="sub">Checked in ' + fmtAt(kidNow.inAt) + '</span></div>';
       html += '<div class="m-head"><h2>' + esc(name) + '</h2><span class="badge' + (good ? ' good' : '') + '">' + esc(badge) + '</span></div>';
       if (!leftHouse) html += wallTimerHtml(name, day, live);
       html += wallCalendarHtml(name, day);
-      if (school) html += wallListHtml(name, open, live && started);
+      if (school) html += wallListHtml(name, open, live && started, day);
       if (open) {
-        html += '<div class="m-foot"><button type="button" class="checkout" data-act="checkout" data-kid="' + name + '">Check out</button>';
+        html += '<div class="m-foot"><button type="button" class="checkout" data-act="checkout" data-kid="' + name + '">Finished</button>';
         html += '<div class="aft-parent"><span>Parent</span><button type="button" data-act="morn-undo" data-kid="' + name + '">Undo</button></div></div>';
       } else if (leftHouse) {
         html += '<div class="aft-parent"><span>Parent</span><button type="button" data-act="morn-undo" data-kid="' + name + '">Undo</button></div>';
@@ -2530,7 +2618,7 @@
     var mp = morningParts();
     kidsShown = kidsMode(mp);
     var html = kidsShown === 'afternoon' ? (morningLive = false, renderAfternoon()) : renderMorning();
-    return html.replace('<div class="page morning-wall">', '<div class="page morning-wall"><div class="list-edit-bar"><button type="button" class="btn dark" data-act="edit-lists">Edit checklists</button></div>');
+    return html.replace('<div class="page morning-wall">', '<div class="page morning-wall kids-board"><div class="list-edit-bar"><button type="button" class="btn dark" data-act="edit-lists">Edit checklists</button></div>');
   }
 
   function shiftAnchor(dir) {
@@ -3234,6 +3322,8 @@
       var weather = currentWeather(nowParts());
       if (wxMain) wxMain.innerHTML = weather ? weatherSvg(weather.kind) + '<span class="m-temp">' + weather.temp + '°</span>' : '<span class="m-temp">—</span>';
       if (wxSub) wxSub.textContent = weather ? (weather.word + (weather.hint ? ' · ' + weather.hint : '')) : 'Weather for Bad Tölz';
+      var gear = document.getElementById('kidsGear');
+      if (gear) gear.textContent = kidsGearLine(nowParts());
       if (card.getAttribute('data-phase') === 'afternoon') {
         KIDS.forEach(function (name) {
           var el = document.getElementById('aftBig-' + name);
@@ -3476,7 +3566,7 @@
   function uncheckedMorning(name) {
     var k = kidState(name);
     var n = 0;
-    morningTasks(name).forEach(function (t) { if (!k.checks[t.id]) n++; });
+    kidsDayTasks(name, morningParts().ymd).forEach(function (t) { if (!k.checks[t.id]) n++; });
     return n;
   }
   function persistMorning() {
@@ -3490,7 +3580,7 @@
     else k.doneAt = null;
     persistMorning();
     if (TEST_MORNING) return;
-    var task = morningTasks(name).filter(function (t) { return t.id === id; })[0];
+    var task = kidsDayTasks(name, morningParts().ymd).filter(function (t) { return t.id === id; })[0];
     setChoreStar(name, id, !!k.checks[id], task ? task.label : 'Morning task', starCount(task, 1));
     syncMorningStar(name);
   }
@@ -3699,6 +3789,11 @@
     if (act === 'aft-in') { aftPunchIn(kid); render(); return; }
     if (act === 'aft-land') { aftLand(kid); render(); return; }
     if (act === 'aft-check') { aftToggle(kid, id); aftMaybeScreens(kid); aftSave(); render(); return; }
+    if (act === 'aft-finish') {
+      var fin = aftRec(kid);
+      if (fin.inAt && !fin.finishedAt) { fin.finishedAt = morningNowMs(); aftSave(); render(); }
+      return;
+    }
     if (act === 'aft-hw') { aftHomework(kid, id); render(); return; }
     if (act === 'aft-need') { aftNeed(kid, id); render(); return; }
     if (act === 'aft-note' || act === 'aft-msg') return;
