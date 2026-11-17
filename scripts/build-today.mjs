@@ -400,10 +400,18 @@ function isHomework(ev, today) {
   return false;
 }
 
+const REMINDER_TITLE = /^(due|fällig|faellig|reminder|erinnerung|to[\s-]?do|deadline)\b/i;
+
 function noSchoolText(ev) {
   if (!ev.allDay) return false;
-  const blob = ((ev.summary || '') + '\n' + (ev.description || '')).toLowerCase();
-  return blob.indexOf('ferien') >= 0 || blob.indexOf('schulfrei') >= 0 || blob.indexOf('no school') >= 0 || blob.indexOf('holiday') >= 0;
+  const title = String(ev.summary || '').replace(/^\s+|\s+$/g, '');
+  if (!title || REMINDER_TITLE.test(title)) return false;
+  const low = title.toLowerCase();
+  if (/(?:^|[^a-zäöüß])no school(?:$|[^a-zäöüß])/.test(low)) return true;
+  if (/(?:^|[^a-zäöüß])school holiday(?:$|[^a-zäöüß])/.test(low)) return true;
+  if (/(?:^|[^a-zäöüß])schulfrei(?:$|[^a-zäöüß])/.test(low)) return true;
+  if (/(?:^|[^a-zäöüß])feiertag/.test(low)) return true;
+  return /(?:^|[^a-zäöüß])[a-zäöüß]*ferien(?:$|[^a-zäöüß])/.test(low);
 }
 
 function dedupe(list) {
@@ -833,6 +841,31 @@ async function selfTest() {
   assert(dentist && dentist.who.indexOf('West') >= 0 && dentist.who.indexOf('June') >= 0 && dentist.who.indexOf('Jack') < 0, 'week event names West and June only');
   assert(payload.days['2026-10-28'].West.events.every((e) => e.title !== 'Football practice'), 'Wednesday has no Thursday football');
   assert(payload.days['2026-11-04'].West.noSchool === true, 'day map includes Herbstferien');
+
+  assert(noSchoolText({ allDay: true, summary: 'Herbstferien' }) === true, 'Herbstferien title is no school');
+  assert(noSchoolText({ allDay: true, summary: 'Weihnachtsferien' }) === true, 'Weihnachtsferien title is no school');
+  assert(noSchoolText({ allDay: true, summary: 'Ferien' }) === true, 'Ferien title is no school');
+  assert(noSchoolText({ allDay: true, summary: 'schulfrei for June' }) === true, 'schulfrei for June is no school');
+  assert(noSchoolText({ allDay: true, summary: 'no school' }) === true, 'no school phrase');
+  assert(noSchoolText({ allDay: true, summary: 'school holiday' }) === true, 'school holiday phrase');
+  assert(noSchoolText({ allDay: true, summary: 'Feiertag' }) === true, 'Feiertag title is no school');
+  assert(noSchoolText({ allDay: true, summary: 'Ferienbetreuung' }) === false, 'Ferienbetreuung is not a break');
+  assert(noSchoolText({ allDay: true, summary: 'Ferienprogramm' }) === false, 'Ferienprogramm is not a break');
+  assert(noSchoolText({ allDay: true, summary: 'holiday care' }) === false, 'holiday care is not a break');
+  assert(noSchoolText({ allDay: true, summary: 'Reminder: schulfrei tomorrow' }) === false, 'reminder titles are ignored');
+  assert(noSchoolText({ allDay: false, summary: 'Herbstferien' }) === false, 'timed events are not day-off markers');
+  const betreuung = [
+    'BEGIN:VCALENDAR',
+    'BEGIN:VEVENT',
+    'DTSTART;VALUE=DATE:20261117',
+    'SUMMARY:Due: Ferienbetreuung sign-up form + SEPA mandate to school (only if booking)',
+    'DESCRIPTION:Buß- und Bettag (no school). Only if booking Ferienbetreuung.',
+    'END:VEVENT',
+    'END:VCALENDAR'
+  ].join('\n');
+  const reminderDay = buildPayload([{ kid: 'Jack', text: betreuung }], '2026-11-17');
+  assert(reminderDay.kids.Jack.noSchool === false, 'Ferienbetreuung reminder does not mark Jack off');
+  assert(reminderDay.kids.West.noSchool === false, 'Ferienbetreuung reminder does not mark West off');
   assert(payload.kids.West.events.some((e) => e.title === 'Football practice' && e.end === '17:30'), 'today snapshot keeps end time');
 
   const early = buildPayload([{
