@@ -47,6 +47,7 @@
     '2026-08-15': 'Mariä Himmelfahrt',
     '2026-10-03': 'Tag der Deutschen Einheit',
     '2026-11-01': 'Allerheiligen',
+    '2026-11-18': 'Buß- und Bettag',
     '2026-12-25': '1. Weihnachtstag',
     '2026-12-26': '2. Weihnachtstag',
     '2027-01-01': 'Neujahr',
@@ -60,6 +61,7 @@
     '2027-08-15': 'Mariä Himmelfahrt',
     '2027-10-03': 'Tag der Deutschen Einheit',
     '2027-11-01': 'Allerheiligen',
+    '2027-11-17': 'Buß- und Bettag',
     '2027-12-25': '1. Weihnachtstag',
     '2027-12-26': '2. Weihnachtstag'
   };
