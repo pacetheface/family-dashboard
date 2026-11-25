@@ -891,14 +891,14 @@
   }
   function kidsGearLine(p) {
     var w = currentWeather(p);
-    if (!w) return 'Bad Tölz · weather in Celsius';
+    if (!w) return 'Bad Tölz · weather in °F';
     var wet = w.kind === 'rain' || w.kind === 'storm' || (w.rain != null && w.rain >= 40);
     var gear = 'no extra gear';
-    if (w.kind === 'snow' || w.temp <= 8) gear = 'hat';
-    else if (wet && w.temp >= 18) gear = 'umbrella';
+    if (w.kind === 'snow' || w.temp <= 46) gear = 'hat';
+    else if (wet && w.temp >= 64) gear = 'umbrella';
     else if (wet) gear = 'rain jacket';
-    else if (w.temp >= 24) gear = 'hat';
-    return 'Bad Tölz · ' + w.temp + '°C · ' + gear;
+    else if (w.temp >= 75) gear = 'hat';
+    return 'Bad Tölz · ' + w.temp + '°F · ' + gear;
   }
   function taskText(t) {
     if (!t) return '';
@@ -1179,6 +1179,97 @@
     });
     return out;
   }
+  var SPECIAL_RE = /(?:^|[^a-z0-9äöüß])(field[\s-]?trip|early dismissal|picture day|no school|school holiday|excursion|ausflug|wandertag|exkursion|projekttag|schulfest|elternabend|unterrichtsfrei|schulfrei|hitzefrei|bundesjugendspiele|sporttag|fotograf\w*|schwimmen|wettbewerb|theater|konzert|museum|feier|fest|trip|frei)(?=$|[^a-z0-9äöüß])/i;
+  function displayTitle(title) {
+    var raw = String(title || '').replace(/^\s+|\s+$/g, '');
+    if (/^[⭐★✦*]/.test(raw)) raw = raw.replace(/^[⭐★✦*\s]+/, '');
+    return raw;
+  }
+  function eventIsSpecial(ev) {
+    if (!ev || ev.synthetic) return false;
+    if (ev.special === true) return true;
+    var raw = String(ev.title || '').replace(/^\s+|\s+$/g, '');
+    if (/^[⭐★✦*]/.test(raw)) return true;
+    if (ev.highlight === true) return true;
+    var title = displayTitle(raw);
+    if (/^(due|fällig|faellig|reminder|erinnerung|to[\s-]?do|deadline)\b/i.test(title)) return false;
+    return SPECIAL_RE.test((title + '\n' + (ev.detail || '') + '\n' + (ev.location || '')).toLowerCase());
+  }
+  function specialsOn(ymd) {
+    var items = [];
+    var seen = {};
+    function add(name, title, bring) {
+      title = displayTitle(title);
+      if (!name || !title) return;
+      var key = name + '|' + title.toLowerCase();
+      if (seen[key]) return;
+      seen[key] = true;
+      items.push({ name: name, title: title, bring: bring || [] });
+    }
+    var day = dayBucket(ymd);
+    if (day) {
+      (day.highlight || []).forEach(function (h) {
+        var title = typeof h === 'string' ? h : h.title;
+        var who = (h && h.who && h.who.length) ? h.who : KIDS.slice();
+        var bring = (h && h.bring) || [];
+        who.forEach(function (name) { add(name, title, bring); });
+      });
+      KIDS.forEach(function (name) {
+        var kid = day[name];
+        if (!kid) return;
+        var spare = (kid.bring || []).slice();
+        (kid.highlight || []).forEach(function (h) {
+          var title = typeof h === 'string' ? h : h.title;
+          var bring = (h && h.bring) || [];
+          add(name, title, bring);
+        });
+        (kid.events || []).forEach(function (ev) {
+          if (!eventIsSpecial(ev)) return;
+          var bring = (ev.bring && ev.bring.length) ? ev.bring.slice() : [];
+          if (!bring.length && spare.length) { bring = spare.slice(0, 4); spare = []; }
+          add(name, ev.title, bring);
+        });
+      });
+    }
+    var hol = holidayRecord(ymd);
+    if (hol) {
+      var who = hol.schoolOnly ? ['West', 'Jack'] : KIDS.slice();
+      who.forEach(function (name) { add(name, hol.name, []); });
+    }
+    var fer = ferienName(ymd);
+    if (fer) KIDS.forEach(function (name) { add(name, fer, []); });
+    return items;
+  }
+  function dressFor(ymd) {
+    var day = forecastMap()[ymd] || {};
+    var temp = day.high != null ? day.high : day.low;
+    if (temp == null) return '';
+    var word = weatherWord(weatherKind(day.code)).toLowerCase();
+    var wet = word === 'rain' || word === 'storms' || word === 'snow';
+    return 'Dress for ' + temp + '°F' + (wet ? ' and ' + word : ', ' + word);
+  }
+  function specialBannerHtml(ymd, onlyName) {
+    var items = specialsOn(ymd).filter(function (it) { return !onlyName || it.name === onlyName; });
+    if (!items.length) return '';
+    var html = '<section class="special-banner" aria-label="Today\'s special"><div class="special-kicker">Today\'s special</div>';
+    items.forEach(function (it) {
+      html += '<div class="special-row"><span class="special-ico" aria-hidden="true">⭐</span><div><b>' + esc(it.name) + '</b> ' + esc(it.title);
+      if (it.bring.length) html += '<div class="special-bring">Bring: ' + esc(it.bring.join(', ')) + '</div>';
+      html += '</div></div>';
+    });
+    return html + '</section>';
+  }
+  function specialTomorrowHtml(ymd, onlyName) {
+    var items = specialsOn(ymd).filter(function (it) { return !onlyName || it.name === onlyName; });
+    if (!items.length) return '';
+    var bits = items.map(function (it) {
+      var bit = it.name + ' · ' + it.title;
+      if (it.bring.length) bit += '. Bring: ' + it.bring.join(', ');
+      return bit;
+    });
+    var dress = dressFor(ymd);
+    return '<aside class="special-tomorrow"><b>Tomorrow</b> ' + esc(bits.join(' · ')) + (dress ? '. ' + esc(dress) : '') + '</aside>';
+  }
   function evKey(ymd, ev) {
     return ymd + '||' + (ev.local ? 'L' : 'G') + '||' + (ev.time || '') + '||' + ev.title;
   }
@@ -1357,12 +1448,12 @@
   function clothing(temp, code, rain) {
     var snow = code != null && ((code >= 71 && code <= 77) || code === 85 || code === 86);
     if (snow) return 'hat, gloves and boots';
-    if (rain && temp <= 8) return 'jacket and boots';
+    if (rain && temp <= 46) return 'jacket and boots';
     if (rain) return 'rain jacket';
-    if (temp <= 4) return 'hat and gloves';
-    if (temp <= 11) return 'warm jacket';
-    if (temp <= 17) return 'light jacket';
-    if (temp >= 22) return 'sunscreen and a hat';
+    if (temp <= 39) return 'hat and gloves';
+    if (temp <= 52) return 'warm jacket';
+    if (temp <= 63) return 'light jacket';
+    if (temp >= 72) return 'sunscreen and a hat';
     return 'layers, just in case';
   }
   function forecastMap() {
@@ -1415,20 +1506,20 @@
   function plainClothes(temp, rainPct, code) {
     var snow = code != null && ((code >= 71 && code <= 77) || code === 85 || code === 86);
     var wet = rainPct != null && rainPct >= 40;
-    if (snow || temp <= 3) return 'Hat & gloves';
-    if (wet && temp <= 12) return 'Rain jacket + boots';
+    if (snow || temp <= 37) return 'Hat & gloves';
+    if (wet && temp <= 54) return 'Rain jacket + boots';
     if (wet) return 'Umbrella';
-    if (temp <= 8) return 'Hat & gloves';
-    if (temp >= 22) return 'Sunscreen';
-    if (temp <= 15) return 'Warm jacket';
+    if (temp <= 46) return 'Hat & gloves';
+    if (temp >= 72) return 'Sunscreen';
+    if (temp <= 59) return 'Warm jacket';
     return 'Light layers';
   }
   function fetchWeather() {
     if (!window.fetch) return;
-    var url = 'https://api.open-meteo.com/v1/forecast?latitude=47.76&longitude=11.56&current=temperature_2m,weather_code&hourly=temperature_2m,precipitation_probability,precipitation,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe%2FBerlin&forecast_days=7';
+    var url = 'https://api.open-meteo.com/v1/forecast?latitude=47.76&longitude=11.56&current=temperature_2m,weather_code&hourly=temperature_2m,precipitation_probability,precipitation,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=Europe%2FBerlin&forecast_days=7&temperature_unit=fahrenheit';
     fetch(url).then(function (r) { return r.json(); }).then(function (j) {
       if (!j || !j.current) throw new Error('bad weather');
-      WX = { at: Date.now(), data: j };
+      WX = { at: Date.now(), unit: 'fahrenheit', data: j };
       try { localStorage.setItem(WX_KEY, JSON.stringify(WX)); } catch (e) {}
       safeRender();
     }).catch(function () {});
@@ -1802,7 +1893,7 @@
       html += '<div class="wxday' + (idx === 0 ? ' today' : '') + '"><div class="wd">' + label + '</div>';
       if (day) {
         html += weatherSvg(weatherKind(day.code));
-        html += '<div class="wt">' + (day.high == null ? '–' : day.high + '°') + ' ' + (day.low == null ? '' : day.low + '°') + '</div>';
+        html += '<div class="wt">' + (day.high == null ? '–' : day.high + '°F') + ' ' + (day.low == null ? '' : day.low + '°F') + '</div>';
         html += '<div class="wr">Rain ' + (day.rain == null ? '–' : Math.round(day.rain) + '%') + '</div>';
       } else html += '<div class="wr">—</div>';
       html += '</div>';
@@ -1816,7 +1907,7 @@
     var kind = cur ? cur.kind : (map ? weatherKind(map.code) : 'cloud');
     var high = map && map.high != null ? map.high : (cur ? cur.temp : null);
     var low = map && map.low != null ? map.low : null;
-    var temps = high == null ? '—' : (high + '°' + (low == null ? '' : ' / ' + low + '°'));
+    var temps = high == null ? '—' : (high + '°F' + (low == null ? '' : ' / ' + low + '°F'));
     return weatherSvg(kind) + '<span class="today-word">TODAY</span> <b>' + temps + '</b>';
   }
 
@@ -1934,7 +2025,7 @@
     return events.map(function (ev) {
       var kind = kindOf(ev);
       var who = ev.who && ev.who.length && ev.who.length < 3 ? ev.who.join(', ') : '';
-      return '<button type="button" class="today-row ' + kind + '" data-act="event" data-key="' + esc(evKey(ymd, ev)) + '"><span class="t-time">' + esc(ev.time ? prettyTime(ev.time) : 'All day') + '</span><span class="t-title">' + esc(ev.title) + '</span>' + (who ? '<span class="t-who">' + esc(who) + '</span>' : '') + '</button>';
+      return '<button type="button" class="today-row ' + kind + '" data-act="event" data-key="' + esc(evKey(ymd, ev)) + '"><span class="t-time">' + esc(ev.time ? prettyTime(ev.time) : 'All day') + '</span><span class="t-title">' + esc(displayTitle(ev.title)) + '</span>' + (who ? '<span class="t-who">' + esc(who) + '</span>' : '') + '</button>';
     }).join('');
   }
   function kidTile(name, p) {
@@ -1976,8 +2067,8 @@
     var rain = day.rain != null ? Math.round(day.rain) : null;
     var html = '<section class="card wx-hero">';
     html += '<div class="wx-hero-main">' + weatherSvg(kind);
-    html += '<div><div class="wx-temp">' + temp + '°</div>';
-    html += '<div class="wx-range">' + (high == null ? '' : 'High ' + high + '°') + (low == null ? '' : (high == null ? '' : ' · ') + 'Low ' + low + '°') + '</div></div></div>';
+    html += '<div><div class="wx-temp">' + temp + '<span class="wx-unit">°F</span></div>';
+    html += '<div class="wx-range">' + (high == null ? '' : 'High ' + high + '°F') + (low == null ? '' : (high == null ? '' : ' · ') + 'Low ' + low + '°F') + '</div></div></div>';
     html += '<div class="wx-hero-side"><div class="wx-cond">' + esc(weatherWord(kind)) + '</div>';
     html += '<div class="wx-rain">Rain ' + (rain == null ? '—' : rain + '%') + '</div>';
     html += '<div class="wx-clothes">' + esc(plainClothes(temp, rainForClothes, code)) + '</div>';
@@ -1992,7 +2083,9 @@
     morningLive = schoolMorning(mp);
     homePhase = kidsMode(mp);
     var html = '<div class="page home">';
+    html += specialBannerHtml(ymd, null);
     html += weatherHero(mp);
+    html += specialTomorrowHtml(addDays(ymd, 1), null);
     var due = null;
     (hub.house || []).some(function (task) { if (houseDue(task, ymd)) { due = task; return true; } return false; });
     var bits = weekendBits(ymd);
@@ -2122,7 +2215,7 @@
     var html = head;
     if (!events.length) html += '<div class="m-muted">Nothing on the calendar</div>';
     events.forEach(function (ev) {
-      var line = esc(ev.title || '');
+      var line = esc(displayTitle(ev.title || ''));
       if (ev.time) line += ' <span class="m-at">· ' + esc(prettyTime(ev.time)) + '</span>';
       html += '<div class="m-ev"><span class="m-eic">' + eventIcon(ev.title) + '</span><span>' + line + '</span></div>';
     });
@@ -2346,6 +2439,8 @@
     var school = kidHasSchool(name, p.ymd);
     var who = name === 'June' ? 'Leaving Kinderhaus' : (name === 'Jack' ? 'Leaving OGT' : 'Leaving school');
     var html = '<section class="m-col ' + name.toLowerCase() + '">';
+    html += specialBannerHtml(p.ymd, name);
+    html += specialTomorrowHtml(addDays(p.ymd, 1), name);
     var morn = morningStamp(name);
     if (!rec.inAt) {
       if (left > 0 && school && !aftCanIn(name, p)) {
@@ -2476,10 +2571,13 @@
     html += '<section class="m-top urg-' + model.urg + '" id="countCard" data-wall="1" data-phase="afternoon">';
     html += '<div class="m-clock"><div class="m-clock-time" id="mClock">' + esc(fmtClock(p)) + '</div><div class="m-clock-date" id="mDate">' + esc((p.weekday || '') + ' ' + p.d + ' ' + (MONTHS[p.mo - 1] || '')) + '</div></div>';
     html += '<div class="m-mid"><div class="count-title" id="countTitle">' + esc(model.title) + '</div><div class="count-big" id="countBig">' + esc(model.big) + '</div><div class="count-sub" id="countSub">' + esc(model.sub) + '</div></div>';
-    html += '<div class="m-wx"><div class="m-wx-main" id="mWxMain">' + (weather ? weatherSvg(weather.kind) + '<span class="m-temp">' + weather.temp + '°</span>' : '<span class="m-temp">—</span>') + '</div>';
+    html += '<div class="m-wx"><div class="m-wx-main" id="mWxMain">' + (weather ? weatherSvg(weather.kind) + '<span class="m-temp">' + weather.temp + '°F</span>' : '<span class="m-temp">—</span>') + '</div>';
     html += '<div class="m-wx-sub" id="mWxSub">' + esc(weather ? (weather.word + (weather.hint ? ' · ' + weather.hint : '')) : 'Weather for Bad Tölz') + '</div></div>';
     html += '<div class="kids-gear" id="kidsGear">' + esc(kidsGearLine(p)) + '</div>';
-    html += '<div class="bar" id="bar"><i id="barFill" style="width:0"></i></div></section><div class="m-cols">';
+    html += '<div class="bar" id="bar"><i id="barFill" style="width:0"></i></div></section>';
+    html += weatherHero(nowParts());
+    html += specialTomorrowHtml(addDays(p.ymd, 1), null);
+    html += '<div class="m-cols">';
     KIDS.forEach(function (name) { html += aftColumn(name, p); });
     html += '</div></div>';
     return html;
@@ -2495,11 +2593,13 @@
     html += '<section class="m-top urg-' + model.urg + '" id="countCard" data-wall="1">';
     html += '<div class="m-clock"><div class="m-clock-time" id="mClock">' + esc(fmtClock(mp)) + '</div><div class="m-clock-date" id="mDate">' + esc((mp.weekday || '') + ' ' + mp.d + ' ' + (MONTHS[mp.mo - 1] || '')) + '</div></div>';
     html += '<div class="m-mid"><div class="count-title" id="countTitle">' + esc(model.title) + '</div><div class="count-big' + (model.mode === 'count' || model.mode === 'wait' ? '' : ' small') + '" id="countBig">' + esc(model.big) + '</div><div class="count-sub" id="countSub">' + esc(model.sub) + '</div></div>';
-    html += '<div class="m-wx"><div class="m-wx-main" id="mWxMain">' + (weather ? weatherSvg(weather.kind) + '<span class="m-temp">' + weather.temp + '°</span>' : '<span class="m-temp">—</span>') + '</div>';
+    html += '<div class="m-wx"><div class="m-wx-main" id="mWxMain">' + (weather ? weatherSvg(weather.kind) + '<span class="m-temp">' + weather.temp + '°F</span>' : '<span class="m-temp">—</span>') + '</div>';
     html += '<div class="m-wx-sub" id="mWxSub">' + esc(weather ? (weather.word + (weather.hint ? ' · ' + weather.hint : '')) : 'Weather for Bad Tölz') + '</div>';
     html += '<button type="button" class="sound" id="soundBtn" data-act="sound" data-role="sound">Enable sound</button></div>';
     html += '<div class="kids-gear" id="kidsGear">' + esc(kidsGearLine(mp)) + '</div>';
     html += '<div class="bar" id="bar"><i id="barFill" style="width:' + model.pct + '%"></i></div></section>';
+    html += weatherHero(nowParts());
+    html += specialTomorrowHtml(addDays(mp.ymd, 1), null);
     html += '<div class="m-cols">';
     KIDS.forEach(function (name) {
       var stat = onTimeDays(name, day);
@@ -2511,6 +2611,8 @@
       var school = kidHasSchool(name, day);
       var open = live && started && !leftHouse && school;
       html += '<section class="m-col ' + name.toLowerCase() + '">';
+      html += specialBannerHtml(day, name);
+      html += specialTomorrowHtml(addDays(day, 1), name);
       if (school && !started) {
         html += '<button type="button" class="checkin ' + name.toLowerCase() + '"' + (live ? ' data-act="checkin" data-kid="' + name + '"' : ' disabled') + '>Check in</button>';
       }
@@ -3270,7 +3372,7 @@
     var html = '<div class="sleep-copy"><div class="sleep-time" id="sleepTime">' + esc(fmtClock(p)) + '</div>';
     html += '<div class="sleep-date" id="sleepDate">' + esc(longDate(p)) + '</div>';
     html += '<div class="sleep-wx" id="sleepWx">';
-    if (view) html += esc(view.temp + '° now · ' + view.word + (view.high != null ? ' · ' + view.high + '°' : '') + (view.low != null ? ' / ' + view.low + '°' : ''));
+    if (view) html += esc(view.temp + '°F now · ' + view.word + (view.high != null ? ' · ' + view.high + '°F' : '') + (view.low != null ? ' / ' + view.low + '°F' : ''));
     else html += 'Bad Tölz';
     html += '</div>';
     if (up) {
@@ -3346,7 +3448,7 @@
       var wxMain = document.getElementById('mWxMain');
       var wxSub = document.getElementById('mWxSub');
       var weather = currentWeather(nowParts());
-      if (wxMain) wxMain.innerHTML = weather ? weatherSvg(weather.kind) + '<span class="m-temp">' + weather.temp + '°</span>' : '<span class="m-temp">—</span>';
+      if (wxMain) wxMain.innerHTML = weather ? weatherSvg(weather.kind) + '<span class="m-temp">' + weather.temp + '°F</span>' : '<span class="m-temp">—</span>';
       if (wxSub) wxSub.textContent = weather ? (weather.word + (weather.hint ? ' · ' + weather.hint : '')) : 'Weather for Bad Tölz';
       var gear = document.getElementById('kidsGear');
       if (gear) gear.textContent = kidsGearLine(nowParts());
@@ -4407,7 +4509,10 @@
   })();
   try {
     var savedWx = localStorage.getItem(WX_KEY);
-    if (savedWx) WX = JSON.parse(savedWx);
+    if (savedWx) {
+      var parsedWx = JSON.parse(savedWx);
+      if (parsedWx && parsedWx.unit === 'fahrenheit') WX = parsedWx;
+    }
   } catch (e3) {}
   loadState();
   loadHub();

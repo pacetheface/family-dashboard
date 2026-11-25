@@ -1,5 +1,9 @@
 name: Today dashboard
 
+# A calendar title that starts with ⭐ is Today's special on the wall.
+# In the event notes, add: Bring: weather-appropriate clothes, Brotzeit
+# Or a line: Special: true
+
 on:
   schedule:
     # Every day, 04:15 through 20:15 UTC. That is 05:15–21:15 Europe/Berlin

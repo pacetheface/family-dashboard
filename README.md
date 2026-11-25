@@ -24,7 +24,7 @@ The left rail is Home, Calendar, Playroom, Meals, House, Sports, Spice, Date, an
 
 The top bar has the family name, the Europe/Berlin clock, today’s high and low, notifications, settings, and Quick add. Quick add uses the microphone only when the browser has speech recognition. Otherwise it is a text field. Anything added there stays on that device.
 
-Times are 24-hour. Temperatures are Celsius. Weather is Open-Meteo for Bad Tölz (latitude 47.76, longitude 11.56), including the 7-day strip.
+Times are 24-hour. Temperatures are Fahrenheit. Weather is Open-Meteo for Bad Tölz (latitude 47.76, longitude 11.56), including the 7-day strip. A calendar title that starts with ⭐ is Today’s special; a `Bring:` line in the notes shows under it. `Special: true` in the notes works too.
 
 ## Morning routine
 
