@@ -377,14 +377,32 @@ export function kidsForFamilyEvent(ev) {
 function bringItems(description) {
   const items = [];
   String(description || '').split('\n').forEach((line) => {
-    const m = line.match(/^\s*(bring|mitbringen)\s*:\s*(.+)$/i);
+    const m = line.match(/^\s*(bring|mitbringen|needs?|braucht|brauche)\s*:\s*(.+)$/i);
     if (!m) return;
-    m[2].split(',').forEach((part) => {
+    m[2].split(/[,;]/).forEach((part) => {
       const t = part.trim();
       if (t) items.push(t.slice(0, 80));
     });
   });
-  return items;
+  return dedupe(items);
+}
+
+// A title that starts with ⭐ is the mark Plum adds. Keywords are the fallback.
+const SPECIAL_RE = /(?:^|[^a-z0-9äöüß])(field[\s-]?trip|early dismissal|picture day|no school|school holiday|excursion|ausflug|wandertag|exkursion|projekttag|schulfest|elternabend|unterrichtsfrei|schulfrei|hitzefrei|bundesjugendspiele|sporttag|fotograf\w*|schwimmen|wettbewerb|theater|konzert|museum|feier|fest|trip|frei)(?=$|[^a-z0-9äöüß])/i;
+
+function specialFromEvent(ev) {
+  const raw = String(ev.summary || '').trim();
+  const starred = /^[⭐★✦*]/.test(raw);
+  const title = (starred ? raw.replace(/^[⭐★✦*\s]+/, '') : raw).slice(0, 140);
+  const desc = String(ev.description || '');
+  const explicit = /^\s*(special|highlight)\s*:\s*(true|yes|1)\s*$/im.test(desc);
+  const reminder = /^(due|fällig|faellig|reminder|erinnerung|to[\s-]?do|deadline)\b/i.test(title);
+  const keyword = SPECIAL_RE.test((title + '\n' + desc).toLowerCase());
+  return {
+    title: title || raw.slice(0, 140),
+    special: starred || explicit || (!reminder && keyword),
+    bring: bringItems(desc)
+  };
 }
 
 function isHomework(ev, today) {
@@ -459,7 +477,8 @@ export function buildDay(calendars, today) {
       const targets = cal.kid === 'Family' ? kidsForFamilyEvent(ev) : [cal.kid];
       const onDay = occursOn(ev, today);
       const hw = isHomework(ev, today) && (onDay || ev.dueYmd === today);
-      const brings = onDay ? bringItems(ev.description) : [];
+      const marked = specialFromEvent(ev);
+      const brings = onDay ? marked.bring : [];
       const schoolOff = onDay && noSchoolText(ev);
       const show = onDay && ev.summary && !(hw && ev.allDay);
       targets.forEach((name) => {
@@ -472,8 +491,10 @@ export function buildDay(calendars, today) {
           bucket.events.push({
             time: ev.allDay ? '' : (ev.startTime || ''),
             end: ev.allDay ? '' : (ev.endTime || ''),
-            title: ev.summary.trim().slice(0, 140),
-            location: (ev.location || '').trim().slice(0, 140)
+            title: marked.title,
+            location: (ev.location || '').trim().slice(0, 140),
+            special: marked.special,
+            bring: brings.slice()
           });
         }
       });
@@ -483,11 +504,12 @@ export function buildDay(calendars, today) {
         allMap[key] = {
           time: ev.allDay ? '' : (ev.startTime || ''),
           end: ev.allDay ? '' : (ev.endTime || ''),
-          title: ev.summary.trim().slice(0, 140),
+          title: marked.title,
           location: (ev.location || '').trim().slice(0, 140),
           allDay: !!ev.allDay,
           who: [],
           bring: [],
+          special: marked.special,
           homework: false,
           detail: String(ev.description || '').replace(/\s+/g, ' ').trim().slice(0, 500)
         };
@@ -766,6 +788,12 @@ async function selfTest() {
     'DTSTART;VALUE=DATE:20261029',
     'SUMMARY:schulfrei for Jack',
     'END:VEVENT',
+    'BEGIN:VEVENT',
+    'DTSTART;VALUE=DATE:20261030',
+    'SUMMARY:⭐ Fire station visit',
+    'DESCRIPTION:Bring: weather-appropriate clothes, Brotzeit',
+    'ATTENDEE:mailto:jackmichaelknapp@gmail.com',
+    'END:VEVENT',
     'END:VCALENDAR'
   ].join('\n');
 
@@ -799,6 +827,14 @@ async function selfTest() {
   assert(!payload.kids.Jack.events.some((e) => e.title === 'Dentist for West and June'), 'named event stays off Jack');
   assert(payload.kids.June.events.some((e) => e.title === 'Pickup' && e.time === '15:00'), 'June attendee');
   assert(payload.kids.June.homework.indexOf('Reading log signed') >= 0, 'VTODO due today');
+  const practice = west.events.filter((e) => e.title === 'Football practice')[0];
+  assert(practice && practice.special === false, 'ordinary practice is not special');
+  const jackOff = payload.kids.Jack.events.filter((e) => e.title === 'schulfrei for Jack')[0];
+  assert(jackOff && jackOff.special === true, 'schulfrei keyword is special');
+  const fire = payload.days['2026-10-30'].Jack.events.filter((e) => e.title === 'Fire station visit')[0];
+  assert(fire && fire.special === true, 'star title is special and the star is stripped');
+  assert(fire.bring.indexOf('weather-appropriate clothes') >= 0 && fire.bring.indexOf('Brotzeit') >= 0, 'fire station bring line');
+  assert(!payload.days['2026-10-30'].West.events.some((e) => e.title === 'Fire station visit'), 'fire station stays on Jack');
   assert(payload.kids.Jack.noSchool === true, 'schulfrei marks Jack');
   assert(payload.kids.West.noSchool === false, 'Jack-only schulfrei does not mark West');
 

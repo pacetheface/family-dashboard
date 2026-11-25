@@ -743,7 +743,47 @@ body, button, input, select, textarea { font-size: 1rem; }
 .kicker, .m-lbl, .aft-kicker, .today-word, .section-label, .variation-head, .linkish, .legend, .cal-foot, .badge, .test-badge, .sample { font-size: 0.9rem; }
 h2, .page-head h2, .m-head h2, .kid-tile h2, .dayname, .sheet h2, .list-section h3 { font-size: 1.8rem; }
 h3, .banner h3, .side-card h3, .meal h3, .kid-head h3 { font-size: 1.45rem; }
-.wx-temp { font-size: 4rem; }
+.wx-temp { font-size: 5rem; }
+.wx-unit { font-size: 0.42em; font-weight: 800; margin-left: 0.06em; }
+.wx-hero .wx-cond { font-size: 2rem; font-weight: 800; }
+.wx-hero .wx-ic { width: 5.5rem; height: 5.5rem; }
+.special-banner {
+  background: #fff6d8;
+  border: 3px solid #e2b13c;
+  border-radius: 1rem;
+  padding: 0.75rem 1rem;
+  color: #071622;
+}
+.special-kicker {
+  font-size: 0.85rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: #8a5a00;
+}
+.special-row {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  margin-top: 0.35rem;
+  font-size: 1.35rem;
+  font-weight: 800;
+  line-height: 1.2;
+}
+.special-ico { font-size: 1.7rem; line-height: 1; }
+.special-bring { font-size: 1rem; font-weight: 700; margin-top: 0.2rem; }
+.special-tomorrow {
+  background: rgba(255, 246, 216, 0.95);
+  border-radius: 0.75rem;
+  padding: 0.45rem 0.8rem;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #3d2a00;
+}
+.m-col .special-banner { margin-bottom: 0.45rem; }
+.m-col .special-row { font-size: 1.1rem; }
+.m-col .special-tomorrow { margin-bottom: 0.4rem; }
+.kids-board .wx-hero { margin: 0.15rem 0 0.35rem; }
 .wx-range, .wx-cond, .wx-clothes { font-size: 1.35rem; }
 .wx-rain, .wx-windows, .kid-detail, .kid-status { font-size: 1.15rem; }
 .kid-tile h2 { font-size: 2rem; }
