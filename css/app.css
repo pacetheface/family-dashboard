@@ -783,7 +783,22 @@ h3, .banner h3, .side-card h3, .meal h3, .kid-head h3 { font-size: 1.45rem; }
 .m-col .special-banner { margin-bottom: 0.45rem; }
 .m-col .special-row { font-size: 1.1rem; }
 .m-col .special-tomorrow { margin-bottom: 0.4rem; }
-.kids-board .wx-hero { margin: 0.15rem 0 0.35rem; }
+.kids-wxstrip {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  flex-wrap: wrap;
+  margin: 0.1rem 0 0.25rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 0.75rem;
+  background: rgba(247, 250, 253, 0.96);
+  color: #003253;
+  font-weight: 800;
+}
+.kids-wxstrip .wx-ic { width: 2rem; height: 2rem; margin: 0; }
+.kids-wx-temp { font-size: 1.7rem; line-height: 1; }
+.kids-wx-word { font-size: 1.15rem; }
+.kids-wx-range { font-size: 0.95rem; font-weight: 700; }
 .wx-range, .wx-cond, .wx-clothes { font-size: 1.35rem; }
 .wx-rain, .wx-windows, .kid-detail, .kid-status { font-size: 1.15rem; }
 .kid-tile h2 { font-size: 2rem; }

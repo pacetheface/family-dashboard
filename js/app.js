@@ -2076,6 +2076,21 @@
     html += '<span>Afternoon 12–16 <b>' + (aftRain == null ? '—' : aftRain + '%') + '</b></span></div></div></section>';
     return html;
   }
+  function kidsWeatherStrip(p) {
+    var view = currentWeather(p);
+    var day = forecastMap()[p.ymd] || {};
+    if (!view && day.high == null) return '<section class="kids-wxstrip">Weather for Bad Tölz</section>';
+    var temp = view ? view.temp : day.high;
+    var kind = view ? view.kind : weatherKind(day.code);
+    var high = day.high != null ? day.high : (view ? view.high : null);
+    var low = day.low != null ? day.low : (view ? view.low : null);
+    var html = '<section class="kids-wxstrip" aria-label="Weather">' + weatherSvg(kind);
+    html += '<span class="kids-wx-temp">' + temp + '°F</span>';
+    html += '<span class="kids-wx-word">' + esc(weatherWord(kind)) + '</span>';
+    if (high != null || low != null) html += '<span class="kids-wx-range">' + (high == null ? '' : 'High ' + high + '°F') + (low == null ? '' : (high == null ? '' : ' · ') + 'Low ' + low + '°F') + '</span>';
+    html += '</section>';
+    return html;
+  }
   function renderHome() {
     var mp = morningParts();
     var ymd = mp.ymd;
@@ -2439,8 +2454,6 @@
     var school = kidHasSchool(name, p.ymd);
     var who = name === 'June' ? 'Leaving Kinderhaus' : (name === 'Jack' ? 'Leaving OGT' : 'Leaving school');
     var html = '<section class="m-col ' + name.toLowerCase() + '">';
-    html += specialBannerHtml(p.ymd, name);
-    html += specialTomorrowHtml(addDays(p.ymd, 1), name);
     var morn = morningStamp(name);
     if (!rec.inAt) {
       if (left > 0 && school && !aftCanIn(name, p)) {
@@ -2452,6 +2465,8 @@
         html += '<p class="m-muted">Tap your name when you get home.</p>';
       }
       if (morn) html += '<p class="m-muted morn-stamp">' + esc(morn) + '</p>';
+      html += specialBannerHtml(p.ymd, name);
+      html += specialTomorrowHtml(addDays(p.ymd, 1), name);
       html += '</section>';
       return html;
     }
@@ -2492,6 +2507,8 @@
     html += progressHtml(cardDone, cardN);
     if (rec.finishedAt) html += '<div class="m-status">Finished ' + fmtAt(rec.finishedAt) + ' ✓</div>';
     else html += '<button type="button" class="checkout" data-act="aft-finish" data-kid="' + name + '">Finished</button>';
+    html += specialBannerHtml(p.ymd, name);
+    html += specialTomorrowHtml(addDays(p.ymd, 1), name);
     if (rec.screensAt) html += '<div class="aft-unlock">Screens unlocked ' + fmtAt(rec.screensAt) + '</div>';
     html += '<div class="aft-parent"><span>Parent</span>';
     html += '<button type="button" class="' + (rec.easy === 1 ? 'on' : '') + '" data-act="aft-easy" data-kid="' + name + '" data-id="1">Easy day</button>';
@@ -2575,8 +2592,7 @@
     html += '<div class="m-wx-sub" id="mWxSub">' + esc(weather ? (weather.word + (weather.hint ? ' · ' + weather.hint : '')) : 'Weather for Bad Tölz') + '</div></div>';
     html += '<div class="kids-gear" id="kidsGear">' + esc(kidsGearLine(p)) + '</div>';
     html += '<div class="bar" id="bar"><i id="barFill" style="width:0"></i></div></section>';
-    html += weatherHero(nowParts());
-    html += specialTomorrowHtml(addDays(p.ymd, 1), null);
+    html += kidsWeatherStrip(nowParts());
     html += '<div class="m-cols">';
     KIDS.forEach(function (name) { html += aftColumn(name, p); });
     html += '</div></div>';
@@ -2598,8 +2614,7 @@
     html += '<button type="button" class="sound" id="soundBtn" data-act="sound" data-role="sound">Enable sound</button></div>';
     html += '<div class="kids-gear" id="kidsGear">' + esc(kidsGearLine(mp)) + '</div>';
     html += '<div class="bar" id="bar"><i id="barFill" style="width:' + model.pct + '%"></i></div></section>';
-    html += weatherHero(nowParts());
-    html += specialTomorrowHtml(addDays(mp.ymd, 1), null);
+    html += kidsWeatherStrip(nowParts());
     html += '<div class="m-cols">';
     KIDS.forEach(function (name) {
       var stat = onTimeDays(name, day);
@@ -2611,15 +2626,11 @@
       var school = kidHasSchool(name, day);
       var open = live && started && !leftHouse && school;
       html += '<section class="m-col ' + name.toLowerCase() + '">';
-      html += specialBannerHtml(day, name);
-      html += specialTomorrowHtml(addDays(day, 1), name);
       if (school && !started) {
         html += '<button type="button" class="checkin ' + name.toLowerCase() + '"' + (live ? ' data-act="checkin" data-kid="' + name + '"' : ' disabled') + '>Check in</button>';
       }
       if (leftHouse) html += '<div class="m-status">Finished ' + fmtAt(kidNow.outAt) + ' ✓<span class="sub">Checked in ' + fmtAt(kidNow.inAt) + '</span></div>';
       html += '<div class="m-head"><h2>' + esc(name) + '</h2><span class="badge' + (good ? ' good' : '') + '">' + esc(badge) + '</span></div>';
-      if (!leftHouse) html += wallTimerHtml(name, day, live);
-      html += wallCalendarHtml(name, day);
       if (school) html += wallListHtml(name, open, live && started, day);
       if (open) {
         html += '<div class="m-foot"><button type="button" class="checkout" data-act="checkout" data-kid="' + name + '">Finished</button>';
@@ -2627,6 +2638,10 @@
       } else if (leftHouse) {
         html += '<div class="aft-parent"><span>Parent</span><button type="button" data-act="morn-undo" data-kid="' + name + '">Undo</button></div>';
       }
+      html += specialBannerHtml(day, name);
+      html += specialTomorrowHtml(addDays(day, 1), name);
+      if (!leftHouse) html += wallTimerHtml(name, day, live);
+      html += wallCalendarHtml(name, day);
       html += '</section>';
     });
     html += '</div></div>';
